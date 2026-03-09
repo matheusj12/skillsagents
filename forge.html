@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>AIOX Prompt Generator</title>
+    <title>AIOX Forge — Agent & Skill Builder</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap"
         rel="stylesheet" />
@@ -106,6 +106,37 @@
             padding: 24px;
             margin-bottom: 24px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Type Toggle */
+        .type-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            background: #0a0c10;
+            padding: 6px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .type-btn {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .type-btn.active {
+            background: rgba(0, 240, 255, 0.1);
+            color: var(--cyan);
+            border: 1px solid rgba(0, 240, 255, 0.3);
         }
 
         .quick-prompts {
@@ -266,7 +297,8 @@
             color: #e2e8f0;
         }
 
-        .markdown-body ul {
+        .markdown-body ul,
+        .markdown-body ol {
             margin-left: 20px;
             margin-bottom: 16px;
         }
@@ -324,34 +356,46 @@
 
 <body>
     <header>
-        <div class="logo">👑 Orion <span>Command Center</span></div>
+        <div class="logo">⚒️ AIOX <span>Forge</span></div>
         <div style="display:flex;gap:16px;align-items:center">
             <a class="back" href="/skills.html">Skills Directory</a>
-            <a class="back" href="/forge.html">🛠️ Agent Forge</a>
             <a class="back" href="/index.html">Voltar ao Setup</a>
         </div>
     </header>
     <div class="hero">
-        <h1>Orquestração de Agentes <span>AIOX</span></h1>
-        <p>Descreva o que você quer construir. O Orion (@aiox-master) vai analisar os 11 agentes e as 1.262 skills e
-            delegar as tarefas criando um plano de ação completo.</p>
+        <h1>Agent & Skill <span>Builder</span></h1>
+        <p>Crie Inteligência Artificial com Inteligência Artificial. Defina o que você precisa e o Orion forjará o
+            Agente Especialista ou a Skill no formato perfeito do AIOX.</p>
 
         <div class="input-box">
-            <div class="quick-prompts">
-                <button class="quick-prompt-btn"
-                    onclick="fillPrompt('Quero criar um SaaS B2B com Next.js, FastAPI e Stripe para gestão de clínica veterinária.')">🚀
-                    SaaS Next.js + FastAPI</button>
-                <button class="quick-prompt-btn"
-                    onclick="fillPrompt('Preciso de um App Mobile em React Native com painel Admin para delivery.')">📱
-                    App Mobile + Admin</button>
-                <button class="quick-prompt-btn"
-                    onclick="fillPrompt('Crie um crawler de dados imobiliários focado em alta performance.')">🕷️ Web
-                    Crawler</button>
+
+            <div class="type-toggle">
+                <button class="type-btn active" id="btnAgent" onclick="setType('agent')">🤖 Criar Agente</button>
+                <button class="type-btn" id="btnSkill" onclick="setType('skill')">🛠️ Criar Skill</button>
             </div>
+
+            <div class="quick-prompts" id="agentPrompts">
+                <button class="quick-prompt-btn"
+                    onclick="fillPrompt('Preciso de um agente especializado em Web3 e Smart Contracts para revisar código Solidity.')">🛡️
+                    Web3 Auditor</button>
+                <button class="quick-prompt-btn"
+                    onclick="fillPrompt('Crie um agente focado em Redação Copywriting e SEO avançado para Marketing.')">✍️
+                    SEO Copywriter</button>
+            </div>
+
+            <div class="quick-prompts" id="skillPrompts" style="display:none;">
+                <button class="quick-prompt-btn"
+                    onclick="fillPrompt('Uma skill focada nas melhores práticas do Tailwind v4 para o agente de design.')">🎨
+                    Tailwind v4 Style</button>
+                <button class="quick-prompt-btn"
+                    onclick="fillPrompt('Skill de engenharia reversa e análise de malware para cibersegurança.')">🦠
+                    Malware Analysis</button>
+            </div>
+
             <textarea id="ideaInput"
-                placeholder="❯ Descreva seu projeto ou problema para o Orion resolver..."></textarea>
-            <button class="btn" id="generateBtn" onclick="generatePrompt()">
-                [🟢 Auto] Executar Orquestração
+                placeholder="❯ Descreva qual especialista ou conhecimento o sistema precisa aprender..."></textarea>
+            <button class="btn" id="generateBtn" onclick="generateManifest()">
+                [🟢 Auto] Forjar Definição
                 <div class="spinner" id="spinner"></div>
             </button>
             <div id="errorMsg" class="error-msg"></div>
@@ -364,7 +408,7 @@
                     <div class="mac-btn mac-min"></div>
                     <div class="mac-btn mac-max"></div>
                 </div>
-                <div class="terminal-title">orion@aiox-master: ~/orchestration</div>
+                <div class="terminal-title">orion@aiox-forge: ~/build-output</div>
             </div>
             <div id="resultBox" class="result-box">
                 <div class="markdown-body" id="resultContent"></div>
@@ -373,10 +417,17 @@
     </div>
 
     <script>
+        let activeType = 'agent';
+
         // Check for local storage history on load
         window.onload = () => {
-            const savedIdea = localStorage.getItem('last_aiox_idea');
-            const savedResult = localStorage.getItem('last_aiox_result');
+            const savedIdea = localStorage.getItem('last_forge_idea');
+            const savedResult = localStorage.getItem('last_forge_result');
+            const savedType = localStorage.getItem('last_forge_type');
+
+            if (savedType) {
+                setType(savedType);
+            }
 
             if (savedIdea) document.getElementById('ideaInput').value = savedIdea;
             if (savedResult) {
@@ -386,6 +437,21 @@
                 addCopyButtons();
             }
         };
+
+        function setType(type) {
+            activeType = type;
+            if (type === 'agent') {
+                document.getElementById('btnAgent').classList.add('active');
+                document.getElementById('btnSkill').classList.remove('active');
+                document.getElementById('agentPrompts').style.display = 'flex';
+                document.getElementById('skillPrompts').style.display = 'none';
+            } else {
+                document.getElementById('btnSkill').classList.add('active');
+                document.getElementById('btnAgent').classList.remove('active');
+                document.getElementById('skillPrompts').style.display = 'flex';
+                document.getElementById('agentPrompts').style.display = 'none';
+            }
+        }
 
         function fillPrompt(text) {
             document.getElementById('ideaInput').value = text;
@@ -407,7 +473,7 @@
             });
         }
 
-        async function generatePrompt() {
+        async function generateManifest() {
             const input = document.getElementById('ideaInput').value.trim();
             const btn = document.getElementById('generateBtn');
             const spinner = document.getElementById('spinner');
@@ -424,10 +490,10 @@
             spinner.style.display = 'block';
 
             try {
-                const response = await fetch('/api/generate', {
+                const response = await fetch('/api/build', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ idea: input })
+                    body: JSON.stringify({ idea: input, type: activeType })
                 });
 
                 const data = await response.json();
@@ -442,8 +508,9 @@
                 wrapper.style.display = 'block';
 
                 // Save to history
-                localStorage.setItem('last_aiox_idea', input);
-                localStorage.setItem('last_aiox_result', renderedHtml);
+                localStorage.setItem('last_forge_idea', input);
+                localStorage.setItem('last_forge_type', activeType);
+                localStorage.setItem('last_forge_result', renderedHtml);
 
                 addCopyButtons();
 
