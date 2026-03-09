@@ -94,7 +94,7 @@ header{{position:sticky;top:0;z-index:50;background:rgba(14,17,23,.95);backdrop-
 <body>
 <header>
   <div class="logo">🌌 AIOX Skills <span>v7.3.0</span></div>
-  <a class="back" href="/tutorial.html">← Voltar ao Tutorial</a>
+  <a class="back" href="/index.html">← Voltar ao Tutorial</a>
 </header>
 <div class="hero">
   <h1>Todas as <span>1.262 Skills</span> Instaladas</h1>
