@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-br"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00f0ff",
+                        "background-light": "#f5f8f8",
+                        "background-dark": "#1a1d21",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .step-connector {
+            position: absolute;
+            left: 1.25rem;
+            top: 2.5rem;
+            bottom: -1.5rem;
+            width: 2px;
+            background: linear-gradient(to bottom, #00f0ff 0%, #1a1d21 100%);
+            opacity: 0.3;
+        }
+        .step-container:last-child .step-connector {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased font-display">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Top Navigation -->
+<header class="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md">
+<div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined text-3xl">terminal</span>
+<h1 class="text-slate-900 dark:text-white text-lg font-bold tracking-tight">AIOX Core <span class="text-primary/80 font-mono text-sm">v5.0.3</span></h1>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Docs</a>
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Agentes</a>
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Skills</a>
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Suporte</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden lg:flex items-center bg-slate-100 dark:bg-slate-800/50 rounded-lg px-3 py-1.5 border border-slate-200 dark:border-slate-700">
+<span class="material-symbols-outlined text-slate-400 text-sm mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-48 text-slate-200" placeholder="Buscar documentação..." type="text"/>
+<span class="text-[10px] font-bold bg-slate-700 text-slate-400 px-1.5 py-0.5 rounded ml-2">⌘K</span>
+</div>
+<button class="bg-primary hover:bg-primary/90 text-background-dark px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all">
+<span class="material-symbols-outlined text-sm">download</span>
+                    Download
+                </button>
+</div>
+</div>
+</header>
+<main class="flex-1 max-w-4xl mx-auto w-full px-6 py-12">
+<!-- Hero Section -->
+<div class="mb-16">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-wider mb-6">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+</span>
+                Release de Elite
+            </div>
+<h1 class="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-4 leading-tight">
+                Guia Completo: <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400">AIOX Core v5.0.3</span> + Antigravity Skills
+            </h1>
+<p class="text-lg text-slate-500 dark:text-slate-400 max-w-2xl leading-relaxed">
+                Configure seu ambiente de desenvolvimento de alta performance com a suíte AIOX. Siga o fluxo linear abaixo para ativação total do núcleo.
+            </p>
+</div>
+<!-- Vertical Timeline Steps -->
+<div class="space-y-16">
+<!-- Step 1 -->
+<div class="step-container relative flex gap-6">
+<div class="step-connector"></div>
+<div class="flex-none">
+<div class="w-10 h-10 rounded-full bg-primary text-background-dark flex items-center justify-center font-bold text-lg z-10 relative shadow-[0_0_15px_rgba(0,240,255,0.3)]">
+                        1
+                    </div>
+</div>
+<div class="flex-1 pt-1">
+<h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">Instalação do Core</h2>
+<p class="text-slate-500 dark:text-slate-400 mb-6">
+                        Inicie preparando a estrutura de diretórios e instalando as dependências base do motor Antigravity.
+                    </p>
+<div class="bg-slate-900 rounded-xl overflow-hidden border border-slate-800 shadow-2xl">
+<div class="flex items-center justify-between px-4 py-2 bg-slate-800/50 border-b border-slate-700/50">
+<div class="flex gap-1.5">
+<div class="w-3 h-3 rounded-full bg-red-500/50"></div>
+<div class="w-3 h-3 rounded-full bg-yellow-500/50"></div>
+<div class="w-3 h-3 rounded-full bg-green-500/50"></div>
+</div>
+<span class="text-[10px] font-mono text-slate-500 uppercase tracking-widest">bash — terminal</span>
+</div>
+<div class="p-6 font-mono text-sm leading-relaxed text-slate-300">
+<div class="flex gap-4 mb-2">
+<span class="text-slate-600 select-none">1</span>
+<span><span class="text-primary">curl</span> -sSL https://get.aiox.ai | <span class="text-primary">bash</span></span>
+</div>
+<div class="flex gap-4 mb-2">
+<span class="text-slate-600 select-none">2</span>
+<span><span class="text-slate-500"># Criando estruturas de regras</span></span>
+</div>
+<div class="flex gap-4 mb-2">
+<span class="text-slate-600 select-none">3</span>
+<span>mkdir -p ~/.aiox-core/ .antigravity/rules/agents/</span>
+</div>
+<div class="flex gap-4">
+<span class="text-slate-600 select-none">4</span>
+<span>aiox init --version 5.0.3</span>
+</div>
+</div>
+</div>
+<div class="mt-6 flex items-start gap-4 p-4 rounded-lg bg-slate-800/30 border border-slate-700/50 text-sm">
+<span class="material-symbols-outlined text-primary">info</span>
+<p class="text-slate-400 italic">O comando <code class="text-slate-200">aiox init</code> vincula automaticamente o diretório <code class="text-slate-200">.antigravity/</code> ao seu workspace global.</p>
+</div>
+</div>
+</div>
+<!-- Step 2 -->
+<div class="step-container relative flex gap-6">
+<div class="step-connector"></div>
+<div class="flex-none">
+<div class="w-10 h-10 rounded-full border-2 border-primary text-primary flex items-center justify-center font-bold text-lg z-10 relative bg-background-dark">
+                        2
+                    </div>
+</div>
+<div class="flex-1 pt-1">
+<h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Conheça Seus Agentes</h2>
+<p class="text-slate-500 dark:text-slate-400 mb-8">O Core v5.0.3 inclui 11 agentes especializados prontos para execução imediata.</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Orion -->
+<div class="p-5 rounded-xl border border-slate-800 bg-slate-800/20 hover:border-primary/40 transition-all group">
+<div class="flex items-center gap-3 mb-3">
+<div class="w-10 h-10 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center">
+<span class="material-symbols-outlined">auto_awesome</span>
+</div>
+<div>
+<h3 class="font-bold text-slate-200 group-hover:text-primary">Orion</h3>
+<p class="text-xs text-slate-500">Arquiteto de Sistemas</p>
+</div>
+</div>
+<div class="bg-background-dark rounded p-2 text-xs font-mono text-slate-400 border border-slate-700/50">
+                                @orion analise a arquitetura atual...
+                            </div>
+</div>
+<!-- Dex -->
+<div class="p-5 rounded-xl border border-slate-800 bg-slate-800/20 hover:border-primary/40 transition-all group">
+<div class="flex items-center gap-3 mb-3">
+<div class="w-10 h-10 rounded-lg bg-green-500/10 text-green-400 flex items-center justify-center">
+<span class="material-symbols-outlined">code</span>
+</div>
+<div>
+<h3 class="font-bold text-slate-200 group-hover:text-primary">Dex</h3>
+<p class="text-xs text-slate-500">Dev Fullstack Especialista</p>
+</div>
+</div>
+<div class="bg-background-dark rounded p-2 text-xs font-mono text-slate-400 border border-slate-700/50">
+                                @dex implementa o novo endpoint de auth...
+                            </div>
+</div>
+<!-- QA Engineer -->
+<div class="p-5 rounded-xl border border-slate-800 bg-slate-800/20 hover:border-primary/40 transition-all group">
+<div class="flex items-center gap-3 mb-3">
+<div class="w-10 h-10 rounded-lg bg-orange-500/10 text-orange-400 flex items-center justify-center">
+<span class="material-symbols-outlined">bug_report</span>
+</div>
+<div>
+<h3 class="font-bold text-slate-200 group-hover:text-primary">QA Engineer</h3>
+<p class="text-xs text-slate-500">Tester Automatizado</p>
+</div>
+</div>
+<div class="bg-background-dark rounded p-2 text-xs font-mono text-slate-400 border border-slate-700/50">
+                                @qa valide o fluxo de checkout...
+                            </div>
+</div>
+<div class="flex items-center justify-center p-5 rounded-xl border border-dashed border-slate-700 bg-transparent opacity-60">
+<p class="text-sm font-medium text-slate-500">+ 8 Agentes Adicionais</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Step 3 -->
+<div class="step-container relative flex gap-6">
+<div class="step-connector"></div>
+<div class="flex-none">
+<div class="w-10 h-10 rounded-full border-2 border-primary text-primary flex items-center justify-center font-bold text-lg z-10 relative bg-background-dark">
+                        3
+                    </div>
+</div>
+<div class="flex-1 pt-1">
+<h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">Instalação das 1.270 Skills</h2>
+<p class="text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
+                        Expanda o poder do seu AIOX com o bundle completo de skills. O diretório de instalação recomendado é o seu caminho local do Gemini:
+                    </p>
+<div class="p-3 bg-slate-800/50 border border-slate-700 rounded-lg mb-8 font-mono text-xs text-primary flex items-center gap-3">
+<span class="material-symbols-outlined text-sm">folder_open</span>
+                        /home/matheus/.gemini/antigravity/skills/
+                    </div>
+<div class="overflow-hidden rounded-xl border border-slate-800 bg-slate-800/10">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-800/40 text-slate-300 text-xs font-bold uppercase tracking-widest">
+<th class="px-6 py-4">Skill Name</th>
+<th class="px-6 py-4 text-center">Bundle</th>
+<th class="px-6 py-4 text-right">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-800">
+<tr>
+<td class="px-6 py-4 flex items-center gap-3">
+<span class="text-primary text-sm font-mono">@brainstorming</span>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="px-2 py-1 rounded-md bg-slate-800 text-[10px] text-slate-400 uppercase">Creative</span>
+</td>
+<td class="px-6 py-4 text-right">
+<span class="text-green-500 material-symbols-outlined text-lg">check_circle</span>
+</td>
+</tr>
+<tr>
+<td class="px-6 py-4 flex items-center gap-3">
+<span class="text-primary text-sm font-mono">@security-auditor</span>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="px-2 py-1 rounded-md bg-slate-800 text-[10px] text-slate-400 uppercase">Security</span>
+</td>
+<td class="px-6 py-4 text-right">
+<span class="text-green-500 material-symbols-outlined text-lg">check_circle</span>
+</td>
+</tr>
+<tr>
+<td class="px-6 py-4 flex items-center gap-3">
+<span class="text-primary text-sm font-mono">@refactor-wizard</span>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="px-2 py-1 rounded-md bg-slate-800 text-[10px] text-slate-400 uppercase">Development</span>
+</td>
+<td class="px-6 py-4 text-right">
+<span class="text-primary/40 material-symbols-outlined text-lg animate-pulse">downloading</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Quick Start -->
+<div class="step-container relative flex gap-6">
+<div class="flex-none">
+<div class="w-10 h-10 rounded-full border-2 border-primary/30 text-primary/50 flex items-center justify-center font-bold text-lg z-10 relative bg-background-dark">
+<span class="material-symbols-outlined">bolt</span>
+</div>
+</div>
+<div class="flex-1 pt-1">
+<h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-6">Quick Start</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div>
+<h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Core Commands</h4>
+<ul class="space-y-3">
+<li class="flex items-center justify-between p-3 rounded-lg bg-slate-900/40 border border-slate-800">
+<span class="font-mono text-primary">*help</span>
+<span class="text-xs text-slate-500">Ver menu de ajuda</span>
+</li>
+<li class="flex items-center justify-between p-3 rounded-lg bg-slate-900/40 border border-slate-800">
+<span class="font-mono text-primary">*yolo</span>
+<span class="text-xs text-slate-500">Execução auto-reparável</span>
+</li>
+<li class="flex items-center justify-between p-3 rounded-lg bg-slate-900/40 border border-slate-800">
+<span class="font-mono text-primary">*build</span>
+<span class="text-xs text-slate-500">Compilar workspace</span>
+</li>
+</ul>
+</div>
+<div>
+<h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Natural Language</h4>
+<div class="p-4 rounded-lg bg-slate-900/40 border border-slate-800 italic text-slate-400 text-sm leading-relaxed">
+                                "Ei AIOX, analise o impacto dessa alteração no banco de dados e sugira uma migração segura usando a skill @security-auditor"
+                            </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Next Steps Footer Card -->
+<div class="mt-24 p-8 rounded-2xl bg-gradient-to-br from-slate-800 to-background-dark border border-slate-700 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative">
+<div class="absolute -right-12 -top-12 w-48 h-48 bg-primary/10 rounded-full blur-3xl"></div>
+<div class="relative z-10">
+<h3 class="text-xl font-bold text-white mb-1">Tudo pronto para decolar?</h3>
+<p class="text-slate-400">Próximo passo: Leia o arquivo de configuração avançada.</p>
+</div>
+<a class="relative z-10 flex items-center gap-3 bg-white text-background-dark px-6 py-3 rounded-xl font-bold hover:scale-105 transition-transform group" href="#">
+                AIOX_GUIA_COMPLETO.md
+                <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</a>
+</div>
+</main>
+<footer class="mt-20 border-t border-slate-800 py-10">
+<div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="flex items-center gap-2 opacity-50 grayscale">
+<span class="material-symbols-outlined">terminal</span>
+<span class="font-bold text-sm tracking-tighter">AIOX CORE PROJECT</span>
+</div>
+<div class="flex gap-8 text-slate-500 text-sm">
+<a class="hover:text-primary" href="#">Twitter</a>
+<a class="hover:text-primary" href="#">Discord</a>
+<a class="hover:text-primary" href="#">Github</a>
+</div>
+<div class="text-slate-600 text-[10px] font-mono">
+                © 2024 ANTIGRAVITY ENGINE V5.0.3 — BUILT FOR PERFORMANCE
+            </div>
+</div>
+</footer>
+</div>
+</body></html>
