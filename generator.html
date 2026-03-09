@@ -12,11 +12,14 @@
     <style>
         :root {
             --cyan: #00f0ff;
-            --bg: #0e1117;
-            --surface: #1a1d27;
+            --cyan-glow: rgba(0, 240, 255, 0.4);
+            --bg: #09090b;
+            --surface: #101216;
             --border: #2a2d3a;
-            --muted: #6b7280;
-            --text: #e2e8f0;
+            --muted: #8b949e;
+            --text: #e6edf3;
+            --terminal-bg: #010409;
+            --terminal-header: #161b22;
         }
 
         * {
@@ -101,7 +104,32 @@
             border: 1px solid var(--border);
             border-radius: 14px;
             padding: 24px;
-            margin-bottom: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .quick-prompts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .quick-prompt-btn {
+            background: rgba(0, 240, 255, 0.05);
+            border: 1px solid var(--border);
+            color: var(--cyan);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-family: 'JetBrains Mono', monospace;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .quick-prompt-btn:hover {
+            background: rgba(0, 240, 255, 0.15);
+            border-color: var(--cyan);
         }
 
         textarea {
@@ -132,12 +160,14 @@
             padding: 12px 24px;
             border-radius: 8px;
             font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
             font-size: .95rem;
             cursor: pointer;
             transition: .2s;
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            box-shadow: 0 0 15px var(--cyan-glow);
         }
 
         .btn:hover {
@@ -165,14 +195,59 @@
             }
         }
 
-        /* RESULT AREA */
-        .result-box {
+        /* TERMINAL RESULT AREA */
+        .result-wrapper {
             display: none;
-            background: var(--surface);
-            border: 1px solid var(--cyan);
-            border-radius: 14px;
-            padding: 32px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
             box-shadow: 0 10px 40px rgba(0, 240, 255, 0.05);
+            margin-top: 30px;
+        }
+
+        .terminal-header {
+            background: var(--terminal-header);
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mac-btns {
+            display: flex;
+            gap: 6px;
+        }
+
+        .mac-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .mac-close {
+            background: #ff5f56;
+        }
+
+        .mac-min {
+            background: #ffbd2e;
+        }
+
+        .mac-max {
+            background: #27c93f;
+        }
+
+        .terminal-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-left: 10px;
+        }
+
+        .result-box {
+            background: var(--terminal-bg);
+            padding: 32px;
+            font-family: 'Inter', sans-serif;
         }
 
         .markdown-body h3 {
@@ -249,43 +324,98 @@
 
 <body>
     <header>
-        <div class="logo">⚡ AIOX <span>Prompt Generator</span></div>
-        <a class="back" href="/index.html">← Voltar ao Tutorial</a>
+        <div class="logo">👑 Orion <span>Command Center</span></div>
+        <a class="back" href="/index.html">← Voltar ao Setup</a>
     </header>
     <div class="hero">
-        <h1>Transforme Ideias em <span>Planos de Ação</span></h1>
-        <p>Descreva o que você quer construir. O Orquestrador IA vai analisar os 11 agentes e as 1.262 skills para criar
-            o prompt inicial perfeito pronto para copiar e colar.</p>
+        <h1>Orquestração de Agentes <span>AIOX</span></h1>
+        <p>Descreva o que você quer construir. O Orion (@aiox-master) vai analisar os 11 agentes e as 1.262 skills e
+            delegar as tarefas criando um plano de ação completo.</p>
 
         <div class="input-box">
+            <div class="quick-prompts">
+                <button class="quick-prompt-btn"
+                    onclick="fillPrompt('Quero criar um SaaS B2B com Next.js, FastAPI e Stripe para gestão de clínica veterinária.')">🚀
+                    SaaS Next.js + FastAPI</button>
+                <button class="quick-prompt-btn"
+                    onclick="fillPrompt('Preciso de um App Mobile em React Native com painel Admin para delivery.')">📱
+                    App Mobile + Admin</button>
+                <button class="quick-prompt-btn"
+                    onclick="fillPrompt('Crie um crawler de dados imobiliários focado em alta performance.')">🕷️ Web
+                    Crawler</button>
+            </div>
             <textarea id="ideaInput"
-                placeholder="Ex: Quero criar um SaaS de agendamento de consultas médicas. O front-end será em Next.js e o back-end em Node. Preciso de autenticação, banco PostgreSQL e integração com Stripe."></textarea>
+                placeholder="❯ Descreva seu projeto ou problema para o Orion resolver..."></textarea>
             <button class="btn" id="generateBtn" onclick="generatePrompt()">
-                Gerar Prompt e Arquitetura 🤖
+                [🟢 Auto] Executar Orquestração
                 <div class="spinner" id="spinner"></div>
             </button>
             <div id="errorMsg" class="error-msg"></div>
         </div>
 
-        <div id="resultBox" class="result-box">
-            <div class="markdown-body" id="resultContent"></div>
+        <div id="resultWrapper" class="result-wrapper">
+            <div class="terminal-header">
+                <div class="mac-btns">
+                    <div class="mac-btn mac-close"></div>
+                    <div class="mac-btn mac-min"></div>
+                    <div class="mac-btn mac-max"></div>
+                </div>
+                <div class="terminal-title">orion@aiox-master: ~/orchestration</div>
+            </div>
+            <div id="resultBox" class="result-box">
+                <div class="markdown-body" id="resultContent"></div>
+            </div>
         </div>
     </div>
 
     <script>
+        // Check for local storage history on load
+        window.onload = () => {
+            const savedIdea = localStorage.getItem('last_aiox_idea');
+            const savedResult = localStorage.getItem('last_aiox_result');
+
+            if (savedIdea) document.getElementById('ideaInput').value = savedIdea;
+            if (savedResult) {
+                const wrapper = document.getElementById('resultWrapper');
+                document.getElementById('resultContent').innerHTML = savedResult;
+                wrapper.style.display = 'block';
+                addCopyButtons();
+            }
+        };
+
+        function fillPrompt(text) {
+            document.getElementById('ideaInput').value = text;
+        }
+
+        function addCopyButtons() {
+            document.querySelectorAll('pre').forEach((pre) => {
+                if (pre.querySelector('.copy-btn')) return; // Already has button
+
+                const btn = document.createElement('button');
+                btn.className = 'copy-btn';
+                btn.innerText = 'Copiar';
+                btn.onclick = () => {
+                    navigator.clipboard.writeText(pre.querySelector('code').innerText);
+                    btn.innerText = 'Copiado!';
+                    setTimeout(() => btn.innerText = 'Copiar', 2000);
+                };
+                pre.appendChild(btn);
+            });
+        }
+
         async function generatePrompt() {
             const input = document.getElementById('ideaInput').value.trim();
             const btn = document.getElementById('generateBtn');
             const spinner = document.getElementById('spinner');
             const errBox = document.getElementById('errorMsg');
-            const resultBox = document.getElementById('resultBox');
+            const wrapper = document.getElementById('resultWrapper');
             const resultContent = document.getElementById('resultContent');
 
             if (!input) return;
 
             // Reset UI
             errBox.style.display = 'none';
-            resultBox.style.display = 'none';
+            wrapper.style.display = 'none';
             btn.disabled = true;
             spinner.style.display = 'block';
 
@@ -303,21 +433,15 @@
                 }
 
                 // Render Markdown
-                resultContent.innerHTML = marked.parse(data.result);
-                resultBox.style.display = 'block';
+                const renderedHtml = marked.parse(data.result);
+                resultContent.innerHTML = renderedHtml;
+                wrapper.style.display = 'block';
 
-                // Add copy buttons to pre blocks
-                document.querySelectorAll('pre').forEach((pre) => {
-                    const btn = document.createElement('button');
-                    btn.className = 'copy-btn';
-                    btn.innerText = 'Copiar';
-                    btn.onclick = () => {
-                        navigator.clipboard.writeText(pre.querySelector('code').innerText);
-                        btn.innerText = 'Copiado!';
-                        setTimeout(() => btn.innerText = 'Copiar', 2000);
-                    };
-                    pre.appendChild(btn);
-                });
+                // Save to history
+                localStorage.setItem('last_aiox_idea', input);
+                localStorage.setItem('last_aiox_result', renderedHtml);
+
+                addCopyButtons();
 
             } catch (error) {
                 errBox.innerText = '🤖 Erro: ' + error.message;
