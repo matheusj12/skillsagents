@@ -950,24 +950,51 @@
         <span class="pt-inline">Passo 2</span><span class="en-inline">Step 2</span>
       </div>
       <h2 class="section-title">
-        <span class="pt">Conheça Seus 11 Agentes</span>
-        <span class="en">Meet Your 11 Agents</span>
+        <span class="pt">AIOX Roster — O Exército de Especialistas</span>
+        <span class="en">AIOX Roster — The Specialist Army</span>
       </h2>
       <p class="section-desc">
-        <span class="pt">Cada agente é um especialista com personalidade, comandos e área de atuação própria. Ative com
-          <code style="color:var(--cyan)">@nome</code>.</span>
-        <span class="en">Each agent is a specialist with its own personality, commands and domain expertise. Activate
-          with <code style="color:var(--cyan)">@name</code>.</span>
+        <span class="pt">O poder do framework não está em um único prompt longuíssimo, mas na <strong>Orquestração
+            Multi-Agente</strong>. Cada agente tem ferramentas e personas específicas trabalhando em paralelo para o
+          mesmo objetivo.</span>
+        <span class="en">The power of the framework lies not in a single giant prompt, but in <strong>Multi-Agent
+            Orchestration</strong>. Each agent has specific tools and personas working in parallel towards the same
+          goal.</span>
       </p>
 
-      <div class="agents-grid">
-        <div class="agent-card">
-          <div class="agent-icon" style="background:rgba(0,240,255,.1);">🧠</div>
-          <div class="agent-name">@aiox-master</div>
-          <div class="agent-role">Orion — <span class="pt-inline">Orquestrador Mestre</span><span
-              class="en-inline">Master Orchestrator</span></div>
-          <div class="agent-cmd">@aiox-master *create-doc</div>
+      <!-- ORION SHOWCASE -->
+      <div
+        style="background:linear-gradient(145deg, rgba(0,240,255,.05), transparent); border: 1px solid var(--cyan); border-radius: 16px; padding: 32px; margin-bottom: 40px; display: flex; flex-wrap: wrap; gap: 24px; align-items: center;">
+        <div style="flex: 1 1 300px;">
+          <div
+            style="display:inline-block;background:var(--cyan);color:#000;font-family:'JetBrains Mono',monospace;font-size:0.75rem;font-weight:800;padding:4px 10px;border-radius:6px;margin-bottom:12px;">
+            ★ UNIVERSAL EXECUTOR</div>
+          <h3 style="font-size: 1.8rem; font-weight: 900; margin-bottom: 12px; color: #fff;">@aiox-master (Orion)</h3>
+          <p style="color: var(--muted); font-size: 0.95rem; margin-bottom: 16px; line-height: 1.6;">
+            Orion é o cérebro central. Ele não escreve código diretamente, ele planeja, ativa as skills certas e delega
+            tarefas para a equipe abaixo usando os comandos <code>*yolo</code> (modo autônomo) e <code>*plan</code>.
+            Use-o para iniciar qualquer novo projeto.
+          </p>
+          <a href="/generator.html"
+            style="display:inline-block;background:transparent;border:1px solid var(--cyan);color:var(--cyan);font-weight:700;font-size:.85rem;padding:8px 20px;border-radius:8px;text-decoration:none;transition:0.2s;"
+            onmouseover="this.style.background='rgba(0,240,255,0.1)'"
+            onmouseout="this.style.background='transparent'">Abrir o Command Center →</a>
         </div>
+        <div
+          style="flex: 1 1 300px; background:#0a0c10; border: 1px solid var(--border); border-radius: 12px; padding: 20px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;">
+          <div style="color: var(--muted); margin-bottom: 8px;">> orion@aiox: initiating task...</div>
+          <div style="color: #6ee7b7; margin-bottom: 8px;">[Planning] Breaking down requirements.</div>
+          <div style="color: #93c5fd; margin-bottom: 8px;">[Delegating] Sending frontend spec to @dev</div>
+          <div style="color: #c4b5fd; margin-bottom: 8px;">[Delegating] Requesting DB schema from @architect</div>
+          <div style="color: var(--cyan); margin-top: 16px;">✓ 4 background tasks working in parallel.</div>
+        </div>
+      </div>
+
+      <h3
+        style="font-size:1.1rem;font-weight:800;margin-bottom:20px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">
+        A Equipe de Execução</h3>
+
+      <div class="agents-grid">
         <div class="agent-card">
           <div class="agent-icon" style="background:rgba(16,185,129,.1);">💻</div>
           <div class="agent-name">@dev</div>
@@ -2073,7 +2100,11 @@
     <div class="container">
       <div class="cta-section">
         <div class="hero-badge" style="margin-bottom:24px;display:inline-flex;">⚡ Quick Start</div>
-        <div style="margin-bottom:30px;"><a href="/generator.html" style="background:#00f0ff;color:#0e1117;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:900;font-size:1.1rem;display:inline-flex;align-items:center;gap:10px;box-shadow:0 0 20px rgba(0,240,255,0.4);">🤖 Gerador de Prompts com IA <span style="font-size:0.8rem;background:rgba(0,0,0,0.2);padding:4px 8px;border-radius:6px;">NOVO</span></a></div>
+        <div style="margin-bottom:30px;"><a href="/generator.html"
+            style="background:#00f0ff;color:#0e1117;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:900;font-size:1.1rem;display:inline-flex;align-items:center;gap:10px;box-shadow:0 0 20px rgba(0,240,255,0.4);">🤖
+            Gerador de Prompts com IA <span
+              style="font-size:0.8rem;background:rgba(0,0,0,0.2);padding:4px 8px;border-radius:6px;">NOVO</span></a>
+        </div>
         <h2 class="cta-title">
           <span class="pt">Comece Agora — 4 Passos</span>
           <span class="en">Start Now — 4 Steps</span>
