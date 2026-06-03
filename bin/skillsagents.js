@@ -33,8 +33,11 @@ function info(msg) { console.log(chalk.cyan ('  →  ') + msg); }
 function dim(msg)  { console.log(chalk.gray ('     ') + msg); }
 function br()      { console.log(); }
 
+const BACK = '__back__';
+const backChoice = { name: chalk.gray('  ← Voltar'), value: BACK };
+
 async function pause() {
-  await inquirer.prompt([{ type: 'input', name: '_', message: chalk.gray('Enter para continuar...') }]);
+  await inquirer.prompt([{ type: 'input', name: '_', message: chalk.gray('  ← Enter para voltar ao menu...') }]);
 }
 
 function loadSkills() {
@@ -156,10 +159,15 @@ async function screenForMyProject() {
     type: 'list',
     name: 'stack',
     message: '  Qual é o tipo do seu projeto?',
-    choices: Object.entries(STACKS).map(([k, v]) => ({ name: '  ' + v.label, value: k })),
-    pageSize: 8,
+    choices: [
+      backChoice,
+      new inquirer.Separator(''),
+      ...Object.entries(STACKS).map(([k, v]) => ({ name: '  ' + v.label, value: k })),
+    ],
+    pageSize: 10,
   }]);
 
+  if (stack === BACK) return;
   const s = STACKS[stack];
   br();
   console.log(chalk.cyanBright('  ── Squad recomendado\n'));
@@ -179,10 +187,13 @@ async function screenForMyProject() {
   br();
 
   const { go } = await inquirer.prompt([{
-    type: 'confirm',
+    type: 'list',
     name: 'go',
-    message: '  Instalar esses agentes agora?',
-    default: true,
+    message: '  O que fazer?',
+    choices: [
+      { name: '  ✔  Instalar esses agentes', value: true  },
+      { name: chalk.gray('  ← Voltar ao menu'),      value: false },
+    ],
   }]);
 
   if (go) {
@@ -211,11 +222,15 @@ async function screenAgents() {
     name: 'scope',
     message: '  Qual catálogo?',
     choices: [
+      backChoice,
+      new inquirer.Separator(''),
       { name: `  🏠  Base (${BASE_AGENTS.length} agentes)     — @master, @dev, @architect, @qa...`, value: 'base' },
       { name: `  🌐  Avançados (${RUFLO_AGENTS.length} agentes)   — swarm, hive-mind, coder, reviewer...`, value: 'ruflo' },
       { name: `  📦  Todos juntos (${BASE_AGENTS.length + RUFLO_AGENTS.length} agentes)`, value: 'all' },
     ],
   }]);
+
+  if (scope === BACK) return;
 
   const pool = scope === 'base' ? BASE_AGENTS
              : scope === 'ruflo' ? RUFLO_AGENTS
@@ -224,16 +239,20 @@ async function screenAgents() {
   const { selected } = await inquirer.prompt([{
     type: 'checkbox',
     name: 'selected',
-    message: '  Selecione (ESPAÇO para marcar, ENTER para confirmar):',
-    choices: pool.map(a => ({
-      name: `${a.icon}  ${(a.name || '@'+a.id).padEnd(32)} ${chalk.gray(a.role || a.cat || '')}`,
-      value: a.id,
-      checked: !!a.priority,
-    })),
-    pageSize: 18,
+    message: '  ESPAÇO para marcar · ENTER para confirmar · ESC para voltar:',
+    choices: [
+      ...pool.map(a => ({
+        name: `${a.icon}  ${(a.name || '@'+a.id).padEnd(32)} ${chalk.gray(a.role || a.cat || '')}`,
+        value: a.id,
+        checked: !!a.priority,
+      })),
+      new inquirer.Separator(''),
+      { name: chalk.gray('  ← Nenhum — voltar ao menu'), value: BACK },
+    ],
+    pageSize: 20,
   }]);
 
-  if (!selected.length) { await pause(); return; }
+  if (!selected.length || selected.includes(BACK)) return;
 
   br();
   let done = 0;
@@ -267,10 +286,14 @@ async function screenSkills() {
     name: 'mode',
     message: '  Como quer explorar?',
     choices: [
+      backChoice,
+      new inquirer.Separator(''),
       { name: `  🔍  Buscar por palavra-chave`, value: 'search' },
       { name: `  📂  Filtrar por categoria (${cats.length} cats)`, value: 'cat' },
     ],
   }]);
+
+  if (mode === BACK) return;
 
   let filtered = skills;
 
@@ -284,12 +307,17 @@ async function screenSkills() {
       type: 'list',
       name: 'cat',
       message: '  Categoria:',
-      choices: cats.map(c => {
-        const cnt = skills.filter(s => s.cat === c).length;
-        return { name: `  ${c.padEnd(20)} ${chalk.gray(cnt + ' skills')}`, value: c };
-      }),
-      pageSize: 15,
+      choices: [
+        backChoice,
+        new inquirer.Separator(''),
+        ...cats.map(c => {
+          const cnt = skills.filter(s => s.cat === c).length;
+          return { name: `  ${c.padEnd(20)} ${chalk.gray(cnt + ' skills')}`, value: c };
+        }),
+      ],
+      pageSize: 16,
     }]);
+    if (cat === BACK) return;
     filtered = skills.filter(s => s.cat === cat);
   }
 
@@ -301,15 +329,19 @@ async function screenSkills() {
   const { selected } = await inquirer.prompt([{
     type: 'checkbox',
     name: 'selected',
-    message: '  Selecione as skills (ESPAÇO para marcar):',
-    choices: show.map(s => ({
-      name: `@${s.name.padEnd(44)} ${chalk.gray('['+s.cat+']')}`,
-      value: s.name,
-    })),
-    pageSize: 18,
+    message: '  ESPAÇO para marcar · ENTER para confirmar:',
+    choices: [
+      ...show.map(s => ({
+        name: `@${s.name.padEnd(44)} ${chalk.gray('['+s.cat+']')}`,
+        value: s.name,
+      })),
+      new inquirer.Separator(''),
+      { name: chalk.gray('  ← Nenhuma — voltar ao menu'), value: BACK },
+    ],
+    pageSize: 20,
   }]);
 
-  if (!selected.length) { await pause(); return; }
+  if (!selected.length || selected.includes(BACK)) return;
 
   br();
   console.log(chalk.yellow('  Skills selecionadas:\n'));
