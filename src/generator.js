@@ -118,6 +118,30 @@ function parseResult(text) {
   };
 }
 
+// ── OPENAI CALL ───────────────────────────────────────────────────
+async function callOpenAI(apiKey, idea) {
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: 'gpt-4o-mini',
+      messages: [{ role: 'user', content: `${SYSTEM}\n\n---\nPROJETO DO USUÁRIO:\n${idea}` }],
+      max_tokens: 1024,
+    }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || `HTTP ${res.status}`);
+  }
+
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content || '';
+}
+
 // ── MAIN GENERATE ─────────────────────────────────────────────────
 async function generate({ idea, provider, apiKey }) {
   const stop = spinner('Gerando com IA...');
@@ -125,6 +149,8 @@ async function generate({ idea, provider, apiKey }) {
     let text;
     if (provider === 'anthropic') {
       text = await callAnthropic(apiKey, idea);
+    } else if (provider === 'openai') {
+      text = await callOpenAI(apiKey, idea);
     } else {
       text = await callGemini(apiKey, idea);
     }

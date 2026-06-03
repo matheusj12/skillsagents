@@ -409,6 +409,137 @@ async function screenStatus() {
   await pause();
 }
 
+// ── CONFIG / CHAVES DE API ────────────────────────────────────────────────────
+async function screenConfig() {
+  const { loadConfig, saveConfig } = require('../src/generator.js');
+
+  const PROVIDERS = [
+    {
+      id:    'gemini',
+      label: '🟡  Gemini (Google)',
+      desc:  'Grátis até 15 req/min — recomendado para começar',
+      field: 'geminiKey',
+      url:   'https://aistudio.google.com/app/apikey',
+    },
+    {
+      id:    'anthropic',
+      label: '🟣  Claude (Anthropic)',
+      desc:  'claude-haiku-4-5 — alta qualidade',
+      field: 'anthropicKey',
+      url:   'https://console.anthropic.com/',
+    },
+    {
+      id:    'openai',
+      label: '🟢  GPT (OpenAI)',
+      desc:  'gpt-4o-mini — amplamente compatível',
+      field: 'openaiKey',
+      url:   'https://platform.openai.com/api-keys',
+    },
+  ];
+
+  function maskKey(key) {
+    if (!key) return chalk.gray('não configurada');
+    return chalk.green('✔ ') + key.slice(0, 6) + '●●●●●●●●●●●●' + key.slice(-4);
+  }
+
+  while (true) {
+    console.clear();
+    const config = loadConfig();
+
+    console.log(chalk.bold.cyanBright('\n  🔑  Chaves de API\n'));
+    console.log(chalk.gray('  Salvas em ~/.skillsagents/config.json\n'));
+    console.log(chalk.gray('  ' + '─'.repeat(52) + '\n'));
+
+    // Mostra status atual
+    PROVIDERS.forEach(p => {
+      const key = config[p.field];
+      const active = config.provider === p.id ? chalk.cyanBright(' ← ativo') : '';
+      console.log(`  ${p.label}${active}`);
+      console.log(chalk.gray(`  ${p.desc}`));
+      console.log(`  Chave: ${maskKey(key)}\n`);
+    });
+
+    console.log(chalk.gray('  ' + '─'.repeat(52) + '\n'));
+
+    const { action } = await inquirer.prompt([{
+      type: 'list',
+      name: 'action',
+      message: '  O que você quer fazer?',
+      choices: [
+        { name: `  🟡  Configurar chave Gemini`,    value: 'gemini'    },
+        { name: `  🟣  Configurar chave Claude`,     value: 'anthropic' },
+        { name: `  🟢  Configurar chave GPT`,        value: 'openai'    },
+        new inquirer.Separator(''),
+        { name: `  ✔   Definir provedor padrão`,    value: 'default'   },
+        { name: `  🗑   Limpar todas as chaves`,     value: 'clear'     },
+        { name: chalk.gray('  ← Voltar'),           value: 'back'      },
+      ],
+    }]);
+
+    if (action === 'back') return;
+
+    if (action === 'clear') {
+      const { confirm } = await inquirer.prompt([{
+        type: 'confirm', name: 'confirm',
+        message: '  Remover todas as chaves?', default: false,
+      }]);
+      if (confirm) { saveConfig({}); ok('Chaves removidas.'); await pause(); }
+      continue;
+    }
+
+    if (action === 'default') {
+      const { provider } = await inquirer.prompt([{
+        type: 'list', name: 'provider',
+        message: '  Provedor padrão para o Gerador de Prompts:',
+        choices: PROVIDERS.map(p => ({ name: `  ${p.label}`, value: p.id })),
+      }]);
+      const cfg = loadConfig();
+      cfg.provider = provider;
+      saveConfig(cfg);
+      ok(`Provedor padrão: ${provider}`);
+      await pause();
+      continue;
+    }
+
+    // Configurar chave de um provedor
+    const prov = PROVIDERS.find(p => p.id === action);
+    if (!prov) continue;
+
+    br();
+    info('Gere sua chave em: ' + chalk.cyan(prov.url));
+    br();
+
+    const { key } = await inquirer.prompt([{
+      type:     'password',
+      name:     'key',
+      message:  `  Cole a chave ${prov.label.trim()}:`,
+      mask:     '●',
+      validate: v => {
+        if (v.trim().length < 10) return 'Chave muito curta';
+        return true;
+      },
+    }]);
+
+    const cfg = loadConfig();
+    cfg[prov.field] = key.trim();
+    // Se for a primeira chave, define como padrão automaticamente
+    if (!cfg.provider) cfg.provider = prov.id;
+    saveConfig(cfg);
+
+    br();
+    ok(`Chave ${prov.label.trim()} salva!`);
+    if (cfg.provider !== prov.id) {
+      const { setDefault } = await inquirer.prompt([{
+        type: 'confirm', name: 'setDefault',
+        message: `  Definir como provedor padrão?`, default: true,
+      }]);
+      if (setDefault) { cfg.provider = prov.id; saveConfig(cfg); }
+    }
+    br();
+    await pause();
+  }
+}
+
 // ── GENERATOR ────────────────────────────────────────────────────────────────
 async function screenGenerator() {
   banner();
@@ -418,41 +549,25 @@ async function screenGenerator() {
   let config = loadConfig();
 
   // ── API KEY SETUP ───────────────────────────────────────────────
-  if (!config.apiKey) {
-    console.log(chalk.yellow('  Primeira vez! Escolha seu provedor de IA:\n'));
+  const KEY_MAP = { gemini: 'geminiKey', anthropic: 'anthropicKey', openai: 'openaiKey' };
+  const activeProvider = config.provider || 'gemini';
+  const activeKey = config[KEY_MAP[activeProvider]];
 
-    const { provider } = await inquirer.prompt([{
-      type: 'list',
-      name: 'provider',
-      message: '  Provedor de IA:',
-      choices: [
-        { name: '  🟡  Gemini (Google) — grátis, 15 req/min', value: 'gemini' },
-        { name: '  🟣  Claude (Anthropic) — pago, mais preciso', value: 'anthropic' },
-      ],
+  if (!activeKey) {
+    console.log(chalk.yellow(`  Nenhuma chave configurada para ${activeProvider}.\n`));
+    console.log(chalk.gray('  Configure em: ') + chalk.cyan('Menu → 🔑 Chaves de API'));
+    br();
+    const { goConfig } = await inquirer.prompt([{
+      type: 'confirm', name: 'goConfig',
+      message: '  Ir para configurações agora?', default: true,
     }]);
-
-    const keyUrl = provider === 'gemini'
-      ? 'https://aistudio.google.com/app/apikey'
-      : 'https://console.anthropic.com/';
-
-    br();
-    info('Gere sua chave em: ' + chalk.cyan(keyUrl));
-    br();
-
-    const { apiKey } = await inquirer.prompt([{
-      type: 'password',
-      name: 'apiKey',
-      message: '  Cole sua API Key:',
-      mask: '●',
-      validate: v => v.trim().length > 10 || 'Chave inválida',
-    }]);
-
-    config = { provider, apiKey: apiKey.trim() };
-    saveConfig(config);
-    br();
-    ok('Chave salva em ' + chalk.cyan('~/.skillsagents/config.json'));
-    br();
+    if (goConfig) await screenConfig();
+    return;
   }
+
+  // Mostra qual provedor está ativo
+  const providerNames = { gemini: '🟡 Gemini', anthropic: '🟣 Claude', openai: '🟢 GPT' };
+  info(`Usando: ${chalk.cyan(providerNames[activeProvider] || activeProvider)}`);
 
   // ── PROJECT INPUT ───────────────────────────────────────────────
   console.log(chalk.gray('  ── Descreva seu projeto ───────────────────────────────\n'));
@@ -473,7 +588,7 @@ async function screenGenerator() {
   // ── GENERATE ─────────────────────────────────────────────────────
   let result;
   try {
-    result = await generate({ idea, provider: config.provider, apiKey: config.apiKey });
+    result = await generate({ idea, provider: activeProvider, apiKey: activeKey });
   } catch(e) {
     br();
     console.log(chalk.red('  ✗  Erro: ' + e.message));
@@ -568,7 +683,7 @@ async function screenGenerator() {
     ],
   }]);
 
-  if (changeKey === 'key') { saveConfig({}); await screenGenerator(); return; }
+  if (changeKey === 'key') { await screenConfig(); return; }
   if (changeKey === 'again') { await screenGenerator(); return; }
 }
 
@@ -691,6 +806,7 @@ async function main() {
         new inquirer.Separator(chalk.gray('  ── ferramentas ────────────────────────────')),
         { name: `  🎮  Pixel Office           ${chalk.gray('inicia servidor local + abre no browser')}`, value: 'office'  },
         { name: `  🔗  Instalar Hooks         ${chalk.gray('integra com Claude Code em tempo real')}`,   value: 'hooks'   },
+        { name: `  🔑  Chaves de API          ${chalk.gray('Gemini · Claude · GPT')}`,                   value: 'config'  },
         { name: `  📊  Status                 ${chalk.gray('veja o que está instalado')}`,               value: 'status'  },
         new inquirer.Separator(''),
         { name: `  ✕   Sair`,                                                                           value: 'exit'    },
@@ -704,6 +820,7 @@ async function main() {
     if (action === 'project') await screenForMyProject();
     if (action === 'agents')  await screenAgents();
     if (action === 'skills')  await screenSkills();
+    if (action === 'config')  await screenConfig();
     if (action === 'office')  await startOfficeServer();
     if (action === 'hooks')   installHooksScreen();
     if (action === 'status')  await screenStatus();
