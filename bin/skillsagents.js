@@ -409,14 +409,52 @@ async function screenStatus() {
 }
 
 // ── PIXEL OFFICE SERVER ───────────────────────────────────────────────────────
-function startOfficeServer() {
+const { spawn } = require('child_process');
+const http = require('http');
+
+function isServerRunning(cb) {
+  const req = http.get('http://localhost:4321/health', res => {
+    cb(res.statusCode === 200);
+  });
+  req.on('error', () => cb(false));
+  req.setTimeout(800, () => { req.destroy(); cb(false); });
+}
+
+async function startOfficeServer() {
   banner();
   console.log(chalk.bold.white('  🎮  Pixel Office\n'));
-  info('Iniciando servidor local na porta ' + chalk.cyan('4321') + '...');
-  br();
-  // Start server (takes over process)
-  const { start } = require('../src/server.js');
-  start();
+
+  isServerRunning(async (running) => {
+    if (running) {
+      ok('Servidor já está rodando em ' + chalk.cyan('http://localhost:4321'));
+      br();
+    } else {
+      info('Iniciando servidor em background na porta ' + chalk.cyan('4321') + '...');
+      br();
+
+      const child = spawn(process.execPath, [path.join(ROOT, 'src', 'server.js')], {
+        detached: true,
+        stdio: 'ignore',
+        env: { ...process.env },
+      });
+      child.unref();
+
+      // Aguarda o servidor subir
+      await new Promise(r => setTimeout(r, 1000));
+      ok('Servidor iniciado (PID ' + child.pid + ')');
+    }
+
+    // Abre o browser
+    const openCmd = process.platform === 'win32' ? 'start'
+                  : process.platform === 'darwin' ? 'open'
+                  : 'xdg-open';
+    exec(`${openCmd} http://localhost:4321/office.html`);
+    ok('Abrindo ' + chalk.cyan('http://localhost:4321/office.html') + ' no browser...');
+    br();
+    dim('Para parar o servidor: feche o terminal ou rode ' + chalk.yellow('killall node'));
+    br();
+    await pause();
+  });
 }
 
 // ── INSTALL HOOKS ─────────────────────────────────────────────────────────────

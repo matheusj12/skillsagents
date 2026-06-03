@@ -215,6 +215,7 @@ function parseJSONLLine(json, projectId) {
 
 // ── START ────────────────────────────────────────────────────────
 function start(options = {}) {
+  if (server.listening) return;
   watchJSONL();
 
   server.listen(PORT, '127.0.0.1', () => {
