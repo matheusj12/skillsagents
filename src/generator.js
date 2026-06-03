@@ -142,18 +142,81 @@ async function callOpenAI(apiKey, idea) {
   return data.choices?.[0]?.message?.content || '';
 }
 
+// ── MISTRAL CALL ─────────────────────────────────────────────────
+async function callMistral(apiKey, model, idea) {
+  const res = await fetch('https://api.mistral.ai/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+    body: JSON.stringify({
+      model,
+      messages: [{ role: 'user', content: `${SYSTEM}\n\n---\nPROJETO:\n${idea}` }],
+      max_tokens: 1024,
+    }),
+  });
+  if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e.error?.message || `HTTP ${res.status}`); }
+  const d = await res.json();
+  return d.choices?.[0]?.message?.content || '';
+}
+
+// ── GROQ CALL ────────────────────────────────────────────────────
+async function callGroq(apiKey, model, idea) {
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+    body: JSON.stringify({
+      model,
+      messages: [{ role: 'user', content: `${SYSTEM}\n\n---\nPROJETO:\n${idea}` }],
+      max_tokens: 1024,
+    }),
+  });
+  if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e.error?.message || `HTTP ${res.status}`); }
+  const d = await res.json();
+  return d.choices?.[0]?.message?.content || '';
+}
+
+// ── DEEPSEEK CALL ────────────────────────────────────────────────
+async function callDeepSeek(apiKey, model, idea) {
+  const res = await fetch('https://api.deepseek.com/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+    body: JSON.stringify({
+      model,
+      messages: [{ role: 'user', content: `${SYSTEM}\n\n---\nPROJETO:\n${idea}` }],
+      max_tokens: 1024,
+    }),
+  });
+  if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e.error?.message || `HTTP ${res.status}`); }
+  const d = await res.json();
+  return d.choices?.[0]?.message?.content || '';
+}
+
 // ── MAIN GENERATE ─────────────────────────────────────────────────
-async function generate({ idea, provider, apiKey }) {
+async function generate({ idea, model, provider, apiKey }) {
   const stop = spinner('Gerando com IA...');
   try {
     let text;
+    const m = model || 'gemini-2.5-flash';
+
     if (provider === 'anthropic') {
       text = await callAnthropic(apiKey, idea);
     } else if (provider === 'openai') {
       text = await callOpenAI(apiKey, idea);
+    } else if (provider === 'mistral') {
+      text = await callMistral(apiKey, m, idea);
+    } else if (provider === 'groq') {
+      text = await callGroq(apiKey, m, idea);
+    } else if (provider === 'deepseek') {
+      text = await callDeepSeek(apiKey, m, idea);
     } else {
-      text = await callGemini(apiKey, idea);
+      // Google Gemini (default)
+      const geminiModel = m.startsWith('gemini') ? m : 'gemini-2.5-flash';
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${apiKey}`;
+      const res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ contents:[{role:'user',parts:[{text:`${SYSTEM}\n\n---\nPROJETO:\n${idea}`}]}] }) });
+      if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e.error?.message||`HTTP ${res.status}`); }
+      const d = await res.json();
+      text = d.candidates?.[0]?.content?.parts?.[0]?.text || '';
     }
+
     stop();
     return parseResult(text);
   } catch(e) {

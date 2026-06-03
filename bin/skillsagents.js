@@ -410,133 +410,222 @@ async function screenStatus() {
 }
 
 // ── CONFIG / CHAVES DE API ────────────────────────────────────────────────────
+
+const MODELS = [
+  // ── GOOGLE GEMINI ──────────────────────────────────────────────
+  { id:'gemini-2.5-flash',      label:'Gemini 2.5 Flash',      icon:'🟡', provider:'google',    desc:'Mais rápido e inteligente • Grátis 15 req/min',  url:'https://aistudio.google.com/app/apikey',      keyField:'googleKey' },
+  { id:'gemini-2.0-flash',      label:'Gemini 2.0 Flash',      icon:'🟡', provider:'google',    desc:'Multimodal, velocidade • Grátis',                url:'https://aistudio.google.com/app/apikey',      keyField:'googleKey' },
+  { id:'gemini-1.5-pro',        label:'Gemini 1.5 Pro',        icon:'🟡', provider:'google',    desc:'Contexto de 2M tokens',                          url:'https://aistudio.google.com/app/apikey',      keyField:'googleKey' },
+  // ── ANTHROPIC CLAUDE ───────────────────────────────────────────
+  { id:'claude-sonnet-4-6',     label:'Claude Sonnet 4.6',     icon:'🟣', provider:'anthropic', desc:'Mais capaz • Ideal para código complexo',        url:'https://console.anthropic.com/',              keyField:'anthropicKey' },
+  { id:'claude-haiku-4-5-20251001', label:'Claude Haiku 4.5', icon:'🟣', provider:'anthropic', desc:'Ultra rápido e barato',                          url:'https://console.anthropic.com/',              keyField:'anthropicKey' },
+  { id:'claude-opus-4-8',       label:'Claude Opus 4.8',       icon:'🟣', provider:'anthropic', desc:'Máxima inteligência',                            url:'https://console.anthropic.com/',              keyField:'anthropicKey' },
+  // ── OPENAI ────────────────────────────────────────────────────
+  { id:'gpt-4o',                label:'GPT-4o',                icon:'🟢', provider:'openai',    desc:'Mais capaz da OpenAI',                           url:'https://platform.openai.com/api-keys',        keyField:'openaiKey' },
+  { id:'gpt-4o-mini',           label:'GPT-4o Mini',           icon:'🟢', provider:'openai',    desc:'Rápido e barato',                                url:'https://platform.openai.com/api-keys',        keyField:'openaiKey' },
+  { id:'o1-mini',               label:'o1 Mini',               icon:'🟢', provider:'openai',    desc:'Raciocínio avançado',                            url:'https://platform.openai.com/api-keys',        keyField:'openaiKey' },
+  // ── DEEPSEEK ──────────────────────────────────────────────────
+  { id:'deepseek-chat',         label:'DeepSeek V3',           icon:'🔵', provider:'deepseek',  desc:'Custo ultra baixo • ~$0.14/M tokens',            url:'https://platform.deepseek.com/api_keys',      keyField:'deepseekKey' },
+  { id:'deepseek-reasoner',     label:'DeepSeek R1',           icon:'🔵', provider:'deepseek',  desc:'Raciocínio passo a passo',                       url:'https://platform.deepseek.com/api_keys',      keyField:'deepseekKey' },
+  // ── MISTRAL ───────────────────────────────────────────────────
+  { id:'mistral-large-latest',  label:'Mistral Large',         icon:'🟠', provider:'mistral',   desc:'Excelente para código e análise',                url:'https://console.mistral.ai/api-keys',         keyField:'mistralKey' },
+  { id:'mistral-small-latest',  label:'Mistral Small',         icon:'🟠', provider:'mistral',   desc:'Rápido e acessível',                             url:'https://console.mistral.ai/api-keys',         keyField:'mistralKey' },
+  // ── GROQ ──────────────────────────────────────────────────────
+  { id:'llama-3.3-70b-versatile',label:'Llama 3.3 70B (Groq)',icon:'⚡', provider:'groq',      desc:'Inferência ultra rápida • Grátis',               url:'https://console.groq.com/keys',               keyField:'groqKey' },
+  { id:'mixtral-8x7b-32768',    label:'Mixtral 8x7B (Groq)',   icon:'⚡', provider:'groq',      desc:'Rápido e gratuito via Groq',                     url:'https://console.groq.com/keys',               keyField:'groqKey' },
+];
+
+const PROVIDER_LABELS = {
+  google:    '🟡  Google Gemini',
+  anthropic: '🟣  Anthropic Claude',
+  openai:    '🟢  OpenAI GPT',
+  deepseek:  '🔵  DeepSeek',
+  mistral:   '🟠  Mistral AI',
+  groq:      '⚡  Groq (Open Source)',
+};
+
+function maskKey(key) {
+  if (!key) return chalk.red('✗ não configurada');
+  return chalk.green('✔ ') + key.slice(0, 6) + '●●●●●●●●●●●●' + key.slice(-4);
+}
+
 async function screenConfig() {
   const { loadConfig, saveConfig } = require('../src/generator.js');
-
-  const PROVIDERS = [
-    {
-      id:    'gemini',
-      label: '🟡  Gemini (Google)',
-      desc:  'Grátis até 15 req/min — recomendado para começar',
-      field: 'geminiKey',
-      url:   'https://aistudio.google.com/app/apikey',
-    },
-    {
-      id:    'anthropic',
-      label: '🟣  Claude (Anthropic)',
-      desc:  'claude-haiku-4-5 — alta qualidade',
-      field: 'anthropicKey',
-      url:   'https://console.anthropic.com/',
-    },
-    {
-      id:    'openai',
-      label: '🟢  GPT (OpenAI)',
-      desc:  'gpt-4o-mini — amplamente compatível',
-      field: 'openaiKey',
-      url:   'https://platform.openai.com/api-keys',
-    },
-  ];
-
-  function maskKey(key) {
-    if (!key) return chalk.gray('não configurada');
-    return chalk.green('✔ ') + key.slice(0, 6) + '●●●●●●●●●●●●' + key.slice(-4);
-  }
 
   while (true) {
     console.clear();
     const config = loadConfig();
+    const activeModel = config.activeModel || 'gemini-2.5-flash';
+    const activeMeta  = MODELS.find(m => m.id === activeModel);
 
-    console.log(chalk.bold.cyanBright('\n  🔑  Chaves de API\n'));
-    console.log(chalk.gray('  Salvas em ~/.skillsagents/config.json\n'));
-    console.log(chalk.gray('  ' + '─'.repeat(52) + '\n'));
+    console.log(chalk.bold.cyanBright('\n  🔑  Modelos e Chaves de API\n'));
+    console.log(chalk.gray('  Config: ~/.skillsagents/config.json\n'));
 
-    // Mostra status atual
-    PROVIDERS.forEach(p => {
-      const key = config[p.field];
-      const active = config.provider === p.id ? chalk.cyanBright(' ← ativo') : '';
-      console.log(`  ${p.label}${active}`);
-      console.log(chalk.gray(`  ${p.desc}`));
-      console.log(`  Chave: ${maskKey(key)}\n`);
+    // Status atual
+    console.log(chalk.bold('  Modelo ativo:'));
+    console.log(`  ${activeMeta?.icon || '🤖'}  ${chalk.cyan(activeMeta?.label || activeModel)}`);
+    console.log(chalk.gray(`     ${activeMeta?.desc || ''}\n`));
+
+    // Chaves por provedor
+    console.log(chalk.bold('  Chaves configuradas:'));
+    const uniqueProviders = [...new Set(MODELS.map(m => m.provider))];
+    uniqueProviders.forEach(p => {
+      const keyField = MODELS.find(m => m.provider === p)?.keyField;
+      const key = keyField && config[keyField];
+      console.log(`  ${PROVIDER_LABELS[p]?.padEnd(26)}  ${maskKey(key)}`);
     });
 
-    console.log(chalk.gray('  ' + '─'.repeat(52) + '\n'));
+    console.log(chalk.gray('\n  ' + '─'.repeat(54) + '\n'));
 
     const { action } = await inquirer.prompt([{
       type: 'list',
       name: 'action',
       message: '  O que você quer fazer?',
+      pageSize: 6,
       choices: [
-        { name: `  🟡  Configurar chave Gemini`,    value: 'gemini'    },
-        { name: `  🟣  Configurar chave Claude`,     value: 'anthropic' },
-        { name: `  🟢  Configurar chave GPT`,        value: 'openai'    },
+        { name: `  🎯  Selecionar modelo ativo`,  value: 'model'  },
+        { name: `  🔐  Adicionar / trocar chave`, value: 'key'    },
+        { name: `  🗑   Limpar uma chave`,         value: 'clear1' },
+        { name: `  💣  Limpar tudo`,              value: 'clear'  },
         new inquirer.Separator(''),
-        { name: `  ✔   Definir provedor padrão`,    value: 'default'   },
-        { name: `  🗑   Limpar todas as chaves`,     value: 'clear'     },
-        { name: chalk.gray('  ← Voltar'),           value: 'back'      },
+        { name: chalk.gray('  ← Voltar'),         value: 'back'   },
       ],
     }]);
 
     if (action === 'back') return;
 
+    // ── SELECIONAR MODELO ───────────────────────────────────────────
+    if (action === 'model') {
+      const groups = {};
+      MODELS.forEach(m => {
+        if (!groups[m.provider]) groups[m.provider] = [];
+        groups[m.provider].push(m);
+      });
+
+      const choices = [];
+      Object.entries(groups).forEach(([provider, models]) => {
+        choices.push(new inquirer.Separator(chalk.gray(`  ── ${PROVIDER_LABELS[provider] || provider}`)));
+        models.forEach(m => {
+          const keyField = m.keyField;
+          const hasKey   = !!config[keyField];
+          const isActive = m.id === activeModel;
+          const keyIcon  = hasKey ? chalk.green('✔') : chalk.red('✗');
+          const tick     = isActive ? chalk.cyanBright(' ← ativo') : '';
+          choices.push({
+            name:  `  ${m.icon}  ${m.label.padEnd(28)} ${keyIcon} ${chalk.gray(m.desc)}${tick}`,
+            value: m.id,
+          });
+        });
+      });
+      choices.push(new inquirer.Separator(''));
+      choices.push({ name: chalk.gray('  ← Voltar'), value: BACK });
+
+      const { selectedModel } = await inquirer.prompt([{
+        type: 'list', name: 'selectedModel',
+        message: '  Escolha o modelo:',
+        choices,
+        pageSize: 20,
+      }]);
+
+      if (selectedModel === BACK) continue;
+
+      const meta = MODELS.find(m => m.id === selectedModel);
+      const cfg  = loadConfig();
+
+      // Verifica se tem chave para esse provedor
+      if (!cfg[meta.keyField]) {
+        br();
+        console.log(chalk.yellow(`  Nenhuma chave para ${PROVIDER_LABELS[meta.provider]}.`));
+        info('Gere sua chave em: ' + chalk.cyan(meta.url));
+        br();
+
+        const { apiKey } = await inquirer.prompt([{
+          type: 'password', name: 'apiKey',
+          message: `  Cole a chave:`,
+          mask: '●',
+          validate: v => v.trim().length > 10 || 'Chave muito curta',
+        }]);
+
+        cfg[meta.keyField] = apiKey.trim();
+      }
+
+      cfg.activeModel = selectedModel;
+      saveConfig(cfg);
+      br();
+      ok(`Modelo ativo: ${meta.icon}  ${chalk.cyan(meta.label)}`);
+      br();
+      await pause();
+    }
+
+    // ── ADICIONAR / TROCAR CHAVE ────────────────────────────────────
+    if (action === 'key') {
+      const providerChoices = [
+        ...Object.entries(PROVIDER_LABELS).map(([id, label]) => ({
+          name: `  ${label}`,
+          value: id,
+        })),
+        new inquirer.Separator(''),
+        { name: chalk.gray('  ← Voltar'), value: BACK },
+      ];
+
+      const { prov } = await inquirer.prompt([{
+        type: 'list', name: 'prov',
+        message: '  Qual provedor?',
+        choices: providerChoices,
+      }]);
+
+      if (prov === BACK) continue;
+
+      const meta = MODELS.find(m => m.provider === prov);
+      br();
+      info('Gere sua chave em: ' + chalk.cyan(meta.url));
+      br();
+
+      const { apiKey } = await inquirer.prompt([{
+        type: 'password', name: 'apiKey',
+        message: `  Cole a chave:`,
+        mask: '●',
+        validate: v => v.trim().length > 6 || 'Chave muito curta',
+      }]);
+
+      const cfg = loadConfig();
+      cfg[meta.keyField] = apiKey.trim();
+      saveConfig(cfg);
+      br();
+      ok(`Chave ${PROVIDER_LABELS[prov]} salva!`);
+      br();
+      await pause();
+    }
+
+    // ── LIMPAR UMA CHAVE ────────────────────────────────────────────
+    if (action === 'clear1') {
+      const { prov } = await inquirer.prompt([{
+        type: 'list', name: 'prov',
+        message: '  Qual chave remover?',
+        choices: [
+          ...Object.entries(PROVIDER_LABELS).map(([id, label]) => ({ name: `  ${label}`, value: id })),
+          new inquirer.Separator(''),
+          { name: chalk.gray('  ← Voltar'), value: BACK },
+        ],
+      }]);
+      if (prov === BACK) continue;
+
+      const meta = MODELS.find(m => m.provider === prov);
+      const cfg  = loadConfig();
+      delete cfg[meta.keyField];
+      saveConfig(cfg);
+      ok(`Chave ${PROVIDER_LABELS[prov]} removida.`);
+      await pause();
+    }
+
+    // ── LIMPAR TUDO ─────────────────────────────────────────────────
     if (action === 'clear') {
       const { confirm } = await inquirer.prompt([{
         type: 'confirm', name: 'confirm',
-        message: '  Remover todas as chaves?', default: false,
+        message: '  Remover TODAS as chaves e configurações?', default: false,
       }]);
-      if (confirm) { saveConfig({}); ok('Chaves removidas.'); await pause(); }
-      continue;
+      if (confirm) { saveConfig({}); ok('Configurações limpas.'); await pause(); }
     }
-
-    if (action === 'default') {
-      const { provider } = await inquirer.prompt([{
-        type: 'list', name: 'provider',
-        message: '  Provedor padrão para o Gerador de Prompts:',
-        choices: PROVIDERS.map(p => ({ name: `  ${p.label}`, value: p.id })),
-      }]);
-      const cfg = loadConfig();
-      cfg.provider = provider;
-      saveConfig(cfg);
-      ok(`Provedor padrão: ${provider}`);
-      await pause();
-      continue;
-    }
-
-    // Configurar chave de um provedor
-    const prov = PROVIDERS.find(p => p.id === action);
-    if (!prov) continue;
-
-    br();
-    info('Gere sua chave em: ' + chalk.cyan(prov.url));
-    br();
-
-    const { key } = await inquirer.prompt([{
-      type:     'password',
-      name:     'key',
-      message:  `  Cole a chave ${prov.label.trim()}:`,
-      mask:     '●',
-      validate: v => {
-        if (v.trim().length < 10) return 'Chave muito curta';
-        return true;
-      },
-    }]);
-
-    const cfg = loadConfig();
-    cfg[prov.field] = key.trim();
-    // Se for a primeira chave, define como padrão automaticamente
-    if (!cfg.provider) cfg.provider = prov.id;
-    saveConfig(cfg);
-
-    br();
-    ok(`Chave ${prov.label.trim()} salva!`);
-    if (cfg.provider !== prov.id) {
-      const { setDefault } = await inquirer.prompt([{
-        type: 'confirm', name: 'setDefault',
-        message: `  Definir como provedor padrão?`, default: true,
-      }]);
-      if (setDefault) { cfg.provider = prov.id; saveConfig(cfg); }
-    }
-    br();
-    await pause();
   }
 }
 
@@ -549,25 +638,24 @@ async function screenGenerator() {
   let config = loadConfig();
 
   // ── API KEY SETUP ───────────────────────────────────────────────
-  const KEY_MAP = { gemini: 'geminiKey', anthropic: 'anthropicKey', openai: 'openaiKey' };
-  const activeProvider = config.provider || 'gemini';
-  const activeKey = config[KEY_MAP[activeProvider]];
+  const activeModelId = config.activeModel || 'gemini-2.5-flash';
+  const activeMeta    = MODELS.find(m => m.id === activeModelId) || MODELS[0];
+  const activeKey     = config[activeMeta.keyField];
 
   if (!activeKey) {
-    console.log(chalk.yellow(`  Nenhuma chave configurada para ${activeProvider}.\n`));
+    br();
+    console.log(chalk.yellow(`  Nenhuma chave para ${PROVIDER_LABELS[activeMeta.provider]}.\n`));
     console.log(chalk.gray('  Configure em: ') + chalk.cyan('Menu → 🔑 Chaves de API'));
     br();
     const { goConfig } = await inquirer.prompt([{
       type: 'confirm', name: 'goConfig',
-      message: '  Ir para configurações agora?', default: true,
+      message: '  Configurar agora?', default: true,
     }]);
     if (goConfig) await screenConfig();
     return;
   }
 
-  // Mostra qual provedor está ativo
-  const providerNames = { gemini: '🟡 Gemini', anthropic: '🟣 Claude', openai: '🟢 GPT' };
-  info(`Usando: ${chalk.cyan(providerNames[activeProvider] || activeProvider)}`);
+  info(`Modelo: ${activeMeta.icon}  ${chalk.cyan(activeMeta.label)}`);
 
   // ── PROJECT INPUT ───────────────────────────────────────────────
   console.log(chalk.gray('  ── Descreva seu projeto ───────────────────────────────\n'));
@@ -588,7 +676,7 @@ async function screenGenerator() {
   // ── GENERATE ─────────────────────────────────────────────────────
   let result;
   try {
-    result = await generate({ idea, provider: activeProvider, apiKey: activeKey });
+    result = await generate({ idea, model: activeModelId, provider: activeMeta.provider, apiKey: activeKey });
   } catch(e) {
     br();
     console.log(chalk.red('  ✗  Erro: ' + e.message));
