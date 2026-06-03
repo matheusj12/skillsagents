@@ -157,28 +157,9 @@ const STACKS = {
 // ── QUICK INSTALL ─────────────────────────────────────────────────────────────
 async function screenQuickInstall(args) {
   banner();
-  const installSkills = (args || []).includes('--skills');
   console.log(chalk.bold.white('  ⚡  Instalando SkillsAgents\n'));
-  info('Copiando agentes para ' + chalk.cyan('.codex/agents/') + ' ...\n');
-  br();
-
-  let count = 0;
-  for (const a of BASE_AGENTS) {
-    if (installAgent(a.id)) {
-      ok(`${a.icon}  ${a.name.padEnd(24)} ${chalk.gray(a.role)}`);
-      count++;
-    }
-  }
-
-  br();
-  ok(chalk.bold(`${count} agentes instalados em `) + chalk.cyan('.codex/agents/'));
-  dim('Adicione --skills para instalar as 1270+ skills globalmente.');
-  br();
-
-  console.log(chalk.gray('  ─'.repeat(30)));
-  br();
-  console.log(chalk.bold('  Próximo passo:'));
-  console.log(chalk.cyan('  @master *help') + chalk.gray('  — chame no seu IDE para começar'));
+  const { install } = require('../src/install.js');
+  install(args || []);
   br();
   await pause();
 }
