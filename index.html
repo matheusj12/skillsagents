@@ -1,34 +1,31 @@
 <!DOCTYPE html>
 <html lang="pt-br" class="dark">
-
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SkillsAgents — Agentes e Skills de Alta Performance</title>
-  <meta name="description"
-    content="O guia definitivo para usar agentes SkillsAgents e 1.270+ skills. Dobre sua produtividade em qualquer projeto." />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
-    rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>SkillsAgents — 146 AI Agents. 1270 Skills. One Command.</title>
+  <meta name="description" content="O framework de agentes IA mais completo. 146 agentes especializados, 1270+ skills e um orquestrador master. Instale em segundos."/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
   <style>
+    /* ── RESET & BASE ─────────────────────────────────────────── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
-      --cyan: #00f0ff;
-      --bg: #0e1117;
-      --surface: #1a1d27;
-      --border: #2a2d3a;
-      --muted: #6b7280;
-      --text: #e2e8f0;
-      --green: #10b981;
-      --orange: #f59e0b;
-      --purple: #8b5cf6;
+      --bg:       #080a0f;
+      --bg2:      #0d1117;
+      --surface:  #111827;
+      --border:   #1e2d3d;
+      --border2:  #243447;
+      --text:     #e2e8f0;
+      --muted:    #64748b;
+      --cyan:     #00f0ff;
+      --cyan2:    #06b6d4;
+      --purple:   #7c3aed;
+      --purple2:  #a855f7;
+      --green:    #10b981;
+      --orange:   #f59e0b;
+      --mono:     'JetBrains Mono', monospace;
     }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    html { scroll-behavior: smooth; }
     body {
       background: var(--bg);
       color: var(--text);
@@ -36,2172 +33,797 @@
       line-height: 1.6;
       overflow-x: hidden;
     }
+    a { text-decoration: none; color: inherit; }
 
-    .mono {
-      font-family: 'JetBrains Mono', monospace;
+    /* ── NAV ─────────────────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px;
+      background: rgba(8,10,15,.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,.06);
     }
-
-    /* HEADER */
-    header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(14, 17, 23, 0.9);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      padding: 0 2rem;
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 800; font-size: .95rem; letter-spacing: -.01em;
     }
-
-    .nav-inner {
-      max-width: 1100px;
-      margin: 0 auto;
-      height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 800;
-      font-size: 1.1rem;
-    }
-
-    .logo-dot {
-      width: 10px;
-      height: 10px;
+    .nav-dot {
+      width: 8px; height: 8px; border-radius: 50%;
       background: var(--cyan);
-      border-radius: 50%;
-      box-shadow: 0 0 10px var(--cyan);
+      box-shadow: 0 0 12px var(--cyan);
       animation: pulse 2s infinite;
     }
-
-    @keyframes pulse {
-
-      0%,
-      100% {
-        opacity: 1
-      }
-
-      50% {
-        opacity: .5
-      }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+    .nav-links { display: flex; align-items: center; gap: 24px; }
+    .nav-links a {
+      font-size: .85rem; font-weight: 500; color: var(--muted);
+      transition: color .15s;
     }
-
-    .badge {
-      background: rgba(0, 240, 255, .1);
-      border: 1px solid rgba(0, 240, 255, .3);
-      color: var(--cyan);
-      font-size: .65rem;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 20px;
-      text-transform: uppercase;
-      letter-spacing: .1em;
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      padding: 7px 18px; border-radius: 8px;
+      background: var(--cyan); color: #000;
+      font-size: .85rem; font-weight: 700;
+      transition: opacity .15s;
     }
+    .nav-cta:hover { opacity: .85; }
 
-    .lang-toggle {
-      display: flex;
-      gap: 4px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 4px;
-    }
-
-    .lang-btn {
-      padding: 4px 12px;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
-      font-size: .8rem;
-      font-weight: 600;
-      transition: .2s;
-      background: transparent;
-      color: var(--muted);
-    }
-
-    .lang-btn.active {
-      background: var(--cyan);
-      color: #0e1117;
-    }
-
-    /* HERO */
+    /* ── HERO ─────────────────────────────────────────────────── */
     .hero {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 80px 2rem 60px;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 120px 24px 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    /* background glow blobs */
+    .hero::before {
+      content: '';
+      position: absolute; top: 20%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 900px; height: 600px;
+      background: radial-gradient(ellipse, rgba(0,240,255,.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: '';
+      position: absolute; top: 60%; left: 30%;
+      width: 500px; height: 500px;
+      background: radial-gradient(ellipse, rgba(124,58,237,.06) 0%, transparent 70%);
+      pointer-events: none;
     }
 
     .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(0, 240, 255, .08);
-      border: 1px solid rgba(0, 240, 255, .2);
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 5px 14px; border-radius: 100px;
+      background: rgba(0,240,255,.08);
+      border: 1px solid rgba(0,240,255,.2);
       color: var(--cyan);
-      font-size: .75rem;
-      font-weight: 700;
-      padding: 6px 14px;
-      border-radius: 20px;
-      text-transform: uppercase;
-      letter-spacing: .1em;
-      margin-bottom: 24px;
+      font-size: .72rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .12em;
+      margin-bottom: 32px;
     }
-
     .hero-badge::before {
       content: '';
-      width: 6px;
-      height: 6px;
+      width: 6px; height: 6px; border-radius: 50%;
       background: var(--cyan);
-      border-radius: 50%;
       animation: pulse 1.5s infinite;
     }
 
-    h1.headline {
-      font-size: clamp(2rem, 5vw, 3.5rem);
+    h1 {
+      font-size: clamp(2.8rem, 7vw, 6rem);
       font-weight: 900;
-      line-height: 1.1;
-      margin-bottom: 20px;
+      line-height: 1.05;
+      letter-spacing: -.03em;
+      margin-bottom: 24px;
+      max-width: 900px;
     }
-
     .gradient-text {
-      background: linear-gradient(135deg, var(--cyan), #818cf8);
+      background: linear-gradient(135deg, var(--cyan) 0%, var(--purple2) 60%, var(--cyan2) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-
     .hero-sub {
-      font-size: 1.1rem;
+      font-size: clamp(1rem, 2vw, 1.25rem);
       color: var(--muted);
-      max-width: 600px;
-      margin-bottom: 40px;
-    }
-
-    .hero-stats {
-      display: flex;
-      gap: 32px;
-      flex-wrap: wrap;
-    }
-
-    .stat {
-      text-align: center;
-    }
-
-    .stat-num {
-      font-size: 2rem;
-      font-weight: 900;
-      color: var(--cyan);
-    }
-
-    .stat-label {
-      font-size: .75rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .05em;
-    }
-
-    /* SECTIONS */
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 0 2rem;
-    }
-
-    section {
-      padding: 80px 0;
-    }
-
-    section:nth-child(even) {
-      background: rgba(26, 29, 39, .4);
-    }
-
-    .section-label {
-      font-size: .7rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .15em;
-      color: var(--cyan);
-      margin-bottom: 12px;
-    }
-
-    h2.section-title {
-      font-size: clamp(1.5rem, 3vw, 2.2rem);
-      font-weight: 800;
-      margin-bottom: 12px;
-    }
-
-    .section-desc {
-      color: var(--muted);
-      font-size: 1rem;
-      max-width: 580px;
+      max-width: 560px;
       margin-bottom: 48px;
+      line-height: 1.7;
     }
 
-    /* TIMELINE */
-    .timeline {
-      display: flex;
-      flex-direction: column;
-      gap: 48px;
+    /* terminal install block */
+    .install-block {
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+      margin-bottom: 56px;
     }
-
-    .tl-item {
-      display: flex;
-      gap: 24px;
-    }
-
-    .tl-left {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      flex-shrink: 0;
-    }
-
-    .tl-num {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: var(--cyan);
-      color: #0e1117;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 900;
-      font-size: 1.1rem;
-      box-shadow: 0 0 20px rgba(0, 240, 255, .3);
-      flex-shrink: 0;
-    }
-
-    .tl-line {
-      width: 2px;
-      flex: 1;
-      background: linear-gradient(to bottom, var(--cyan), transparent);
-      opacity: .2;
-      margin-top: 8px;
-    }
-
-    .tl-content {
-      flex: 1;
-      padding-top: 8px;
-    }
-
-    .tl-content h3 {
-      font-size: 1.3rem;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .tl-content p {
-      color: var(--muted);
-      margin-bottom: 20px;
-      font-size: .95rem;
-    }
-
-    /* CODE BLOCK */
-    .code-block {
-      background: #0a0c10;
-      border: 1px solid var(--border);
+    .terminal {
+      display: inline-flex; align-items: center; gap: 12px;
+      padding: 14px 24px;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
       border-radius: 12px;
-      overflow: hidden;
+      font-family: var(--mono);
+      font-size: 1rem;
+      cursor: pointer;
+      transition: border-color .2s;
+      position: relative;
+    }
+    .terminal:hover { border-color: rgba(0,240,255,.4); }
+    .terminal .prompt { color: var(--muted); }
+    .terminal .cmd { color: var(--cyan); font-weight: 500; }
+    .terminal .copy-hint {
+      position: absolute; right: 16px;
+      font-size: .72rem; color: var(--muted);
+      opacity: 0; transition: opacity .2s;
+    }
+    .terminal:hover .copy-hint { opacity: 1; }
+    .cursor {
+      display: inline-block; width: 2px; height: 1em;
+      background: var(--cyan);
+      animation: blink .9s infinite;
+      vertical-align: middle; margin-left: 2px;
+    }
+    @keyframes blink { 0%,49%{opacity:1} 50%,100%{opacity:0} }
+
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+    .btn-primary {
+      padding: 13px 28px; border-radius: 10px;
+      background: var(--cyan); color: #000;
+      font-weight: 800; font-size: .95rem;
+      display: flex; align-items: center; gap: 8px;
+      transition: opacity .15s, transform .15s;
+      box-shadow: 0 0 24px rgba(0,240,255,.3);
+    }
+    .btn-primary:hover { opacity: .9; transform: translateY(-1px); }
+    .btn-secondary {
+      padding: 13px 28px; border-radius: 10px;
+      background: transparent;
+      border: 1px solid var(--border2);
+      color: var(--text); font-weight: 600; font-size: .95rem;
+      display: flex; align-items: center; gap: 8px;
+      transition: border-color .15s, background .15s;
+    }
+    .btn-secondary:hover { border-color: var(--border2); background: rgba(255,255,255,.04); }
+
+    /* stats bar */
+    .stats-bar {
+      margin-top: 64px;
+      display: flex; gap: 48px; justify-content: center; flex-wrap: wrap;
+      padding: 28px 48px;
+      background: rgba(255,255,255,.02);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      backdrop-filter: blur(8px);
+    }
+    .stat { text-align: center; }
+    .stat-num {
+      font-size: 2.2rem; font-weight: 900;
+      background: linear-gradient(135deg, var(--cyan), var(--purple2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -.03em;
+    }
+    .stat-label { font-size: .75rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-top: 2px; }
+
+    /* ── SECTION BASE ────────────────────────────────────────── */
+    section { padding: 100px 24px; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .section-tag {
+      font-size: .7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .15em; color: var(--cyan); margin-bottom: 16px;
+    }
+    h2 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 900; letter-spacing: -.03em; line-height: 1.1;
       margin-bottom: 16px;
     }
+    .section-sub {
+      font-size: 1.1rem; color: var(--muted);
+      max-width: 560px; margin-bottom: 56px; line-height: 1.7;
+    }
 
-    .code-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 16px;
-      background: rgba(255, 255, 255, .03);
+    /* ── PIXEL OFFICE SECTION ─────────────────────────────────── */
+    .office-section {
+      background: linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .office-section::before {
+      content: '';
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 1000px; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    }
+    .office-preview {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border2);
+      box-shadow: 0 0 80px rgba(0,240,255,.08), 0 40px 80px rgba(0,0,0,.4);
+    }
+    /* browser chrome */
+    .browser-chrome {
+      background: #161b22;
+      padding: 12px 16px;
+      display: flex; align-items: center; gap: 12px;
       border-bottom: 1px solid var(--border);
     }
-
-    .code-dots {
-      display: flex;
-      gap: 6px;
+    .browser-dots { display: flex; gap: 6px; }
+    .browser-dots span {
+      width: 12px; height: 12px; border-radius: 50%;
     }
-
-    .code-dots span {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-    }
-
-    .code-dots .r {
-      background: #ff5f57;
-    }
-
-    .code-dots .y {
-      background: #ffbd2e;
-    }
-
-    .code-dots .g {
-      background: #28ca41;
-    }
-
-    .code-lang {
-      font-size: .65rem;
-      font-family: 'JetBrains Mono', monospace;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .1em;
-    }
-
-    .code-body {
-      padding: 20px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: .85rem;
-      line-height: 1.8;
-    }
-
-    .c-cyan {
-      color: var(--cyan);
-    }
-
-    .c-muted {
-      color: #4b5563;
-    }
-
-    .c-green {
-      color: #86efac;
-    }
-
-    .c-orange {
-      color: #fcd34d;
-    }
-
-    .c-purple {
-      color: #c4b5fd;
-    }
-
-    /* INFO BOX */
-    .info-box {
-      display: flex;
-      gap: 12px;
-      padding: 14px 16px;
-      background: rgba(0, 240, 255, .05);
-      border: 1px solid rgba(0, 240, 255, .15);
-      border-radius: 10px;
-      font-size: .9rem;
-      color: #94a3b8;
-    }
-
-    .info-icon {
-      font-size: 1.1rem;
-      flex-shrink: 0;
-      margin-top: 1px;
-    }
-
-    /* AGENTS GRID */
-    .agents-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 16px;
-      margin-bottom: 32px;
-    }
-
-    .agent-card {
-      background: var(--surface);
+    .dot-r { background: #ff5f57; }
+    .dot-y { background: #febc2e; }
+    .dot-g { background: #28c840; }
+    .browser-url {
+      flex: 1; background: var(--bg2);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 20px;
-      cursor: default;
-      transition: .25s;
-    }
-
-    .agent-card:hover {
-      border-color: var(--cyan);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(0, 240, 255, .1);
-    }
-
-    .agent-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.4rem;
-      margin-bottom: 14px;
-    }
-
-    .agent-name {
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-
-    .agent-role {
-      font-size: .8rem;
+      border-radius: 6px; padding: 5px 12px;
+      font-size: .78rem; font-family: var(--mono);
       color: var(--muted);
-      margin-bottom: 12px;
+    }
+    .office-iframe {
+      width: 100%;
+      height: 520px;
+      border: none;
+      display: block;
     }
 
-    .agent-cmd {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: .78rem;
-      background: #0a0c10;
-      border: 1px solid var(--border);
-      padding: 8px 12px;
-      border-radius: 7px;
-      color: var(--cyan);
-    }
-
-    /* SKILLS SECTION */
-    .skills-grid {
+    /* office feature list */
+    .office-features {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 12px;
+      gap: 20px;
+      margin-top: 48px;
     }
-
-    .skill-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 16px;
-      transition: .2s;
-    }
-
-    .skill-card:hover {
-      border-color: rgba(0, 240, 255, .4);
-    }
-
-    .skill-tag {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: .85rem;
-      color: var(--cyan);
-      font-weight: 500;
-      margin-bottom: 6px;
-    }
-
-    .skill-desc {
-      font-size: .82rem;
-      color: var(--muted);
-    }
-
-    .skill-badge {
-      display: inline-block;
-      font-size: .65rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      padding: 2px 7px;
-      border-radius: 4px;
-      margin-top: 8px;
-    }
-
-    .badge-dev {
-      background: rgba(139, 92, 246, .15);
-      color: #c4b5fd;
-    }
-
-    .badge-sec {
-      background: rgba(239, 68, 68, .15);
-      color: #fca5a5;
-    }
-
-    .badge-ai {
-      background: rgba(16, 185, 129, .15);
-      color: #6ee7b7;
-    }
-
-    .badge-arch {
-      background: rgba(245, 158, 11, .15);
-      color: #fcd34d;
-    }
-
-    .badge-qa {
-      background: rgba(59, 130, 246, .15);
-      color: #93c5fd;
-    }
-
-    /* WORKFLOW */
-    .workflow-row {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr auto 1fr;
-      align-items: center;
-      gap: 0;
-      margin-bottom: 24px;
-    }
-
-    .wf-step {
-      background: var(--surface);
+    .office-feat {
+      padding: 20px;
+      background: rgba(255,255,255,.02);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 20px;
-      text-align: center;
+      transition: border-color .2s;
     }
+    .office-feat:hover { border-color: rgba(0,240,255,.2); }
+    .office-feat-icon { font-size: 1.4rem; margin-bottom: 10px; }
+    .office-feat-title { font-size: .9rem; font-weight: 700; margin-bottom: 4px; }
+    .office-feat-desc { font-size: .8rem; color: var(--muted); line-height: 1.5; }
 
-    .wf-step-icon {
-      font-size: 1.8rem;
-      margin-bottom: 8px;
-    }
-
-    .wf-step-title {
-      font-size: .85rem;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-
-    .wf-step-sub {
-      font-size: .75rem;
-      color: var(--muted);
-    }
-
-    .wf-arrow {
-      font-size: 1.5rem;
-      color: var(--cyan);
-      opacity: .4;
-      padding: 0 8px;
-      text-align: center;
-    }
-
-    @media(max-width:768px) {
-      .workflow-row {
-        grid-template-columns: 1fr;
-      }
-
-      .wf-arrow {
-        transform: rotate(90deg);
-      }
-    }
-
-    /* COMBOS */
-    .combo-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 28px;
-      margin-bottom: 16px;
-    }
-
-    .combo-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .combo-num {
-      width: 32px;
-      height: 32px;
-      background: rgba(0, 240, 255, .1);
-      border: 1px solid rgba(0, 240, 255, .3);
-      color: var(--cyan);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: .9rem;
-      flex-shrink: 0;
-    }
-
-    .combo-title {
-      font-weight: 700;
-      font-size: 1.05rem;
-    }
-
-    .combo-result {
-      font-size: .82rem;
-      color: var(--muted);
-    }
-
-    .combo-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 14px;
-    }
-
-    .tag {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: .78rem;
-      padding: 4px 10px;
-      border-radius: 6px;
-      background: #0a0c10;
-      border: 1px solid var(--border);
-      color: var(--cyan);
-    }
-
-    /* PERFORMANCE */
-    .perf-grid {
+    /* ── AGENTS SECTION ──────────────────────────────────────── */
+    .agents-section { background: var(--bg2); }
+    .agents-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
       gap: 16px;
     }
-
-    .perf-card {
-      background: var(--surface);
+    .agent-card {
+      padding: 20px;
+      background: var(--bg);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 24px;
-      text-align: center;
+      border-radius: 14px;
+      transition: border-color .2s, transform .2s, box-shadow .2s;
+      cursor: default;
+      position: relative;
+      overflow: hidden;
+    }
+    .agent-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, var(--glow-color, rgba(0,240,255,0)) 0%, transparent 60%);
+      opacity: 0; transition: opacity .3s;
+    }
+    .agent-card:hover { transform: translateY(-3px); border-color: var(--border2); }
+    .agent-card:hover::before { opacity: .05; }
+    .agent-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.3); }
+    .agent-icon { font-size: 1.6rem; margin-bottom: 12px; }
+    .agent-handle {
+      font-family: var(--mono); font-size: .82rem;
+      color: var(--cyan); font-weight: 700; margin-bottom: 4px;
+    }
+    .agent-title { font-size: .88rem; font-weight: 600; margin-bottom: 6px; }
+    .agent-desc { font-size: .78rem; color: var(--muted); line-height: 1.5; }
+    .agent-tag {
+      display: inline-block; margin-top: 10px;
+      padding: 2px 8px; border-radius: 4px;
+      font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
     }
 
-    .perf-num {
-      font-size: 2.5rem;
-      font-weight: 900;
-      color: var(--cyan);
-      line-height: 1;
-    }
-
-    .perf-unit {
-      font-size: .8rem;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-
-    .perf-bar {
-      height: 4px;
-      background: var(--border);
-      border-radius: 2px;
-      margin: 14px 0 8px;
-    }
-
-    .perf-fill {
-      height: 100%;
-      border-radius: 2px;
-      background: linear-gradient(90deg, var(--cyan), #818cf8);
-    }
-
-    .perf-label {
-      font-size: .8rem;
-      color: var(--muted);
-    }
-
-    /* CTA */
-    .cta-section {
-      background: linear-gradient(135deg, rgba(0, 240, 255, .08), rgba(129, 140, 248, .08));
-      border: 1px solid rgba(0, 240, 255, .2);
-      border-radius: 20px;
-      padding: 60px;
-      text-align: center;
-      margin: 80px 0;
-    }
-
-    .cta-title {
-      font-size: 2rem;
-      font-weight: 900;
-      margin-bottom: 16px;
-    }
-
-    .cta-sub {
-      color: var(--muted);
-      margin-bottom: 40px;
-      max-width: 500px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .cta-grid {
+    /* ── HOW IT WORKS ─────────────────────────────────────────── */
+    .how-section { background: var(--bg); }
+    .steps {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 16px;
-      max-width: 800px;
-      margin: 0 auto;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
     }
+    .step {
+      padding: 32px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      position: relative;
+    }
+    .step-num {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: rgba(0,240,255,.1);
+      border: 1px solid rgba(0,240,255,.2);
+      color: var(--cyan);
+      font-weight: 900; font-size: 1.1rem;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 20px;
+    }
+    .step h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; }
+    .step p { font-size: .85rem; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
+    .step-code {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-family: var(--mono);
+      font-size: .82rem;
+      color: var(--cyan);
+    }
+    .step-code .c { color: var(--muted); }
+    .step-output { color: var(--green); font-size: .78rem; margin-top: 6px; }
 
-    .cta-item {
-      background: rgba(0, 0, 0, .3);
+    /* ── MASTER AGENT SECTION ────────────────────────────────── */
+    .master-section {
+      background: linear-gradient(135deg, rgba(124,58,237,.05) 0%, rgba(0,240,255,.03) 100%);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .master-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: center;
+    }
+    @media(max-width:768px){ .master-inner { grid-template-columns: 1fr; gap: 40px; } }
+    .master-terminal {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,.4);
+    }
+    .term-header {
+      background: #161b22;
+      padding: 10px 16px;
+      display: flex; align-items: center; gap: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .term-header span { font-size: .75rem; color: var(--muted); font-family: var(--mono); }
+    .term-body { padding: 20px; font-family: var(--mono); font-size: .82rem; line-height: 1.8; }
+    .t-prompt { color: var(--muted); }
+    .t-cmd    { color: var(--text); }
+    .t-out    { color: var(--cyan); }
+    .t-out2   { color: var(--green); }
+    .t-dim    { color: #374151; }
+    .master-content h2 { margin-bottom: 16px; }
+    .master-commands { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; }
+    .master-cmd {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 12px 16px;
+      background: rgba(255,255,255,.02);
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 20px;
+      transition: border-color .2s;
+    }
+    .master-cmd:hover { border-color: rgba(0,240,255,.2); }
+    .master-cmd-name { font-family: var(--mono); font-size: .82rem; color: var(--cyan); font-weight: 700; white-space: nowrap; min-width: 120px; }
+    .master-cmd-desc { font-size: .82rem; color: var(--muted); }
+
+    /* ── FINAL CTA ───────────────────────────────────────────── */
+    .cta-section {
+      text-align: center;
+      background: var(--bg2);
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-section::before {
+      content: '';
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      width: 800px; height: 400px;
+      background: radial-gradient(ellipse, rgba(124,58,237,.08) 0%, transparent 70%);
+    }
+    .cta-section h2 { font-size: clamp(2rem, 5vw, 3.5rem); margin-bottom: 16px; }
+    .cta-section p { color: var(--muted); font-size: 1.1rem; margin-bottom: 48px; }
+    .cta-cmds {
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      margin-bottom: 40px;
     }
 
-    .cta-step {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: .75rem;
-      color: var(--muted);
-      margin-bottom: 8px;
-    }
-
-    .cta-cmd {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: .9rem;
-      color: var(--cyan);
-      word-break: break-all;
-    }
-
-    /* FOOTER */
+    /* ── FOOTER ──────────────────────────────────────────────── */
     footer {
       border-top: 1px solid var(--border);
-      padding: 32px 2rem;
-      text-align: center;
-      color: var(--muted);
-      font-size: .8rem;
+      padding: 32px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px;
+    }
+    .footer-logo { font-weight: 800; font-size: .9rem; display: flex; align-items: center; gap: 8px; }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a { font-size: .82rem; color: var(--muted); transition: color .15s; }
+    .footer-links a:hover { color: var(--text); }
+    .footer-copy { font-size: .78rem; color: var(--muted); }
+
+    /* ── DIVIDER LINE ────────────────────────────────────────── */
+    .line-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border2), transparent);
     }
 
-    /* LANG */
-    .pt {
-      display: block;
-    }
+    /* ── SCROLLBAR ───────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
 
-    .en {
-      display: none;
-    }
-
-    body.lang-en .pt {
-      display: none;
-    }
-
-    body.lang-en .en {
-      display: block;
-    }
-
-    .pt-inline {
-      display: inline;
-    }
-
-    .en-inline {
-      display: none;
-    }
-
-    body.lang-en .pt-inline {
-      display: none;
-    }
-
-    body.lang-en .en-inline {
-      display: inline;
+    /* ── RESPONSIVE ──────────────────────────────────────────── */
+    @media(max-width:640px){
+      .stats-bar { gap: 24px; padding: 20px 24px; }
+      .hero-actions { flex-direction: column; align-items: center; }
+      .nav-links a:not(.nav-cta):not(:last-child) { display: none; }
+      footer { flex-direction: column; text-align: center; }
     }
   </style>
 </head>
-
 <body>
 
-  <header>
-    <div class="nav-inner">
-      <div class="logo">
-        <div class="logo-dot"></div>
-        <span>SkillsAgents</span>
-        <span class="badge">v1.0.0</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:16px;">
-        <span style="font-size:.85rem;color:var(--muted);">
-          <span class="pt-inline">Tutorial de Elite</span>
-          <span class="en-inline">Elite Tutorial</span>
-        </span>
-        <div class="lang-toggle">
-          <button class="lang-btn active" onclick="setLang('pt')">PT</button>
-          <button class="lang-btn" onclick="setLang('en')">EN</button>
-        </div>
-      </div>
-    </div>
-  </header>
+<!-- ── NAV ──────────────────────────────────────────────────────── -->
+<nav>
+  <div class="nav-logo">
+    <div class="nav-dot"></div>
+    SkillsAgents
+  </div>
+  <div class="nav-links">
+    <a href="/office.html">Office</a>
+    <a href="/generator.html">Generator</a>
+    <a href="/forge.html">Forge</a>
+    <a href="/skills.html">Skills</a>
+    <a href="/office.html" class="nav-cta">Abrir Office →</a>
+  </div>
+</nav>
 
-  <!-- HERO -->
-  <div class="hero">
-    <div class="hero-badge">
-      <span class="pt-inline">🚀 Guia de Alta Performance</span>
-      <span class="en-inline">🚀 High Performance Guide</span>
+<!-- ── HERO ─────────────────────────────────────────────────────── -->
+<div class="hero">
+  <div class="hero-badge">v1.0.0 — Agora disponível</div>
+
+  <h1>
+    O framework de agentes IA<br/>
+    <span class="gradient-text">mais completo do mundo.</span>
+  </h1>
+
+  <p class="hero-sub">
+    146 agentes especializados. 1270+ skills. Um orquestrador master que comanda tudo.
+    Do zero ao primeiro agente em 10 segundos.
+  </p>
+
+  <div class="install-block">
+    <div class="terminal" onclick="copyCmd(this, 'npx skillsagents install')">
+      <span class="prompt">$</span>
+      <span class="cmd">npx skillsagents install</span>
+      <span class="cursor"></span>
+      <span class="copy-hint">Clique para copiar</span>
     </div>
-    <h1 class="headline">
-      <span class="pt">Domine SkillsAgents.<br><span class="gradient-text">Multiplique seu Output.</span></span>
-      <span class="en">Master SkillsAgents.<br><span class="gradient-text">Multiply Your Output.</span></span>
-    </h1>
-    <p class="hero-sub">
-      <span class="pt">O sistema completo de agentes inteligentes + 1.270 skills especializadas para você desenvolver
-        mais rápido, com mais qualidade, em qualquer projeto.</span>
-      <span class="en">The complete system of intelligent agents + 1,270 specialized skills to help you build faster,
-        with higher quality, on any project.</span>
-    </p>
-    <div class="hero-stats">
-      <div class="stat">
-        <div class="stat-num">11</div>
-        <div class="stat-label"><span class="pt-inline">Agentes IA</span><span class="en-inline">AI Agents</span></div>
-      </div>
-      <div class="stat">
-        <div class="stat-num">1.270</div>
-        <div class="stat-label">Skills</div>
-      </div>
-      <div class="stat">
-        <div class="stat-num">3×</div>
-        <div class="stat-label"><span class="pt-inline">Mais velocidade</span><span class="en-inline">Faster
-            output</span></div>
-      </div>
-      <div class="stat">
-        <div class="stat-num">∞</div>
-        <div class="stat-label"><span class="pt-inline">Domínios</span><span class="en-inline">Domains</span></div>
-      </div>
+    <div class="terminal" onclick="copyCmd(this, 'npx skillsagents install --skills')">
+      <span class="prompt">$</span>
+      <span class="cmd">npx skillsagents install --skills</span>
+      <span class="copy-hint">Clique para copiar</span>
     </div>
   </div>
 
-  <!-- SECTION 1: INSTALAÇÃO -->
-  <section style="background:rgba(26,29,39,.4);">
-    <div class="container">
-      <div class="section-label">
-        <span class="pt-inline">Passo 1</span><span class="en-inline">Step 1</span>
+  <div class="hero-actions">
+    <a href="/office.html" class="btn-primary">🎮 Abrir Pixel Office</a>
+    <a href="/generator.html" class="btn-secondary">🤖 Gerar Prompt com IA</a>
+    <a href="/skills.html" class="btn-secondary">🛠 Ver todas as Skills</a>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat">
+      <div class="stat-num">146</div>
+      <div class="stat-label">Agentes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">1270+</div>
+      <div class="stat-label">Skills</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">3×</div>
+      <div class="stat-label">Mais produtivo</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">10s</div>
+      <div class="stat-label">Para instalar</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">0</div>
+      <div class="stat-label">Configuração manual</div>
+    </div>
+  </div>
+</div>
+
+<div class="line-divider"></div>
+
+<!-- ── PIXEL OFFICE ──────────────────────────────────────────────── -->
+<section class="office-section">
+  <div class="container">
+    <div class="section-tag">Pixel Office</div>
+    <h2>Seus agentes.<br/><span class="gradient-text">Vivos na sua tela.</span></h2>
+    <p class="section-sub">
+      Visualize em tempo real o que cada agente está fazendo — como o Sims, mas os resultados são código de produção.
+    </p>
+
+    <div class="office-preview">
+      <div class="browser-chrome">
+        <div class="browser-dots">
+          <span class="dot-r"></span>
+          <span class="dot-y"></span>
+          <span class="dot-g"></span>
+        </div>
+        <div class="browser-url">localhost:3001/office.html</div>
       </div>
-      <h2 class="section-title">
-        <span class="pt">Instalação em 2 Minutos</span>
-        <span class="en">2-Minute Setup</span>
-      </h2>
-      <p class="section-desc">
-        <span class="pt">Instale o SkillsAgents e as 1.270 skills com dois comandos. Zero configuração manual.</span>
-        <span class="en">Install SkillsAgents and 1,270 skills with two commands. Zero manual configuration.</span>
-      </p>
+      <iframe class="office-iframe" src="/office.html" title="Pixel Office Preview" loading="lazy"></iframe>
+    </div>
 
-      <div class="timeline">
-        <div class="tl-item">
-          <div class="tl-left">
-            <div class="tl-num">1</div>
-            <div class="tl-line"></div>
-          </div>
-          <div class="tl-content">
-            <h3><span class="pt">Instale o SkillsAgents</span><span class="en">Install SkillsAgents</span></h3>
-            <p><span class="pt">Execute no diretório do seu projeto. O instalador cria os agentes automaticamente em
-                <code style="color:var(--cyan)">.codex/agents/</code></span><span class="en">Run in your
-                project directory. The installer creates agents automatically in <code
-                  style="color:var(--cyan)">.codex/agents/</code></span></p>
-            <div class="code-block">
-              <div class="code-header">
-                <div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><span
-                  class="code-lang">bash — terminal</span>
-              </div>
-              <div class="code-body">
-                <div><span class="c-muted"># </span><span class="pt-inline">Instale no projeto atual</span><span
-                    class="en-inline">Install in current project</span></div>
-                <div><span class="c-cyan">npx</span> skillsagents <span class="c-green">install</span></div>
-                <div style="margin-top:12px"><span class="c-muted"># </span><span class="pt-inline">Resultado
-                    esperado</span><span class="en-inline">Expected output</span></div>
-                <div><span class="c-green">✔ skillsagents installed</span></div>
-                <div><span class="c-green">✔ 12 agents ready in .codex/agents/</span></div>
-              </div>
-            </div>
-            <div class="info-box">
-              <span class="info-icon">ℹ️</span>
-              <span class="pt">Funciona em projetos novos e existentes. Os agentes são adicionados sem sobrescrever suas configurações.</span>
-              <span class="en">Works on new and existing projects. Agents are added without overwriting your configurations.</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="tl-item">
-          <div class="tl-left">
-            <div class="tl-num">2</div>
-            <div class="tl-line"></div>
-          </div>
-          <div class="tl-content">
-            <h3><span class="pt">Instale as 1.270 Skills</span><span class="en">Install 1,270 Skills</span></h3>
-            <p><span class="pt">Instala globalmente em <code
-                  style="color:var(--cyan)">~/.skillsagents/skills/</code> — disponível em todos os seus
-                projetos.</span><span class="en">Installs globally to <code
-                  style="color:var(--cyan)">~/.skillsagents/skills/</code> — available across all your
-                projects.</span></p>
-            <div class="code-block">
-              <div class="code-header">
-                <div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><span
-                  class="code-lang">bash — terminal</span>
-              </div>
-              <div class="code-body">
-                <div><span class="c-muted"># </span><span class="pt-inline">Instala 1.270+ skills globalmente</span><span class="en-inline">Install 1,270+ skills globally</span></div>
-                <div><span class="c-cyan">npx</span> skillsagents <span
-                    class="c-green">install</span> <span class="c-orange">--skills</span></div>
-                <div style="margin-top:12px"><span class="c-green">✓ Installed to ~/.skillsagents/skills</span>
-                </div>
-                <div><span class="c-muted"># </span><span class="pt-inline">Verificar instalação</span><span
-                    class="en-inline">Verify installation</span></div>
-                <div><span class="c-cyan">ls</span> ~/.skillsagents/skills/ | <span class="c-cyan">wc</span> -l
-                </div>
-                <div><span class="c-green">1270</span></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="tl-item">
-          <div class="tl-left">
-            <div class="tl-num">3</div>
-          </div>
-          <div class="tl-content">
-            <h3><span class="pt">Confirme que está funcionando</span><span class="en">Confirm It Works</span></h3>
-            <p><span class="pt">No seu IDE, mencione qualquer agente para ativá-lo.</span><span class="en">In your IDE, mention any agent to activate it.</span></p>
-            <div class="code-block">
-              <div class="code-header">
-                <div class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><span
-                  class="code-lang">ai chat</span>
-              </div>
-              <div class="code-body">
-                <div><span class="c-muted">> </span><span class="pt-inline">Você:</span><span
-                    class="en-inline">You:</span></div>
-                <div style="color:var(--text)"><span class="pt-inline">@dev *help</span><span
-                    class="en-inline">@dev *help</span></div>
-                <div style="margin-top:12px"><span class="c-muted">> </span>SkillsAgents:</div>
-                <div style="color:var(--cyan)"><span class="pt-inline">✅ SkillsAgents v1.0.0 ativo. 12 agentes
-                    online.</span><span class="en-inline">✅ SkillsAgents v1.0.0 active. 12 agents online.</span></div>
-              </div>
-            </div>
-          </div>
-        </div>
+    <div class="office-features">
+      <div class="office-feat">
+        <div class="office-feat-icon">🎮</div>
+        <div class="office-feat-title">Animações em tempo real</div>
+        <div class="office-feat-desc">Cada agente tem estados: TYPING, IDLE, WALKING, THINKING. Você vê o que estão fazendo.</div>
+      </div>
+      <div class="office-feat">
+        <div class="office-feat-icon">👥</div>
+        <div class="office-feat-title">13+ agentes simultâneos</div>
+        <div class="office-feat-desc">Spawn novos agentes em tempo real. Cada um ocupa uma mesa com monitor e glow da sua cor.</div>
+      </div>
+      <div class="office-feat">
+        <div class="office-feat-icon">📊</div>
+        <div class="office-feat-title">Activity log ao vivo</div>
+        <div class="office-feat-desc">Veja o histórico de ações de cada agente: comandos executados, skills usadas, status.</div>
+      </div>
+      <div class="office-feat">
+        <div class="office-feat-icon">🖱️</div>
+        <div class="office-feat-title">Interativo</div>
+        <div class="office-feat-desc">Clique em qualquer personagem para ver detalhes. Controle a velocidade do escritório.</div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- SECTION 2: AGENTES -->
-  <section>
-    <div class="container">
-      <div class="section-label">
-        <span class="pt-inline">Passo 2</span><span class="en-inline">Step 2</span>
-      </div>
-      <h2 class="section-title">
-        <span class="pt">SkillsAgents Roster — O Exército de Especialistas</span>
-        <span class="en">SkillsAgents Roster — The Specialist Army</span>
-      </h2>
-      <p class="section-desc">
-        <span class="pt">O poder do framework não está em um único prompt longuíssimo, mas na <strong>Orquestração
-            Multi-Agente</strong>. Cada agente tem ferramentas e personas específicas trabalhando em paralelo para o
-          mesmo objetivo.</span>
-        <span class="en">The power of the framework lies not in a single giant prompt, but in <strong>Multi-Agent
-            Orchestration</strong>. Each agent has specific tools and personas working in parallel towards the same
-          goal.</span>
-      </p>
+<div class="line-divider"></div>
 
-      <!-- ORION SHOWCASE -->
-      <div
-        style="background:linear-gradient(145deg, rgba(0,240,255,.05), transparent); border: 1px solid var(--cyan); border-radius: 16px; padding: 32px; margin-bottom: 40px; display: flex; flex-wrap: wrap; gap: 24px; align-items: center;">
-        <div style="flex: 1 1 300px;">
-          <div
-            style="display:inline-block;background:var(--cyan);color:#000;font-family:'JetBrains Mono',monospace;font-size:0.75rem;font-weight:800;padding:4px 10px;border-radius:6px;margin-bottom:12px;">
-            ★ UNIVERSAL EXECUTOR</div>
-          <h3 style="font-size: 1.8rem; font-weight: 900; margin-bottom: 12px; color: #fff;">@aiox-master (Orion)</h3>
-          <p style="color: var(--muted); font-size: 0.95rem; margin-bottom: 16px; line-height: 1.6;">
-            Orion é o cérebro central. Ele não escreve código diretamente, ele planeja, ativa as skills certas e delega
-            tarefas para a equipe abaixo usando os comandos <code>*yolo</code> (modo autônomo) e <code>*plan</code>.
-            Use-o para iniciar qualquer novo projeto.
-          </p>
-          <div style="display:flex;gap:12px;margin-top:16px;">
-            <a href="/generator.html"
-              style="display:inline-block;background:transparent;border:1px solid var(--cyan);color:var(--cyan);font-weight:700;font-size:.85rem;padding:8px 20px;border-radius:8px;text-decoration:none;transition:0.2s;"
-              onmouseover="this.style.background='rgba(0,240,255,0.1)'"
-              onmouseout="this.style.background='transparent'">Abrir o Command Center →</a>
-            <a href="/forge.html"
-              style="display:inline-block;background:transparent;border:1px solid var(--border);color:var(--muted);font-weight:700;font-size:.85rem;padding:8px 20px;border-radius:8px;text-decoration:none;transition:0.2s;"
-              onmouseover="this.style.background='rgba(255,255,255,0.05)'"
-              onmouseout="this.style.background='transparent'">🛠️ Criar Especialista</a>
+<!-- ── MASTER AGENT ──────────────────────────────────────────────── -->
+<section class="master-section">
+  <div class="container">
+    <div class="master-inner">
+      <div class="master-terminal">
+        <div class="term-header">
+          <div class="browser-dots">
+            <span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span>
           </div>
+          <span>@master — SkillsAgents Orchestrator</span>
         </div>
-        <div
-          style="flex: 1 1 300px; background:#0a0c10; border: 1px solid var(--border); border-radius: 12px; padding: 20px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;">
-          <div style="color: var(--muted); margin-bottom: 8px;">> orion@aiox: initiating task...</div>
-          <div style="color: #6ee7b7; margin-bottom: 8px;">[Planning] Breaking down requirements.</div>
-          <div style="color: #93c5fd; margin-bottom: 8px;">[Delegating] Sending frontend spec to @dev</div>
-          <div style="color: #c4b5fd; margin-bottom: 8px;">[Delegating] Requesting DB schema from @architect</div>
-          <div style="color: var(--cyan); margin-top: 16px;">✓ 4 background tasks working in parallel.</div>
+        <div class="term-body">
+          <div><span class="t-prompt">você → </span><span class="t-cmd">@master *squad criar um SaaS B2B</span></div>
+          <div>&nbsp;</div>
+          <div><span class="t-out">👑 @master analisando...</span></div>
+          <div>&nbsp;</div>
+          <div><span class="t-out2">Squad montado:</span></div>
+          <div><span class="t-dim">  ├─</span> <span class="t-out">@architect</span> <span class="t-dim">→ sistema de design</span></div>
+          <div><span class="t-dim">  ├─</span> <span class="t-out">@dev</span> <span class="t-dim">→ implementação</span></div>
+          <div><span class="t-dim">  ├─</span> <span class="t-out">@devops</span> <span class="t-dim">→ CI/CD e deploy</span></div>
+          <div><span class="t-dim">  └─</span> <span class="t-out">@qa</span> <span class="t-dim">→ revisão e testes</span></div>
+          <div>&nbsp;</div>
+          <div><span class="t-out2">Skills ativas:</span></div>
+          <div><span class="t-dim">  </span><span class="t-out">@react-patterns @fastapi-pro @stripe-integration</span></div>
+          <div>&nbsp;</div>
+          <div><span class="t-out2">✔ Fase 1 iniciando...</span></div>
         </div>
       </div>
 
-      <h3
-        style="font-size:1.1rem;font-weight:800;margin-bottom:20px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">
-        A Equipe de Execução</h3>
-
-      <div class="agents-grid">
-        <div class="agent-card">
-          <div class="agent-icon" style="background:rgba(16,185,129,.1);">💻</div>
-          <div class="agent-name">@dev</div>
-          <div class="agent-role">Dex — <span class="pt-inline">Dev Fullstack</span><span class="en-inline">Fullstack
-              Developer</span></div>
-          <div class="agent-cmd">@dev *build STORY-42</div>
-        </div>
-        <div class="agent-card">
-          <div class="agent-icon" style="background:rgba(239,68,68,.1);">🔍</div>
-          <div class="agent-name">@qa</div>
-          <div class="agent-role"><span class="pt-inline">QA Engineer — Testes</span><span class="en-inline">QA Engineer
-              — Testing</span></div>
-          <div class="agent-cmd">@qa *review-build</div>
-        </div>
-        <div class="agent-card">
-          <div class="agent-icon" style="background:rgba(139,92,246,.1);">🏗️</div>
-          <div class="agent-name">@architect</div>
-          <div class="agent-role"><span class="pt-inline">Arquiteto de Sistemas</span><span class="en-inline">Systems
-              Architect</span></div>
-          <div class="agent-cmd">@architect *create-plan</div>
-        </div>
-        <div class="agent-card">
-          <div class="agent-icon" style="background:rgba(245,158,11,.1);">📊</div>
-          <div class="agent-name">@analyst</div>
-          <div class="agent-role"><span class="pt-inline">Analista de Negócios</span><span class="en-inline">Business
-              Analyst</span></div>
-          <div class="agent-cmd">@analyst *create-brief</div>
-        </div>
-        <div class="agent-card">
-          <div class="agent-icon" style="background:rgba(59,130,246,.1);">📋</div>
-          <div class="agent-name">@pm</div>
-          <div class="agent-role"><span class="pt-inline">Product Manager</span><span class="en-inline">Product
-              Manager</span></div>
-          <div class="agent-cmd">@pm *write-spec</div>
-        </div>
-        <div class="agent-card">
-          <div class="agent-icon" style="background:rgba(236,72,153,.1);">🎨</div>
-          <div class="agent-name">@ux-design-expert</div>
-          <div class="agent-role"><span class="pt-inline">Designer UX/UI</span><span class="en-inline">UX/UI
-              Designer</span></div>
-          <div class="agent-cmd">@ux-design-expert *guide</div>
-        </div>
-        <div class="agent-card">
-          <div class="agent-icon" style="background:rgba(20,184,166,.1);">⚙️</div>
-          <div class="agent-name">@devops</div>
-          <div class="agent-role"><span class="pt-inline">DevOps Engineer</span><span class="en-inline">DevOps
-              Engineer</span></div>
-          <div class="agent-cmd">@devops *create-worktree</div>
-        </div>
-        <div class="agent-card">
-          <div class="agent-icon" style="background:rgba(245,158,11,.1);">🏃</div>
-          <div class="agent-name">@sm</div>
-          <div class="agent-role"><span class="pt-inline">Scrum Master</span><span class="en-inline">Scrum Master</span>
-          </div>
-          <div class="agent-cmd">@sm *create-next-story</div>
-        </div>
-        <div class="agent-card">
-          <div class="agent-icon" style="background:rgba(99,102,241,.1);">📦</div>
-          <div class="agent-name">@po</div>
-          <div class="agent-role"><span class="pt-inline">Product Owner</span><span class="en-inline">Product
-              Owner</span></div>
-          <div class="agent-cmd">@po *prioritize-backlog</div>
-        </div>
-        <div class="agent-card">
-          <div class="agent-icon" style="background:rgba(6,182,212,.1);">🗄️</div>
-          <div class="agent-name">@data-engineer</div>
-          <div class="agent-role"><span class="pt-inline">Eng. de Dados</span><span class="en-inline">Data
-              Engineer</span></div>
-          <div class="agent-cmd">@data-engineer *help</div>
-        </div>
-      </div>
-
-      <div class="info-box" style="margin-top:8px;">
-        <span class="info-icon">💡</span>
-        <span>
-          <span class="pt"><strong>Regra de ouro:</strong> Todo agente responde a <code
-              style="color:var(--cyan)">*help</code> com sua lista completa de comandos. Comece sempre por aí.</span>
-          <span class="en"><strong>Golden rule:</strong> Every agent responds to <code
-              style="color:var(--cyan)">*help</code> with its full command list. Always start there.</span>
-        </span>
-      </div>
-    </div>
-  </section>
-
-  <!-- SECTION 2.5: ORION USE CASES -->
-  <section
-    style="background:rgba(26,29,39,.4); padding-top:40px; padding-bottom:80px; border-top:1px solid var(--border);">
-    <div class="container">
-      <h3 style="font-size:1.5rem;font-weight:800;margin-bottom:24px;color:#fff;">
-        <span class="pt">Como conversar com Orion</span>
-        <span class="en">How to talk to Orion</span>
-      </h3>
-
-      <div class="workflow-row" style="grid-template-columns: 1fr; gap:16px;">
-        <div class="wf-step" style="text-align:left; background:rgba(0,0,0,.3);">
-          <div class="wf-step-title" style="font-size: 1rem; color:var(--cyan); margin-bottom:12px;">O Método Autônomo
-            (*yolo)</div>
-          <div class="code-block" style="margin-bottom:0;">
-            <div class="code-body" style="padding:16px;">
-              <span class="c-muted"># Delegue o trabalho completo sem precisar aprovar cada passo.</span><br>
-              <span class="c-purple">@aiox-master</span> "Quero um dashboard para gerenciar meus clientes com Next.js e
-              Supabase. <span class="c-orange">*yolo</span>"
-            </div>
-          </div>
-        </div>
-
-        <div class="wf-step" style="text-align:left; background:rgba(0,0,0,.3);">
-          <div class="wf-step-title" style="font-size: 1rem; color:var(--cyan); margin-bottom:12px;">O Método
-            Estratégico (*plan)</div>
-          <div class="code-block" style="margin-bottom:0;">
-            <div class="code-body" style="padding:16px;">
-              <span class="c-muted"># Peça para o Orion documentar e arquitetar uma solução antes de tocar no
-                código.</span><br>
-              <span class="c-purple">@aiox-master</span> "Use a skill <span class="c-cyan">@c4-architecture</span> para
-              planejar meu novo SaaS. Use o comando <span class="c-orange">*plan</span> e divida o escopo por Agente."
-            </div>
-          </div>
-        </div>
-
-        <div class="wf-step" style="text-align:left; background:rgba(0,0,0,.3);">
-          <div class="wf-step-title" style="font-size: 1rem; color:var(--cyan); margin-bottom:12px;">Acordando a Equipe
-            (Roteamento)</div>
-          <div class="code-block" style="margin-bottom:0;">
-            <div class="code-body" style="padding:16px;">
-              <span class="c-muted"># Orion automaticamente acordará os responsáveis necessários.</span><br>
-              <span class="c-purple">@aiox-master</span> "Acione o <span class="c-cyan">@ux-design-expert</span> para
-              desenhar a nova tela de login baseada no Dribbble, e o <span class="c-cyan">@dev</span> para implementar
-              em React."
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SECTION 3: ALL SKILLS DIRECTORY -->
-  <section style="background:rgba(26,29,39,.4);">
-    <div class="container">
-      <div class="section-label">
-        <span class="pt-inline">Passo 3</span><span class="en-inline">Step 3</span>
-      </div>
-      <h2 class="section-title">
-        <span class="pt">As 1.262 Skills — Biblioteca Completa</span>
-        <span class="en">All 1,262 Skills — Complete Library</span>
-      </h2>
-      <p class="section-desc">
-        <span class="pt">Cada skill é um especialista ativável com <code
-            style="color:var(--cyan)">Use @nome-da-skill</code>. Filtre por categoria ou pesquise para encontrar a skill
-          certa para seu projeto.</span>
-        <span class="en">Each skill is a specialist activatable with <code
-            style="color:var(--cyan)">Use @skill-name</code>. Filter by category or search to find the right skill for
-          your project.</span>
-      </p>
-
-      <!-- CATEGORY STATS OVERVIEW -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:40px;">
-        <div
-          style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center;">
-          <div style="font-size:1.6rem;font-weight:900;color:var(--cyan)">587</div>
-          <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:4px">
-            General</div>
-        </div>
-        <div
-          style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center;">
-          <div style="font-size:1.6rem;font-weight:900;color:#fcd34d">130</div>
-          <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:4px">
-            DevOps/Cloud</div>
-        </div>
-        <div
-          style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center;">
-          <div style="font-size:1.6rem;font-weight:900;color:#6ee7b7">108</div>
-          <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:4px">
-            AI/ML</div>
-        </div>
-        <div
-          style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center;">
-          <div style="font-size:1.6rem;font-weight:900;color:#e2e8f0">92</div>
-          <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:4px">
-            Automation</div>
-        </div>
-        <div
-          style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center;">
-          <div style="font-size:1.6rem;font-weight:900;color:#c4b5fd">71</div>
-          <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:4px">
-            Language</div>
-        </div>
-        <div
-          style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center;">
-          <div style="font-size:1.6rem;font-weight:900;color:#93c5fd">58</div>
-          <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:4px">
-            Frontend</div>
-        </div>
-        <div
-          style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center;">
-          <div style="font-size:1.6rem;font-weight:900;color:#fca5a5">42</div>
-          <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:4px">
-            Security</div>
-        </div>
-        <div
-          style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center;">
-          <div style="font-size:1.6rem;font-weight:900;color:#86efac">36</div>
-          <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:4px">
-            Backend/API</div>
-        </div>
-        <div
-          style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center;">
-          <div style="font-size:1.6rem;font-weight:900;color:#a5f3fc">36</div>
-          <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:4px">
-            Database</div>
-        </div>
-        <div
-          style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center;">
-          <div style="font-size:1.6rem;font-weight:900;color:#67e8f9">30</div>
-          <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:4px">
-            Testing</div>
-        </div>
-        <div
-          style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center;">
-          <div style="font-size:1.6rem;font-weight:900;color:#f9a8d4">28</div>
-          <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:4px">
-            Marketing</div>
-        </div>
-        <div
-          style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center;">
-          <div style="font-size:1.6rem;font-weight:900;color:#fdba74">23</div>
-          <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:4px">
-            Product</div>
-        </div>
-      </div>
-
-      <!-- INLINE SKILLS BROWSER -->
-      <div
-        style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:32px;">
-        <div
-          style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
-          <div style="font-weight:700;font-size:1rem;">
-            <span class="pt-inline">🔍 Pesquisar Skills</span>
-            <span class="en-inline">🔍 Search Skills</span>
-          </div>
-          <a href="/skills.html" target="_blank"
-            style="display:inline-flex;align-items:center;gap:8px;background:rgba(0,240,255,.1);border:1px solid rgba(0,240,255,.3);color:var(--cyan);padding:8px 16px;border-radius:8px;text-decoration:none;font-size:.82rem;font-weight:700;transition:.2s;"
-            onmouseover="this.style.background='rgba(0,240,255,.2)'"
-            onmouseout="this.style.background='rgba(0,240,255,.1)'">
-            <span class="pt-inline">Ver todas as 1.262 skills →</span>
-            <span class="en-inline">View all 1,262 skills →</span>
-          </a>
-        </div>
-
-        <div style="display:flex;gap:10px;margin-bottom:16px;">
-          <input id="s3search" type="text" placeholder="🔍  ex: react, security, python, docker..." oninput="s3filter()"
-            style="flex:1;background:#0a0c10;border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.85rem;outline:none;transition:.2s;"
-            onfocus="this.style.borderColor='var(--cyan)'" onblur="this.style.borderColor='var(--border)'" />
-          <span id="s3count" style="color:var(--muted);font-size:.82rem;align-self:center;white-space:nowrap;">1.262
-            skills</span>
-        </div>
-
-        <!-- CATEGORY FILTER BUTTONS -->
-        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;" id="s3cats">
-          <button class="s3cb active" onclick="s3cat('ALL')">All (1262)</button>
-          <button class="s3cb" onclick="s3cat('General')" style="color:#94a3b8;border-color:#94a3b8">General
-            (587)</button>
-          <button class="s3cb" onclick="s3cat('DevOps/Cloud')" style="color:#fcd34d;border-color:#fcd34d">DevOps/Cloud
-            (130)</button>
-          <button class="s3cb" onclick="s3cat('AI/ML')" style="color:#6ee7b7;border-color:#6ee7b7">AI/ML (108)</button>
-          <button class="s3cb" onclick="s3cat('Automation')" style="color:#e2e8f0;border-color:#e2e8f0">Automation
-            (92)</button>
-          <button class="s3cb" onclick="s3cat('Language')" style="color:#c4b5fd;border-color:#c4b5fd">Language
-            (71)</button>
-          <button class="s3cb" onclick="s3cat('Frontend')" style="color:#93c5fd;border-color:#93c5fd">Frontend
-            (58)</button>
-          <button class="s3cb" onclick="s3cat('Security')" style="color:#fca5a5;border-color:#fca5a5">Security
-            (42)</button>
-          <button class="s3cb" onclick="s3cat('Backend/API')" style="color:#86efac;border-color:#86efac">Backend/API
-            (36)</button>
-          <button class="s3cb" onclick="s3cat('Database')" style="color:#a5f3fc;border-color:#a5f3fc">Database
-            (36)</button>
-          <button class="s3cb" onclick="s3cat('Testing')" style="color:#67e8f9;border-color:#67e8f9">Testing
-            (30)</button>
-          <button class="s3cb" onclick="s3cat('Marketing')" style="color:#f9a8d4;border-color:#f9a8d4">Marketing
-            (28)</button>
-          <button class="s3cb" onclick="s3cat('Product')" style="color:#fdba74;border-color:#fdba74">Product
-            (23)</button>
-        </div>
-
-        <!-- SKILLS GRID (loaded from JSON) -->
-        <div id="s3grid"
-          style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;max-height:560px;overflow-y:auto;padding-right:4px;">
-        </div>
-        <div id="s3more" style="text-align:center;margin-top:16px;display:none;">
-          <button onclick="s3showAll()"
-            style="background:rgba(0,240,255,.1);border:1px solid rgba(0,240,255,.3);color:var(--cyan);padding:8px 20px;border-radius:8px;cursor:pointer;font-size:.82rem;font-weight:700;">
-            <span class="pt-inline">Mostrar todas →</span><span class="en-inline">Show all →</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- TOP PICKS BY CATEGORY -->
-      <h3 style="font-size:1.1rem;font-weight:800;margin-bottom:20px;">
-        <span class="pt">⭐ Top Skills por Categoria</span>
-        <span class="en">⭐ Top Skills by Category</span>
-      </h3>
-
-      <!-- General / Dev -->
-      <div
-        style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:12px;">
-        <div
-          style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:12px;">
-          🔧 General Dev (587 skills)</div>
-        <div class="skills-grid">
-          <div class="skill-card">
-            <div class="skill-tag">@brainstorming</div>
-            <div class="skill-desc"><span class="pt-inline">Planeja antes de implementar. Evita retrabalho e garante que
-                você está resolvendo o problema certo.</span><span class="en-inline">Plan before implementing. Avoid
-                rework and ensure you're solving the right problem.</span></div><span
-              class="skill-badge badge-arch">Planning</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@code-review-excellence</div>
-            <div class="skill-desc"><span class="pt-inline">Code reviews construtivos que ensinam, não apenas apontam
-                erros. Eleva o nível do time.</span><span class="en-inline">Constructive code reviews that teach, not
-                just point out errors. Elevates team quality.</span></div><span class="skill-badge badge-qa">QA</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@debugging-strategies</div>
-            <div class="skill-desc"><span class="pt-inline">Framework sistemático de debugging: sintoma → hipótese →
-                isolamento → causa raiz → fix.</span><span class="en-inline">Systematic debugging framework: symptom →
-                hypothesis → isolation → root cause → fix.</span></div><span class="skill-badge badge-dev">Dev</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@clean-code</div>
-            <div class="skill-desc"><span class="pt-inline">Princípios do Uncle Bob: nomes claros, funções pequenas,
-                comentários que agregam valor.</span><span class="en-inline">Uncle Bob principles: clear names, small
-                functions, comments that add value.</span></div><span class="skill-badge badge-dev">Dev</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@systematic-debugging</div>
-            <div class="skill-desc"><span class="pt-inline">Use antes de propor qualquer fix — garante diagnóstico
-                correto antes da solução.</span><span class="en-inline">Use before proposing any fix — ensures correct
-                diagnosis before the solution.</span></div><span class="skill-badge badge-dev">Dev</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@plan-writing</div>
-            <div class="skill-desc"><span class="pt-inline">Planos de tarefa atômicos com dependências e critérios de
-                aceitação verificáveis.</span><span class="en-inline">Atomic task plans with dependencies and verifiable
-                acceptance criteria.</span></div><span class="skill-badge badge-arch">Planning</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- AI/ML -->
-      <div
-        style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:12px;">
-        <div
-          style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#6ee7b7;margin-bottom:12px;">
-          🤖 AI/ML (108 skills)</div>
-        <div class="skills-grid">
-          <div class="skill-card">
-            <div class="skill-tag">@rag-engineer</div>
-            <div class="skill-desc"><span class="pt-inline">RAG completo: embeddings, chunking, vector DB
-                (Pinecone/Weaviate/pgvector), reranking e avaliação de qualidade.</span><span class="en-inline">Full
-                RAG: embeddings, chunking, vector DB (Pinecone/Weaviate/pgvector), reranking and quality
-                evaluation.</span></div><span class="skill-badge badge-ai">AI/ML</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@langgraph</div>
-            <div class="skill-desc"><span class="pt-inline">Agentes LLM stateful em produção com LangGraph. Grafos,
-                checkpointing, human-in-the-loop e multi-agentes.</span><span class="en-inline">Stateful LLM agents in
-                production with LangGraph. Graphs, checkpointing, human-in-the-loop and multi-agents.</span></div><span
-              class="skill-badge badge-ai">AI/ML</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@prompt-engineer</div>
-            <div class="skill-desc"><span class="pt-inline">Frameworks RTF, RISEN, Chain-of-Thought, RODES. Otimiza
-                outputs e reduz custo de tokens.</span><span class="en-inline">RTF, RISEN, Chain-of-Thought, RODES
-                frameworks. Optimizes outputs and reduces token cost.</span></div><span
-              class="skill-badge badge-ai">AI/ML</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@crewai</div>
-            <div class="skill-desc"><span class="pt-inline">Multi-agentes com papéis definidos (role-based).
-                Orquestração de crews para tarefas complexas com tool use.</span><span class="en-inline">Multi-agents
-                with defined roles (role-based). Crew orchestration for complex tasks with tool use.</span></div><span
-              class="skill-badge badge-ai">AI/ML</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@gemini-api-dev</div>
-            <div class="skill-desc"><span class="pt-inline">Integração completa com Gemini: multimodal, function
-                calling, streaming, structured outputs e grounding.</span><span class="en-inline">Full Gemini
-                integration: multimodal, function calling, streaming, structured outputs and grounding.</span></div>
-            <span class="skill-badge badge-ai">AI/ML</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@agent-evaluation</div>
-            <div class="skill-desc"><span class="pt-inline">Testa e benchmarka agentes LLM: behavioral testing, métricas
-                de confiabilidade e monitoramento em produção.</span><span class="en-inline">Tests and benchmarks LLM
-                agents: behavioral testing, reliability metrics and production monitoring.</span></div><span
-              class="skill-badge badge-ai">AI/ML</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- DevOps/Cloud -->
-      <div
-        style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:12px;">
-        <div
-          style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#fcd34d;margin-bottom:12px;">
-          ☁️ DevOps/Cloud (130 skills)</div>
-        <div class="skills-grid">
-          <div class="skill-card">
-            <div class="skill-tag">@docker-expert</div>
-            <div class="skill-desc"><span class="pt-inline">Multi-stage builds, imagens mínimas, segurança, Docker
-                Compose e padrões de produção.</span><span class="en-inline">Multi-stage builds, minimal images,
-                security, Docker Compose and production patterns.</span></div><span
-              class="skill-badge badge-dev">DevOps</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@kubernetes-architect</div>
-            <div class="skill-desc"><span class="pt-inline">K8s avançado: GitOps com ArgoCD/Flux, HPA, Helm, service
-                mesh e multi-cluster.</span><span class="en-inline">Advanced K8s: GitOps with ArgoCD/Flux, HPA, Helm,
-                service mesh and multi-cluster.</span></div><span class="skill-badge badge-dev">DevOps</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@terraform-specialist</div>
-            <div class="skill-desc"><span class="pt-inline">IaC com Terraform/OpenTofu: módulos reutilizáveis, state
-                remoto, workspaces e automação de infra.</span><span class="en-inline">IaC with Terraform/OpenTofu:
-                reusable modules, remote state, workspaces and infra automation.</span></div><span
-              class="skill-badge badge-dev">DevOps</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@github-actions-templates</div>
-            <div class="skill-desc"><span class="pt-inline">Workflows CI/CD prontos para produção: test, build, deploy e
-                segurança integrados.</span><span class="en-inline">Production-ready CI/CD workflows: test, build,
-                deploy and integrated security.</span></div><span class="skill-badge badge-dev">DevOps</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@aws-serverless</div>
-            <div class="skill-desc"><span class="pt-inline">Lambda, API Gateway, DynamoDB, SQS/SNS com SAM/CDK. Cold
-                start e padrões event-driven.</span><span class="en-inline">Lambda, API Gateway, DynamoDB, SQS/SNS with
-                SAM/CDK. Cold start and event-driven patterns.</span></div><span
-              class="skill-badge badge-dev">AWS</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@gcp-cloud-run</div>
-            <div class="skill-desc"><span class="pt-inline">Serverless no GCP: Cloud Run, Cloud Functions, Pub/Sub,
-                otimização de cold start e event-driven.</span><span class="en-inline">Serverless on GCP: Cloud Run,
-                Cloud Functions, Pub/Sub, cold start optimization and event-driven.</span></div><span
-              class="skill-badge badge-dev">GCP</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Security -->
-      <div
-        style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:12px;">
-        <div
-          style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#fca5a5;margin-bottom:12px;">
-          🔒 Security (42 skills)</div>
-        <div class="skills-grid">
-          <div class="skill-card">
-            <div class="skill-tag">@security-auditor</div>
-            <div class="skill-desc"><span class="pt-inline">Auditoria completa: OWASP Top 10, DevSecOps, compliance
-                SOC2/GDPR e análise de vulnerabilidades.</span><span class="en-inline">Full audit: OWASP Top 10,
-                DevSecOps, SOC2/GDPR compliance and vulnerability analysis.</span></div><span
-              class="skill-badge badge-sec">Security</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@threat-modeling-expert</div>
-            <div class="skill-desc"><span class="pt-inline">STRIDE, PASTA, attack trees e mapeamento de superfície de
-                ataque. Modela ameaças antes de codar.</span><span class="en-inline">STRIDE, PASTA, attack trees and
-                attack surface mapping. Models threats before coding.</span></div><span
-              class="skill-badge badge-sec">Security</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@auth-implementation-patterns</div>
-            <div class="skill-desc"><span class="pt-inline">JWT, OAuth2, sessões, RBAC e ABAC. Implementa auth seguro e
-                escalável em qualquer stack.</span><span class="en-inline">JWT, OAuth2, sessions, RBAC and ABAC.
-                Implements secure and scalable auth in any stack.</span></div><span
-              class="skill-badge badge-sec">Security</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@api-security-best-practices</div>
-            <div class="skill-desc"><span class="pt-inline">Rate limiting, input validation, injection prevention, CORS
-                e headers de segurança em APIs.</span><span class="en-inline">Rate limiting, input validation, injection
-                prevention, CORS and security headers in APIs.</span></div><span
-              class="skill-badge badge-sec">Security</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@ethical-hacking-methodology</div>
-            <div class="skill-desc"><span class="pt-inline">Metodologia completa de pentest: reconhecimento, scanning,
-                exploração, pós-exploração e relatório.</span><span class="en-inline">Full pentest methodology:
-                reconnaissance, scanning, exploitation, post-exploitation and report.</span></div><span
-              class="skill-badge badge-sec">Security</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@secrets-management</div>
-            <div class="skill-desc"><span class="pt-inline">Vault, AWS Secrets Manager e rotação automática de
-                credenciais em pipelines CI/CD.</span><span class="en-inline">Vault, AWS Secrets Manager and automatic
-                credential rotation in CI/CD pipelines.</span></div><span class="skill-badge badge-sec">Security</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Frontend -->
-      <div
-        style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:12px;">
-        <div
-          style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#93c5fd;margin-bottom:12px;">
-          🎨 Frontend (58 skills)</div>
-        <div class="skills-grid">
-          <div class="skill-card">
-            <div class="skill-tag">@react-patterns</div>
-            <div class="skill-desc"><span class="pt-inline">Hooks modernos, composição, Server Components, Suspense e
-                melhores práticas React 18/19.</span><span class="en-inline">Modern hooks, composition, Server
-                Components, Suspense and React 18/19 best practices.</span></div><span
-              class="skill-badge badge-dev">Frontend</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@nextjs-app-router-patterns</div>
-            <div class="skill-desc"><span class="pt-inline">App Router avançado: Server Components, streaming, parallel
-                routes e data fetching otimizado.</span><span class="en-inline">Advanced App Router: Server Components,
-                streaming, parallel routes and optimized data fetching.</span></div><span
-              class="skill-badge badge-dev">Next.js</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@typescript-expert</div>
-            <div class="skill-desc"><span class="pt-inline">Tipos avançados, generics, conditional types, mapped types e
-                type-level programming.</span><span class="en-inline">Advanced types, generics, conditional types,
-                mapped types and type-level programming.</span></div><span
-              class="skill-badge badge-dev">TypeScript</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@frontend-design</div>
-            <div class="skill-desc"><span class="pt-inline">UI premium com identidade visual única. Glassmorphism,
-                animações sutis e micro-interações.</span><span class="en-inline">Premium UI with unique visual
-                identity. Glassmorphism, subtle animations and micro-interactions.</span></div><span
-              class="skill-badge badge-dev">UI/UX</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@react-state-management</div>
-            <div class="skill-desc"><span class="pt-inline">Redux Toolkit, Zustand, Jotai e React Query. Escolha o
-                estado certo para cada problema.</span><span class="en-inline">Redux Toolkit, Zustand, Jotai and React
-                Query. Choose the right state for each problem.</span></div><span
-              class="skill-badge badge-dev">State</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@tailwind-design-system</div>
-            <div class="skill-desc"><span class="pt-inline">Design system escalável com Tailwind CSS v4, tokens de
-                design e biblioteca de componentes.</span><span class="en-inline">Scalable design system with Tailwind
-                CSS v4, design tokens and component library.</span></div><span class="skill-badge badge-dev">CSS</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Backend/Database -->
-      <div
-        style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:12px;">
-        <div
-          style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#86efac;margin-bottom:12px;">
-          ⚙️ Backend / Database (72 skills)</div>
-        <div class="skills-grid">
-          <div class="skill-card">
-            <div class="skill-tag">@fastapi-pro</div>
-            <div class="skill-desc"><span class="pt-inline">APIs async de alta performance com FastAPI, SQLAlchemy 2.0,
-                Pydantic V2 e padrões de produção.</span><span class="en-inline">High-performance async APIs with
-                FastAPI, SQLAlchemy 2.0, Pydantic V2 and production patterns.</span></div><span
-              class="skill-badge badge-dev">Python</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@nestjs-expert</div>
-            <div class="skill-desc"><span class="pt-inline">Nest.js com DI, guards, interceptors, TypeORM/Mongoose e
-                arquitetura modular escalável.</span><span class="en-inline">Nest.js with DI, guards, interceptors,
-                TypeORM/Mongoose and scalable modular architecture.</span></div><span
-              class="skill-badge badge-dev">Node.js</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@postgresql-optimization</div>
-            <div class="skill-desc"><span class="pt-inline">Tuning de queries, indexação estratégica, EXPLAIN ANALYZE e
-                otimização de banco PostgreSQL.</span><span class="en-inline">Query tuning, strategic indexing, EXPLAIN
-                ANALYZE and PostgreSQL database optimization.</span></div><span class="skill-badge badge-dev">DB</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@database-design</div>
-            <div class="skill-desc"><span class="pt-inline">Schema design, normalização, indexação e escolha de banco:
-                SQL vs NoSQL para cada caso de uso.</span><span class="en-inline">Schema design, normalization, indexing
-                and DB selection: SQL vs NoSQL for each use case.</span></div><span
-              class="skill-badge badge-dev">DB</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@api-design-principles</div>
-            <div class="skill-desc"><span class="pt-inline">REST e GraphQL bem projetados: versioning, paginação, error
-                handling e contratos consistentes.</span><span class="en-inline">Well-designed REST and GraphQL:
-                versioning, pagination, error handling and consistent contracts.</span></div><span
-              class="skill-badge badge-arch">API</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@microservices-patterns</div>
-            <div class="skill-desc"><span class="pt-inline">Sagas, event sourcing, CQRS, circuit breakers e padrões de
-                resiliência em microserviços.</span><span class="en-inline">Sagas, event sourcing, CQRS, circuit
-                breakers and resilience patterns in microservices.</span></div><span
-              class="skill-badge badge-arch">Architecture</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Language Skills -->
-      <div
-        style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:12px;">
-        <div
-          style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#c4b5fd;margin-bottom:12px;">
-          💻 Language Skills (71 skills)</div>
-        <div class="skills-grid">
-          <div class="skill-card">
-            <div class="skill-tag">@python-pro</div>
-            <div class="skill-desc"><span class="pt-inline">Python 3.12+: async/await, type hints, uv, ruff, Pydantic,
-                FastAPI e ecossistema moderno.</span><span class="en-inline">Python 3.12+: async/await, type hints, uv,
-                ruff, Pydantic, FastAPI and modern ecosystem.</span></div><span
-              class="skill-badge badge-dev">Python</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@golang-pro</div>
-            <div class="skill-desc"><span class="pt-inline">Go 1.21+ com concorrência moderna, goroutines, channels,
-                context e microserviços de produção.</span><span class="en-inline">Go 1.21+ with modern concurrency,
-                goroutines, channels, context and production microservices.</span></div><span
-              class="skill-badge badge-dev">Go</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@rust-pro</div>
-            <div class="skill-desc"><span class="pt-inline">Rust 1.75+ com ownership, lifetimes, async Tokio, segurança
-                de memória e systems programming.</span><span class="en-inline">Rust 1.75+ with ownership, lifetimes,
-                async Tokio, memory safety and systems programming.</span></div><span
-              class="skill-badge badge-dev">Rust</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@java-pro</div>
-            <div class="skill-desc"><span class="pt-inline">Java 21+ com virtual threads (Loom), pattern matching,
-                Spring Boot 3.x e GraalVM native.</span><span class="en-inline">Java 21+ with virtual threads (Loom),
-                pattern matching, Spring Boot 3.x and GraalVM native.</span></div><span
-              class="skill-badge badge-dev">Java</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@ruby-pro</div>
-            <div class="skill-desc"><span class="pt-inline">Ruby idiomático com metaprogramming, Rails patterns, RSpec e
-                desenvolvimento de gems.</span><span class="en-inline">Idiomatic Ruby with metaprogramming, Rails
-                patterns, RSpec and gem development.</span></div><span class="skill-badge badge-dev">Ruby</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@elixir-pro</div>
-            <div class="skill-desc"><span class="pt-inline">Elixir com OTP, supervision trees, Phoenix LiveView e
-                sistemas distribuídos fault-tolerant.</span><span class="en-inline">Elixir with OTP, supervision trees,
-                Phoenix LiveView and fault-tolerant distributed systems.</span></div><span
-              class="skill-badge badge-dev">Elixir</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Testing -->
-      <div
-        style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:12px;">
-        <div
-          style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#67e8f9;margin-bottom:12px;">
-          🧪 Testing (30 skills)</div>
-        <div class="skills-grid">
-          <div class="skill-card">
-            <div class="skill-tag">@test-driven-development</div>
-            <div class="skill-desc"><span class="pt-inline">TDD red-green-refactor rigoroso. Escreve o teste antes,
-                implementa o mínimo, refatora com segurança.</span><span class="en-inline">Rigorous red-green-refactor
-                TDD. Write the test first, implement the minimum, refactor safely.</span></div><span
-              class="skill-badge badge-qa">TDD</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@e2e-testing-patterns</div>
-            <div class="skill-desc"><span class="pt-inline">Playwright e Cypress para testes E2E confiáveis: seletores
-                resilientes, CI integrado e visual regression.</span><span class="en-inline">Playwright and Cypress for
-                reliable E2E tests: resilient selectors, integrated CI and visual regression.</span></div><span
-              class="skill-badge badge-qa">E2E</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@python-testing-patterns</div>
-            <div class="skill-desc"><span class="pt-inline">pytest avançado: fixtures, mocking, parametrize e TDD em
-                Python com cobertura completa.</span><span class="en-inline">Advanced pytest: fixtures, mocking,
-                parametrize and TDD in Python with full coverage.</span></div><span
-              class="skill-badge badge-qa">Python</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@javascript-testing-patterns</div>
-            <div class="skill-desc"><span class="pt-inline">Jest e Vitest com Testing Library: unit tests, integration
-                tests e mocking estratégico.</span><span class="en-inline">Jest and Vitest with Testing Library: unit
-                tests, integration tests and strategic mocking.</span></div><span class="skill-badge badge-qa">JS</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Automation -->
-      <div
-        style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:12px;">
-        <div
-          style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#e2e8f0;margin-bottom:12px;">
-          ⚡ Automation (92 skills)</div>
-        <div class="skills-grid">
-          <div class="skill-card">
-            <div class="skill-tag">@gmail-automation</div>
-            <div class="skill-desc"><span class="pt-inline">Busca, lê, envia, arquiva e gerencia labels no Gmail.
-                Automação de fluxos de email.</span><span class="en-inline">Search, read, send, archive and manage
-                labels in Gmail. Email flow automation.</span></div><span class="skill-badge badge-dev">Email</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@google-calendar-automation</div>
-            <div class="skill-desc"><span class="pt-inline">Agenda reuniões, cria eventos, busca horários livres e
-                gerencia calendários Google.</span><span class="en-inline">Schedule meetings, create events, find free
-                slots and manage Google calendars.</span></div><span class="skill-badge badge-dev">Calendar</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@slack-automation</div>
-            <div class="skill-desc"><span class="pt-inline">Envia mensagens, gerencia canais, busca conversas e cria
-                workflows no Slack via Rube MCP.</span><span class="en-inline">Send messages, manage channels, search
-                conversations and create Slack workflows via Rube MCP.</span></div><span
-              class="skill-badge badge-dev">Slack</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@jira-automation</div>
-            <div class="skill-desc"><span class="pt-inline">Cria issues, gerencia sprints, atualiza status e interage
-                com o Jira via Composio.</span><span class="en-inline">Create issues, manage sprints, update status and
-                interact with Jira via Composio.</span></div><span class="skill-badge badge-dev">Jira</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@github-automation</div>
-            <div class="skill-desc"><span class="pt-inline">Automatiza repositórios, PRs, issues, CI/CD e permissões
-                GitHub via Rube MCP.</span><span class="en-inline">Automates repositories, PRs, issues, CI/CD and GitHub
-                permissions via Rube MCP.</span></div><span class="skill-badge badge-dev">GitHub</span>
-          </div>
-          <div class="skill-card">
-            <div class="skill-tag">@notion-automation</div>
-            <div class="skill-desc"><span class="pt-inline">Páginas, bancos de dados, blocos e comentários no Notion
-                programaticamente.</span><span class="en-inline">Pages, databases, blocks and comments in Notion
-                programmatically.</span></div><span class="skill-badge badge-dev">Notion</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- CTA to full page -->
-      <div
-        style="text-align:center;padding:32px;background:linear-gradient(135deg,rgba(0,240,255,.06),rgba(129,140,248,.06));border:1px solid rgba(0,240,255,.15);border-radius:14px;margin-top:24px;">
-        <div style="font-size:1.2rem;font-weight:800;margin-bottom:8px;">
-          <span class="pt">Veja todas as 1.262 skills em uma página</span>
-          <span class="en">See all 1,262 skills on one page</span>
-        </div>
-        <p style="color:var(--muted);font-size:.9rem;margin-bottom:20px;">
-          <span class="pt">Com busca instantânea e filtros por categoria. Encontre a skill certa em segundos.</span>
-          <span class="en">With instant search and category filters. Find the right skill in seconds.</span>
+      <div class="master-content">
+        <div class="section-tag">@master</div>
+        <h2>Um agente que<br/><span class="gradient-text">comanda todos.</span></h2>
+        <p class="section-sub" style="margin-bottom:0">
+          O @master conhece todos os 146 agentes e 1270+ skills. Diga o objetivo — ele monta o squad, define a estratégia e delega para os especialistas.
         </p>
-        <a href="/skills.html" target="_blank"
-          style="display:inline-flex;align-items:center;gap:10px;background:var(--cyan);color:#0e1117;padding:12px 28px;border-radius:10px;text-decoration:none;font-weight:800;font-size:.95rem;transition:.2s;"
-          onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-          🚀 <span class="pt-inline">Abrir Biblioteca Completa de Skills</span><span class="en-inline">Open Complete
-            Skills Library</span>
-        </a>
+
+        <div class="master-commands">
+          <div class="master-cmd">
+            <span class="master-cmd-name">*squad &lt;projeto&gt;</span>
+            <span class="master-cmd-desc">Monta o squad ideal para qualquer projeto</span>
+          </div>
+          <div class="master-cmd">
+            <span class="master-cmd-name">*plan &lt;objetivo&gt;</span>
+            <span class="master-cmd-desc">Plano de execução faseado completo</span>
+          </div>
+          <div class="master-cmd">
+            <span class="master-cmd-name">*swarm &lt;meta&gt;</span>
+            <span class="master-cmd-desc">Lança swarm autônomo de agentes</span>
+          </div>
+          <div class="master-cmd">
+            <span class="master-cmd-name">*yolo</span>
+            <span class="master-cmd-desc">Modo 100% autônomo — executa tudo</span>
+          </div>
+        </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <style>
-    .s3cb {
-      padding: 5px 12px;
-      border-radius: 20px;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--muted);
-      font-size: .72rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: .15s;
-    }
+<div class="line-divider"></div>
 
-    .s3cb:hover,
-    .s3cb.active {
-      background: rgba(0, 240, 255, .08);
-      border-color: var(--cyan) !important;
-      color: var(--cyan) !important;
-    }
+<!-- ── AGENTS GRID ───────────────────────────────────────────────── -->
+<section class="agents-section">
+  <div class="container">
+    <div class="section-tag">Time de Especialistas</div>
+    <h2>13 agentes base.<br/><span class="gradient-text">134 agentes Ruflo.</span></h2>
+    <p class="section-sub">Cada agente é um especialista com autoridades definidas, comandos próprios e integração nativa com qualquer IDE com IA.</p>
 
-    #s3grid::-webkit-scrollbar {
-      width: 4px;
-    }
+    <div class="agents-grid" id="agentsGrid"></div>
 
-    #s3grid::-webkit-scrollbar-track {
-      background: transparent;
-    }
+    <div style="text-align:center;margin-top:40px;">
+      <a href="/office.html" class="btn-primary" style="display:inline-flex">Ver todos no Pixel Office →</a>
+    </div>
+  </div>
+</section>
 
-    #s3grid::-webkit-scrollbar-thumb {
-      background: var(--border);
-      border-radius: 2px;
-    }
-  </style>
+<div class="line-divider"></div>
 
-  <script>
-    // Load skills from JSON and render inline browser
-    (async () => {
-      try {
-        const r = await fetch('/skills_data.json');
-        const data = await r.json();
-        window._s3skills = data;
-        window._s3cat = 'ALL';
-        s3render();
-      } catch (e) {
-        document.getElementById('s3grid').innerHTML = '<p style="color:var(--muted);grid-column:1/-1;text-align:center;padding:20px;">Abra o servidor local para carregar as skills.</p>';
-      }
-    })();
+<!-- ── HOW IT WORKS ──────────────────────────────────────────────── -->
+<section class="how-section">
+  <div class="container">
+    <div class="section-tag">Como funciona</div>
+    <h2>Do zero ao primeiro agente<br/><span class="gradient-text">em 10 segundos.</span></h2>
+    <p class="section-sub">Sem configuração manual. Funciona no Cursor, Claude Code, Gemini, Windsurf e qualquer IDE com IA.</p>
 
-    const CAT_COLORS = {
-      'Security': ['#fca5a5', 'rgba(239,68,68,.15)'],
-      'AI/ML': ['#6ee7b7', 'rgba(16,185,129,.15)'],
-      'Frontend': ['#93c5fd', 'rgba(59,130,246,.15)'],
-      'Language': ['#c4b5fd', 'rgba(139,92,246,.15)'],
-      'DevOps/Cloud': ['#fcd34d', 'rgba(245,158,11,.15)'],
-      'Testing': ['#67e8f9', 'rgba(6,182,212,.15)'],
-      'Database': ['#a5f3fc', 'rgba(20,184,166,.15)'],
-      'Backend/API': ['#86efac', 'rgba(34,197,94,.15)'],
-      'Marketing': ['#f9a8d4', 'rgba(236,72,153,.15)'],
-      'Product': ['#fdba74', 'rgba(249,115,22,.15)'],
-      'Automation': ['#e2e8f0', 'rgba(148,163,184,.15)'],
-      'Architecture': ['#fde68a', 'rgba(234,179,8,.15)'],
-      'General': ['#94a3b8', 'rgba(100,116,139,.12)'],
-    };
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Instale os agentes</h3>
+        <p>Um comando cria a pasta <code style="color:var(--cyan)">.codex/agents/</code> com todos os agentes prontos para uso.</p>
+        <div class="step-code">
+          <span style="color:var(--muted)">$</span> npx skillsagents install<br/>
+          <span class="step-output">✔ skillsagents installed<br/>✔ 13 agents ready in .codex/agents/</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Instale as 1270+ skills</h3>
+        <p>Skills instaladas globalmente em <code style="color:var(--cyan)">~/.skillsagents/skills/</code> — disponíveis em todos os seus projetos.</p>
+        <div class="step-code">
+          <span style="color:var(--muted)">$</span> npx skillsagents install --skills<br/>
+          <span class="step-output">✔ 1270 skills installed globally</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Chame o @master</h3>
+        <p>No seu IDE com IA, chame o @master — ele monta o squad e define o plano para qualquer projeto.</p>
+        <div class="step-code">
+          <span style="color:var(--muted)">&gt; você:</span> @master *squad meu projeto<br/>
+          <span class="step-output">✅ SkillsAgents v1.0.0 — 146 agents online</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-    let s3showMax = 120;
+<div class="line-divider"></div>
 
-    function s3cat(cat) {
-      window._s3cat = cat;
-      s3showMax = 120;
-      document.querySelectorAll('.s3cb').forEach(b => {
-        const label = b.textContent.split(' (')[0];
-        b.classList.toggle('active', (cat === 'ALL' && label === 'All') || (label === cat));
-      });
-      s3render();
-    }
+<!-- ── CTA FINAL ─────────────────────────────────────────────────── -->
+<section class="cta-section">
+  <div class="container" style="position:relative;z-index:1;">
+    <div class="hero-badge" style="display:inline-flex;margin-bottom:24px;">⚡ Pronto para usar agora</div>
+    <h2>Comece em<br/><span class="gradient-text">10 segundos.</span></h2>
+    <p>Instale os agentes, chame o @master e deixa a IA trabalhar.</p>
 
-    function s3filter() { s3showMax = 120; s3render(); }
+    <div class="cta-cmds">
+      <div class="terminal" onclick="copyCmd(this, 'npx skillsagents install')">
+        <span class="prompt">$</span>
+        <span class="cmd">npx skillsagents install</span>
+        <span class="copy-hint">copiar</span>
+      </div>
+      <div class="terminal" onclick="copyCmd(this, 'npx skillsagents install --skills')">
+        <span class="prompt">$</span>
+        <span class="cmd">npx skillsagents install --skills</span>
+        <span class="copy-hint">copiar</span>
+      </div>
+      <div class="terminal" onclick="copyCmd(this, '@master *help')">
+        <span class="prompt">&gt;</span>
+        <span class="cmd">@master *help</span>
+        <span class="copy-hint">copiar</span>
+      </div>
+    </div>
 
-    function s3showAll() { s3showMax = 9999; s3render(); }
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <a href="/office.html"    class="btn-primary">🎮 Pixel Office</a>
+      <a href="/generator.html" class="btn-secondary">🤖 Generator</a>
+      <a href="/forge.html"     class="btn-secondary">⚒️ Forge</a>
+      <a href="/skills.html"    class="btn-secondary">🛠 Skills</a>
+    </div>
+  </div>
+</section>
 
-    function s3render() {
-      if (!window._s3skills) return;
-      const q = (document.getElementById('s3search') || { value: '' }).value.toLowerCase().trim();
-      const cat = window._s3cat || 'ALL';
-      const filtered = window._s3skills.filter(s => {
-        const catOk = cat === 'ALL' || s.cat === cat;
-        const txtOk = !q || s.name.toLowerCase().includes(q) || (s.desc || '').toLowerCase().includes(q);
-        return catOk && txtOk;
-      });
-      const shown = filtered.slice(0, s3showMax);
-      const grid = document.getElementById('s3grid');
-      if (!grid) return;
-      grid.innerHTML = shown.map(s => {
-        const [col, bg] = CAT_COLORS[s.cat] || ['#94a3b8', 'rgba(100,116,139,.12)'];
-        const desc = (s.desc || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').slice(0, 100) + (s.desc && s.desc.length > 100 ? '…' : '');
-        return `<div style="background:#1a1d27;border:1px solid #2a2d3a;border-radius:9px;padding:12px 14px;transition:.2s;cursor:default;" onmouseover="this.style.borderColor='rgba(0,240,255,.4)';this.style.transform='translateY(-1px)'" onmouseout="this.style.borderColor='#2a2d3a';this.style.transform='none'">
-      <div style="font-family:'JetBrains Mono',monospace;font-size:.78rem;color:#00f0ff;font-weight:500;margin-bottom:4px;word-break:break-all;">@${s.name}</div>
-      <div style="font-size:.74rem;color:#6b7280;line-height:1.45;margin-bottom:7px;">${desc}</div>
-      <span style="font-size:.6rem;font-weight:700;text-transform:uppercase;padding:2px 6px;border-radius:4px;letter-spacing:.04em;color:${col};background:${bg}">${s.cat}</span>
+<!-- ── FOOTER ─────────────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-logo">
+    <div class="nav-dot"></div>
+    SkillsAgents
+  </div>
+  <div class="footer-links">
+    <a href="/office.html">Office</a>
+    <a href="/generator.html">Generator</a>
+    <a href="/forge.html">Forge</a>
+    <a href="/skills.html">Skills</a>
+    <a href="https://github.com/matheusj12/skillsagents" target="_blank">GitHub</a>
+  </div>
+  <div class="footer-copy">© 2026 SkillsAgents — 146 agents · 1270+ skills</div>
+</footer>
+
+<script>
+// ── AGENTS DATA ─────────────────────────────────────────────────
+const AGENTS = [
+  { handle:'@master',          title:'Master Orchestrator',  icon:'👑', desc:'Comanda todos os 146 agentes e 1270+ skills. Ponto de entrada único.',              tag:'PRIORITY',  tagColor:'#FFD700', tagBg:'rgba(255,215,0,.12)',      glow:'rgba(255,215,0,0.1)' },
+  { handle:'@dev',             title:'Developer',            icon:'💻', desc:'Implementa código de produção. TDD, refactoring, debugging e otimização.',         tag:'DEV',       tagColor:'#00f0ff', tagBg:'rgba(0,240,255,.1)',       glow:'rgba(0,240,255,0.08)' },
+  { handle:'@architect',       title:'Software Architect',   icon:'🏗️', desc:'Decisões de arquitetura, design de sistema e documentação técnica.',               tag:'ARCH',      tagColor:'#818cf8', tagBg:'rgba(129,140,248,.1)',     glow:'rgba(129,140,248,0.08)' },
+  { handle:'@qa',              title:'Quality Assurance',    icon:'✅', desc:'Revisão de código, testes e validação. Tem a palavra final em qualidade.',         tag:'QA',        tagColor:'#10b981', tagBg:'rgba(16,185,129,.1)',      glow:'rgba(16,185,129,0.08)' },
+  { handle:'@devops',          title:'DevOps Engineer',      icon:'⚙️', desc:'CI/CD, deploy, infraestrutura. Autoridade exclusiva em git push e releases.',      tag:'DEVOPS',    tagColor:'#f59e0b', tagBg:'rgba(245,158,11,.1)',      glow:'rgba(245,158,11,0.08)' },
+  { handle:'@pm',              title:'Product Manager',      icon:'📋', desc:'PRDs, roadmap, alinhamento de negócio. Visão estratégica do produto.',              tag:'PRODUCT',   tagColor:'#f472b6', tagBg:'rgba(244,114,182,.1)',     glow:'rgba(244,114,182,0.08)' },
+  { handle:'@analyst',         title:'Business Analyst',     icon:'🔍', desc:'Análise de requisitos, pesquisa e relatórios. Entende o problema primeiro.',       tag:'RESEARCH',  tagColor:'#a78bfa', tagBg:'rgba(167,139,250,.1)',     glow:'rgba(167,139,250,0.08)' },
+  { handle:'@data-engineer',   title:'Data Engineer',        icon:'📊', desc:'Pipelines de dados, ETL, ML workflows e modelagem de banco.',                      tag:'DATA',      tagColor:'#34d399', tagBg:'rgba(52,211,153,.1)',      glow:'rgba(52,211,153,0.08)' },
+  { handle:'@ux-design-expert',title:'UX Design Expert',     icon:'🎨', desc:'UI premium, wireframes, design systems e auditorias de experiência.',              tag:'DESIGN',    tagColor:'#fb923c', tagBg:'rgba(251,146,60,.1)',      glow:'rgba(251,146,60,0.08)' },
+  { handle:'@agent-swarm',     title:'Swarm Deployer',       icon:'🐝', desc:'Orquestra swarms de agentes em topologias mesh, hierárquica ou adaptativa.',      tag:'SWARM',     tagColor:'#fbbf24', tagBg:'rgba(251,191,36,.1)',      glow:'rgba(251,191,36,0.08)' },
+  { handle:'@hive-mind',       title:'Hive Mind (BFT)',      icon:'🧩', desc:'Coordenação Byzantine fault-tolerant. Consenso distribuído entre agentes.',        tag:'DIST',      tagColor:'#f87171', tagBg:'rgba(248,113,113,.1)',     glow:'rgba(248,113,113,0.08)' },
+  { handle:'@agent-coder',     title:'Code Implementer',     icon:'🔧', desc:'Implementação de alta qualidade com TDD London School e padrões enterprise.',      tag:'RUFLO',     tagColor:'#4ade80', tagBg:'rgba(74,222,128,.1)',      glow:'rgba(74,222,128,0.08)' },
+  { handle:'@agent-reviewer',  title:'Code Reviewer',        icon:'🔎', desc:'Revisão sênior de código: qualidade, segurança, performance e maintainability.',   tag:'RUFLO',     tagColor:'#c084fc', tagBg:'rgba(192,132,252,.1)',     glow:'rgba(192,132,252,0.08)' },
+];
+
+const grid = document.getElementById('agentsGrid');
+AGENTS.forEach(a => {
+  grid.innerHTML += `
+    <div class="agent-card" style="--glow-color:${a.glow}">
+      <div class="agent-icon">${a.icon}</div>
+      <div class="agent-handle">${a.handle}</div>
+      <div class="agent-title">${a.title}</div>
+      <div class="agent-desc">${a.desc}</div>
+      <span class="agent-tag" style="color:${a.tagColor};background:${a.tagBg}">${a.tag}</span>
     </div>`;
-      }).join('');
-      const moreEl = document.getElementById('s3more');
-      if (moreEl) moreEl.style.display = filtered.length > s3showMax ? 'block' : 'none';
-      const countEl = document.getElementById('s3count');
-      if (countEl) countEl.textContent = filtered.length + ' skills';
+});
+
+// ── COPY COMMAND ─────────────────────────────────────────────────
+function copyCmd(el, text) {
+  navigator.clipboard.writeText(text).catch(()=>{});
+  const hint = el.querySelector('.copy-hint');
+  const orig = hint.textContent;
+  hint.textContent = '✔ copiado!';
+  hint.style.color = 'var(--green)';
+  hint.style.opacity = '1';
+  setTimeout(() => {
+    hint.textContent = orig;
+    hint.style.color = '';
+    hint.style.opacity = '';
+  }, 1500);
+}
+
+// ── SMOOTH REVEAL ─────────────────────────────────────────────────
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.opacity = '1';
+      e.target.style.transform = 'translateY(0)';
     }
-  </script>
+  });
+}, { threshold: 0.1 });
 
-  <!-- SECTION 4: WORKFLOW -->
-  <section>
-    <div class="container">
-      <div class="section-label">
-        <span class="pt-inline">Passo 4</span><span class="en-inline">Step 4</span>
-      </div>
-      <h2 class="section-title">
-        <span class="pt">O Fluxo de Trabalho Ideal</span>
-        <span class="en">The Ideal Workflow</span>
-      </h2>
-      <p class="section-desc">
-        <span class="pt">O poder real vem de combinar agentes + skills numa sequência. Siga este fluxo para qualquer
-          feature ou projeto.</span>
-        <span class="en">The real power comes from combining agents + skills in sequence. Follow this flow for any
-          feature or project.</span>
-      </p>
-
-      <div class="workflow-row">
-        <div class="wf-step">
-          <div class="wf-step-icon">🔬</div>
-          <div class="wf-step-title">@analyst</div>
-          <div class="wf-step-sub"><span class="pt-inline">Entende o problema</span><span class="en-inline">Understand
-              the problem</span></div>
-        </div>
-        <div class="wf-arrow">→</div>
-        <div class="wf-step">
-          <div class="wf-step-icon">🏗️</div>
-          <div class="wf-step-title">@architect</div>
-          <div class="wf-step-sub"><span class="pt-inline">Desenha a solução</span><span class="en-inline">Design the
-              solution</span></div>
-        </div>
-        <div class="wf-arrow">→</div>
-        <div class="wf-step">
-          <div class="wf-step-icon">📋</div>
-          <div class="wf-step-title">@sm</div>
-          <div class="wf-step-sub"><span class="pt-inline">Cria histórias</span><span class="en-inline">Create
-              stories</span></div>
-        </div>
-      </div>
-      <div class="workflow-row" style="margin-top:16px;">
-        <div class="wf-step">
-          <div class="wf-step-icon">💻</div>
-          <div class="wf-step-title">@dev</div>
-          <div class="wf-step-sub"><span class="pt-inline">Implementa o código</span><span class="en-inline">Implement
-              the code</span></div>
-        </div>
-        <div class="wf-arrow">→</div>
-        <div class="wf-step">
-          <div class="wf-step-icon">🔍</div>
-          <div class="wf-step-title">@qa</div>
-          <div class="wf-step-sub"><span class="pt-inline">Revisa e valida</span><span class="en-inline">Review and
-              validate</span></div>
-        </div>
-        <div class="wf-arrow">→</div>
-        <div class="wf-step">
-          <div class="wf-step-icon">🚀</div>
-          <div class="wf-step-title">@devops</div>
-          <div class="wf-step-sub"><span class="pt-inline">Deploy seguro</span><span class="en-inline">Safe
-              deploy</span></div>
-        </div>
-      </div>
-
-      <h3 style="margin:48px 0 24px;font-size:1.2rem;font-weight:700;">
-        <span class="pt">Combinações Matadoras: Agente + Skill</span>
-        <span class="en">Killer Combos: Agent + Skill</span>
-      </h3>
-
-      <div class="combo-card">
-        <div class="combo-header">
-          <div class="combo-num">1</div>
-          <div>
-            <div class="combo-title"><span class="pt-inline">Feature Completa do Zero</span><span class="en-inline">Full
-                Feature From Scratch</span></div>
-            <div class="combo-result"><span class="pt-inline">Resultado: código funcionando com testes e
-                documentação</span><span class="en-inline">Result: working code with tests and documentation</span>
-            </div>
-          </div>
-        </div>
-        <div class="combo-tags">
-          <span class="tag">@analyst *create-brief</span>
-          <span class="tag">+ @brainstorming</span>
-          <span class="tag">+ @architect *create-plan</span>
-          <span class="tag">+ @dev *build STORY-X</span>
-          <span class="tag">+ @qa *review-build</span>
-        </div>
-      </div>
-
-      <div class="combo-card">
-        <div class="combo-header">
-          <div class="combo-num">2</div>
-          <div>
-            <div class="combo-title"><span class="pt-inline">Revisão de Segurança em API</span><span
-                class="en-inline">API Security Review</span></div>
-            <div class="combo-result"><span class="pt-inline">Resultado: lista priorizada de vulnerabilidades + plano de
-                correção</span><span class="en-inline">Result: prioritized vulnerability list + fix plan</span></div>
-          </div>
-        </div>
-        <div class="combo-tags">
-          <span class="tag">@qa *critique-spec</span>
-          <span class="tag">+ @security-auditor</span>
-          <span class="tag">+ @api-security-best-practices</span>
-          <span class="tag">+ @dev *apply-qa-fixes</span>
-        </div>
-      </div>
-
-      <div class="combo-card">
-        <div class="combo-header">
-          <div class="combo-num">3</div>
-          <div>
-            <div class="combo-title"><span class="pt-inline">Debug de Bug Crítico em Produção</span><span
-                class="en-inline">Critical Production Bug Debug</span></div>
-            <div class="combo-result"><span class="pt-inline">Resultado: causa raiz identificada + fix implementado +
-                test de não-regressão</span><span class="en-inline">Result: root cause identified + fix implemented +
-                non-regression test</span></div>
-          </div>
-        </div>
-        <div class="combo-tags">
-          <span class="tag">@dev *rollback</span>
-          <span class="tag">+ @debugging-strategies</span>
-          <span class="tag">+ @systematic-debugging</span>
-          <span class="tag">+ @dev *execute-subtask</span>
-          <span class="tag">+ @qa *verify-fix</span>
-        </div>
-      </div>
-
-      <div class="combo-card">
-        <div class="combo-header">
-          <div class="combo-num">4</div>
-          <div>
-            <div class="combo-title"><span class="pt-inline">Produto com IA do Zero</span><span
-                class="en-inline">AI-Powered Product From Scratch</span></div>
-            <div class="combo-result"><span class="pt-inline">Resultado: sistema RAG funcional com agentes e avaliação
-                de qualidade</span><span class="en-inline">Result: functional RAG system with agents and quality
-                evaluation</span></div>
-          </div>
-        </div>
-        <div class="combo-tags">
-          <span class="tag">@architect *assess-complexity</span>
-          <span class="tag">+ @rag-engineer</span>
-          <span class="tag">+ @prompt-engineer</span>
-          <span class="tag">+ @langgraph</span>
-          <span class="tag">+ @agent-evaluation</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SECTION 5: COMANDOS ESSENCIAIS -->
-  <section style="background:rgba(26,29,39,.4);">
-    <div class="container">
-      <div class="section-label">
-        <span class="pt-inline">Referência Rápida</span><span class="en-inline">Quick Reference</span>
-      </div>
-      <h2 class="section-title">
-        <span class="pt">Comandos que Você Vai Usar Todo Dia</span>
-        <span class="en">Commands You'll Use Every Day</span>
-      </h2>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px;">
-
-        <div>
-          <h4
-            style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:12px;">
-            <span class="pt-inline">Comandos Universais</span><span class="en-inline">Universal Commands</span>
-          </h4>
-          <div class="code-block">
-            <div class="code-body" style="padding:16px;">
-              <div style="display:flex;justify-content:space-between;margin-bottom:10px;"><span class="c-cyan">@agente
-                  *help</span><span class="c-muted"><span class="pt-inline"># lista tudo</span><span class="en-inline">#
-                    list all</span></span></div>
-              <div style="display:flex;justify-content:space-between;margin-bottom:10px;"><span class="c-cyan">@agente
-                  *status</span><span class="c-muted"><span class="pt-inline"># progresso atual</span><span
-                    class="en-inline"># current progress</span></span></div>
-              <div style="display:flex;justify-content:space-between;margin-bottom:10px;"><span class="c-cyan">@agente
-                  *yolo</span><span class="c-muted"><span class="pt-inline"># modo autônomo</span><span
-                    class="en-inline"># autonomous mode</span></span></div>
-              <div style="display:flex;justify-content:space-between;"><span class="c-cyan">@agente *exit</span><span
-                  class="c-muted"><span class="pt-inline"># encerra o agente</span><span class="en-inline"># exit
-                    agent</span></span></div>
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <h4
-            style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:12px;">
-            @dev — Top 5</h4>
-          <div class="code-block">
-            <div class="code-body" style="padding:16px;">
-              <div style="display:flex;justify-content:space-between;margin-bottom:10px;"><span
-                  class="c-green">*develop</span><span class="c-muted"><span class="pt-inline"># implementa
-                    história</span><span class="en-inline"># implement story</span></span></div>
-              <div style="display:flex;justify-content:space-between;margin-bottom:10px;"><span
-                  class="c-green">*develop-yolo</span><span class="c-muted"><span class="pt-inline"># 100%
-                    autônomo</span><span class="en-inline"># 100% autonomous</span></span></div>
-              <div style="display:flex;justify-content:space-between;margin-bottom:10px;"><span class="c-green">*build
-                  STORY-X</span><span class="c-muted"><span class="pt-inline"># build completo</span><span
-                    class="en-inline"># full build</span></span></div>
-              <div style="display:flex;justify-content:space-between;margin-bottom:10px;"><span
-                  class="c-green">*run-tests</span><span class="c-muted"><span class="pt-inline"># roda todos os
-                    testes</span><span class="en-inline"># run all tests</span></span></div>
-              <div style="display:flex;justify-content:space-between;"><span class="c-green">*waves</span><span
-                  class="c-muted"><span class="pt-inline"># acha tarefas paralelas</span><span class="en-inline"># find
-                    parallel tasks</span></span></div>
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <h4
-            style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:12px;">
-            Use a Skill</h4>
-          <div class="code-block">
-            <div class="code-body" style="padding:16px;">
-              <div style="margin-bottom:10px;"><span class="c-purple">Use @brainstorming</span> <span
-                  class="c-muted"><span class="pt-inline">para planejar X</span><span class="en-inline">to plan
-                    X</span></span></div>
-              <div style="margin-bottom:10px;"><span class="c-purple">@dev</span> + <span class="c-cyan">Use
-                  @debugging-strategies</span></div>
-              <div style="margin-bottom:10px;"><span class="c-purple">Use @security-auditor</span> <span
-                  class="c-muted"><span class="pt-inline">neste código</span><span class="en-inline">on this
-                    code</span></span></div>
-              <div><span class="c-purple">@architect</span> + <span class="c-cyan">Use @architecture</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SECTION 6: PERFORMANCE -->
-  <section>
-    <div class="container">
-      <div class="section-label">
-        <span class="pt-inline">Resultados Reais</span><span class="en-inline">Real Results</span>
-      </div>
-      <h2 class="section-title">
-        <span class="pt">O Que Você Ganha</span>
-        <span class="en">What You Gain</span>
-      </h2>
-      <div class="perf-grid">
-        <div class="perf-card">
-          <div class="perf-num">3×</div>
-          <div class="perf-unit"><span class="pt-inline">mais rápido em features novas</span><span
-              class="en-inline">faster on new features</span></div>
-          <div class="perf-bar">
-            <div class="perf-fill" style="width:85%"></div>
-          </div>
-          <div class="perf-label"><span class="pt-inline">Agente @dev + @architect + Plan</span><span
-              class="en-inline">Agent @dev + @architect + Plan</span></div>
-        </div>
-        <div class="perf-card">
-          <div class="perf-num">80%</div>
-          <div class="perf-unit"><span class="pt-inline">menos bugs em produção</span><span class="en-inline">fewer
-              production bugs</span></div>
-          <div class="perf-bar">
-            <div class="perf-fill" style="width:75%"></div>
-          </div>
-          <div class="perf-label"><span class="pt-inline">@qa review + TDD skill</span><span class="en-inline">@qa
-              review + TDD skill</span></div>
-        </div>
-        <div class="perf-card">
-          <div class="perf-num">0</div>
-          <div class="perf-unit"><span class="pt-inline">contexto perdido entre sessões</span><span
-              class="en-inline">context lost between sessions</span></div>
-          <div class="perf-bar">
-            <div class="perf-fill" style="width:100%"></div>
-          </div>
-          <div class="perf-label"><span class="pt-inline">Memory Layer + histórias detalhadas</span><span
-              class="en-inline">Memory Layer + detailed stories</span></div>
-        </div>
-        <div class="perf-card">
-          <div class="perf-num">∞</div>
-          <div class="perf-unit"><span class="pt-inline">domínios suportados</span><span class="en-inline">supported
-              domains</span></div>
-          <div class="perf-bar">
-            <div class="perf-fill" style="width:95%"></div>
-          </div>
-          <div class="perf-label">Dev, Security, AI, Data, UX, Business...</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CTA -->
-  <section>
-    <div class="container">
-      <div class="cta-section">
-        <div class="hero-badge" style="margin-bottom:24px;display:inline-flex;">⚡ Quick Start</div>
-        <div style="margin-bottom:30px;"><a href="/generator.html"
-            style="background:#00f0ff;color:#0e1117;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:900;font-size:1.1rem;display:inline-flex;align-items:center;gap:10px;box-shadow:0 0 20px rgba(0,240,255,0.4);">🤖
-            Gerador de Prompts com IA <span
-              style="font-size:0.8rem;background:rgba(0,0,0,0.2);padding:4px 8px;border-radius:6px;">NOVO</span></a>
-        </div>
-        <h2 class="cta-title">
-          <span class="pt">Comece Agora — 4 Passos</span>
-          <span class="en">Start Now — 4 Steps</span>
-        </h2>
-        <p class="cta-sub">
-          <span class="pt">Do zero ao primeiro agente ativo em menos de 5 minutos.</span>
-          <span class="en">From zero to first active agent in under 5 minutes.</span>
-        </p>
-        <div class="cta-grid">
-          <div class="cta-item">
-            <div class="cta-step">STEP 1</div>
-            <div class="cta-cmd">npx skillsagents install</div>
-          </div>
-          <div class="cta-item">
-            <div class="cta-step">STEP 2</div>
-            <div class="cta-cmd">npx skillsagents install --skills</div>
-          </div>
-          <div class="cta-item">
-            <div class="cta-step">STEP 3</div>
-            <div class="cta-cmd">@dev *help</div>
-          </div>
-          <div class="cta-item">
-            <div class="cta-step">STEP 4</div>
-            <div class="cta-cmd">Use @brainstorming para planejar seu próximo projeto</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <footer>
-    <div>SkillsAgents v1.0.0 — 12 agentes + 1.270 skills</div>
-    <div style="margin-top:4px;color:#374151;">© 2026 — <span class="pt-inline">Built for high-performance
-        developers</span><span class="en-inline">Built for high-performance developers</span></div>
-  </footer>
-
-  <script>
-    function setLang(lang) {
-      document.body.classList.toggle('lang-en', lang === 'en');
-      document.querySelectorAll('.lang-btn').forEach(b => {
-        b.classList.toggle('active', b.textContent === lang.toUpperCase());
-      });
-      document.documentElement.lang = lang === 'en' ? 'en' : 'pt-br';
-    }
-  </script>
+document.querySelectorAll('.step, .agent-card, .office-feat, .master-cmd').forEach(el => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(16px)';
+  el.style.transition = 'opacity .5s ease, transform .5s ease';
+  observer.observe(el);
+});
+</script>
 </body>
-
 </html>
