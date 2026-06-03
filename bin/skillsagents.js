@@ -157,9 +157,16 @@ const STACKS = {
 // ── QUICK INSTALL ─────────────────────────────────────────────────────────────
 async function screenQuickInstall(args) {
   banner();
-  console.log(chalk.bold.white('  ⚡  Instalando SkillsAgents\n'));
-  const { install } = require('../src/install.js');
-  install(args || []);
+  console.log(chalk.bold.white('  ⚡  Início Rápido — Instalação\n'));
+  try {
+    const { install } = require('../src/install.js');
+    install(args || []);
+  } catch(e) {
+    br();
+    console.log(chalk.red('  ✗  Erro inesperado: ' + e.message));
+    br();
+    dim('Tente: npx --ignore-existing github:matheusj12/skillsagents install');
+  }
   br();
   await pause();
 }

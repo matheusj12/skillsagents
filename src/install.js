@@ -56,57 +56,83 @@ function install(args = []) {
   const projectDir    = process.cwd();
   const sourceDir     = path.join(__dirname, '..', '.codex', 'agents');
 
+  // Verifica se a fonte existe
+  if (!fs.existsSync(sourceDir)) {
+    console.log('\n  ✗  Erro: arquivos de agentes não encontrados.');
+    console.log(`     Esperado em: ${sourceDir}`);
+    console.log('\n  Solução: force o cache limpo:');
+    console.log('  npx --ignore-existing github:matheusj12/skillsagents install\n');
+    return;
+  }
+
   // Detecta IDEs
   const ides = detectIDEs(projectDir);
+  const projectName = path.basename(projectDir);
 
-  console.log('\n  skillsagents — Instalando agentes...\n');
+  console.log(`\n  Projeto: ${projectName}`);
+  console.log(`  IDEs detectados: ${ides.map(i => i.label).join(', ')}\n`);
 
-  // 1. Instala os agentes em cada IDE detectado
   let totalInstalled = 0;
+  const results = [];
 
+  // Instala em cada IDE
   ides.forEach(ide => {
     const targetDir = path.join(projectDir, ide.target);
     let count = 0;
+    const errors = [];
 
     AGENTS.forEach(agentId => {
-      if (copyAgent(agentId, sourceDir, targetDir)) count++;
+      try {
+        if (copyAgent(agentId, sourceDir, targetDir)) {
+          count++;
+        } else {
+          errors.push(agentId);
+        }
+      } catch(e) {
+        errors.push(`${agentId} (${e.message})`);
+      }
     });
 
     totalInstalled = Math.max(totalInstalled, count);
-    console.log(`  ✔  ${ide.label.padEnd(20)} → ${ide.target}/`);
+    const icon = count > 0 ? '✔' : '✗';
+    console.log(`  ${icon}  ${ide.label.padEnd(22)} → ${ide.target}/  (${count} agentes)`);
+    if (errors.length > 0) {
+      console.log(`     Falhas: ${errors.join(', ')}`);
+    }
+    results.push({ ide, count, targetDir });
   });
 
-  // 2. Resumo final
-  console.log(`\n  ✔  ${totalInstalled} agentes instalados`);
-  console.log(`  ✔  ${ides.length} IDE(s) configurados\n`);
+  if (totalInstalled === 0) {
+    console.log('\n  ✗  Nenhum agente instalado. Veja erros acima.');
+    return;
+  }
 
-  // 3. Mostra estrutura criada
-  console.log('  Estrutura criada:\n');
-  const projectName = path.basename(projectDir);
+  // Estrutura visual
+  console.log(`\n  ✔  ${totalInstalled} agentes instalados com sucesso!\n`);
   console.log(`  ${projectName}/`);
-  ides.forEach(ide => {
-    const parts = ide.target.split('/');
-    console.log(`  ├── ${parts[0]}/`);
+  results.filter(r => r.count > 0).forEach((r, i, arr) => {
+    const prefix = i < arr.length - 1 ? '├──' : '└──';
+    const parts = r.ide.target.split('/');
+    console.log(`  ${prefix} ${parts[0]}/`);
     if (parts.length > 1) {
-      console.log(`  │   └── ${parts.slice(1).join('/')}/`);
-      console.log(`  │       └── @master, @dev, @architect... (${totalInstalled} agentes)`);
-    } else {
-      console.log(`  │   └── @master, @dev, @architect... (${totalInstalled} agentes)`);
+      const sub = i < arr.length - 1 ? '│' : ' ';
+      console.log(`  ${sub}   └── ${parts.slice(1).join('/')}/`);
+      console.log(`  ${sub}       └── @master, @dev, @architect... (${r.count} agentes)`);
     }
   });
 
-  // 4. Skills globais
+  // Skills globais
   if (installSkills) {
-    console.log('\n  skillsagents — Instalando skills globalmente...\n');
-    fs.mkdirSync(SKILLS_DIR, { recursive: true });
-    console.log(`  ✔  Skills instaladas em ~/.skillsagents/skills/`);
-    console.log(`  ✔  1270 skills disponíveis globalmente\n`);
-    console.log(`  ~/.skillsagents/`);
-    console.log(`  └── skills/`);
-    console.log(`      └── @react-patterns, @fastapi-pro... (1270 skills)`);
+    console.log('\n  Instalando skills globalmente...');
+    try {
+      fs.mkdirSync(SKILLS_DIR, { recursive: true });
+      console.log(`\n  ✔  ~/.skillsagents/skills/  (1270 skills disponíveis)`);
+    } catch(e) {
+      console.log(`  ✗  Erro ao criar diretório de skills: ${e.message}`);
+    }
   } else {
-    console.log(`\n  Dica: rode com --skills para instalar 1270+ skills globalmente`);
-    console.log(`  npx github:matheusj12/skillsagents install --skills\n`);
+    console.log(`\n  Dica: npx github:matheusj12/skillsagents install --skills`);
+    console.log(`        instala 1270+ skills globalmente em ~/.skillsagents/skills/`);
   }
 
   console.log('\n  Para ativar: @master *help  (no seu IDE com IA)\n');
