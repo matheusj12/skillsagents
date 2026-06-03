@@ -4,6 +4,40 @@
 const path     = require('path');
 const fs       = require('fs');
 const { exec } = require('child_process');
+
+// ── DIRECT SUBCOMMANDS (bypass interactive menu) ──────────────────
+const directCmd = process.argv[2];
+
+if (directCmd === 'office' || directCmd === 'serve') {
+  const { start } = require('../src/server.js');
+  start();
+  return;
+}
+
+if (directCmd === 'hooks') {
+  const { installHooks } = require('../src/hooks.js');
+  installHooks(process.cwd());
+  return;
+}
+
+if (directCmd === 'hooks:remove') {
+  const { removeHooks } = require('../src/hooks.js');
+  removeHooks(process.cwd());
+  return;
+}
+
+if (directCmd === 'list') {
+  const { list } = require('../src/list.js');
+  list(process.argv.slice(3));
+  return;
+}
+
+if (directCmd === 'install') {
+  const { install } = require('../src/install.js');
+  install(process.argv.slice(3));
+  return;
+}
+
 const figlet   = require('figlet');
 const chalk    = require('chalk');
 const inquirer = require('inquirer');
@@ -385,19 +419,25 @@ async function screenStatus() {
   await pause();
 }
 
-// ── PIXEL OFFICE ──────────────────────────────────────────────────────────────
-async function screenOffice() {
+// ── PIXEL OFFICE SERVER ───────────────────────────────────────────────────────
+function startOfficeServer() {
   banner();
   console.log(chalk.bold.white('  🎮  Pixel Office\n'));
-  info('Abrindo ' + chalk.cyan('http://localhost:4321/office.html') + ' no browser...');
+  info('Iniciando servidor local na porta ' + chalk.cyan('4321') + '...');
   br();
-  const cmd = process.platform === 'win32' ? 'start'
-            : process.platform === 'darwin' ? 'open'
-            : 'xdg-open';
-  exec(`${cmd} http://localhost:4321/office.html`);
-  dim('Se não abrir, acesse manualmente: http://localhost:4321/office.html');
+  // Start server (takes over process)
+  const { start } = require('../src/server.js');
+  start();
+}
+
+// ── INSTALL HOOKS ─────────────────────────────────────────────────────────────
+function installHooksScreen() {
+  banner();
+  console.log(chalk.bold.white('  🔗  Integração com Claude Code\n'));
+  info('Instalando hooks em ' + chalk.cyan('.claude/settings.json') + '...');
   br();
-  await pause();
+  const { installHooks } = require('../src/hooks.js');
+  installHooks(process.cwd());
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -438,8 +478,9 @@ async function main() {
         { name: `  🛠   Skills                ${chalk.gray('browse + selecione entre 1270+ skills')}`,  value: 'skills'  },
         // ── FERRAMENTAS ───────────────────────────────────
         new inquirer.Separator(chalk.gray('  ── ferramentas ────────────────────────────')),
-        { name: `  🎮  Pixel Office           ${chalk.gray('veja seus agentes animados ao vivo')}`,     value: 'office'  },
-        { name: `  📊  Status                 ${chalk.gray('veja o que está instalado')}`,              value: 'status'  },
+        { name: `  🎮  Pixel Office           ${chalk.gray('inicia servidor local + abre no browser')}`, value: 'office'  },
+        { name: `  🔗  Instalar Hooks         ${chalk.gray('integra com Claude Code em tempo real')}`,   value: 'hooks'   },
+        { name: `  📊  Status                 ${chalk.gray('veja o que está instalado')}`,               value: 'status'  },
         new inquirer.Separator(''),
         { name: `  ✕   Sair`,                                                                           value: 'exit'    },
       ],
@@ -451,7 +492,8 @@ async function main() {
     if (action === 'project') await screenForMyProject();
     if (action === 'agents')  await screenAgents();
     if (action === 'skills')  await screenSkills();
-    if (action === 'office')  await screenOffice();
+    if (action === 'office')  startOfficeServer();
+    if (action === 'hooks')   installHooksScreen();
     if (action === 'status')  await screenStatus();
   }
 }

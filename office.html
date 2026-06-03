@@ -764,18 +764,99 @@ function loop() {
   requestAnimationFrame(loop);
 }
 
+// ─── LIVE MODE (SSE from local server) ───────────────────────────
+let liveMode = false;
+let liveToastTimer = null;
+
+function connectLive() {
+  const PORT = 4321;
+  const evtSource = new EventSource(`http://localhost:${PORT}/events`);
+
+  evtSource.onopen = () => {
+    liveMode = true;
+    // Stop demo simulation
+    clearInterval(liveToastTimer);
+    // Show LIVE badge
+    const badge = document.createElement('span');
+    badge.id = 'live-badge';
+    badge.className = 'badge';
+    badge.style.cssText = 'background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3);';
+    badge.textContent = '● LIVE';
+    document.querySelector('.nav-right').prepend(badge);
+    showToast('🟢 Conectado ao servidor local — modo LIVE ativo', '#10b981');
+  };
+
+  evtSource.onmessage = e => {
+    const ev = JSON.parse(e.data);
+    handleLiveEvent(ev);
+  };
+
+  evtSource.onerror = () => {
+    if (liveMode) {
+      liveMode = false;
+      const badge = document.getElementById('live-badge');
+      if (badge) badge.remove();
+    }
+    // Retry in 3s
+    setTimeout(connectLive, 3000);
+  };
+}
+
+function handleLiveEvent(ev) {
+  const char = chars.find(c => c.id === ev.agentId);
+
+  if (ev.type === 'agent_online') {
+    const c = chars.find(x => x.id === ev.agentId);
+    if (c && !c.active) {
+      c.active = true;
+      c.state = 'IDLE';
+      spawnIdx = Math.max(spawnIdx, chars.indexOf(c) + 1);
+      renderRoster();
+      showToast(`✨ ${c.name} entrou no escritório (sessão real)`, c.color);
+    }
+    return;
+  }
+
+  if (!char) return;
+
+  if (ev.type === 'tool_start') {
+    char.state = ev.state || 'TYPING';
+    char.lastAction = `${ev.tool} — ${ev.state}`;
+    logActivity(char);
+    if (ev.tool === 'Bash')    char.lastAction = `executando Bash`;
+    if (ev.tool === 'Read')    char.lastAction = `lendo arquivo`;
+    if (ev.tool === 'Write')   char.lastAction = `escrevendo arquivo`;
+    if (ev.tool === 'Edit')    char.lastAction = `editando código`;
+    if (ev.tool === 'Agent')   char.lastAction = `despachando sub-agente`;
+    if (ev.tool === 'WebSearch') char.lastAction = `pesquisando na web`;
+  }
+
+  if (ev.type === 'tool_end' || ev.type === 'agent_idle') {
+    char.state = 'IDLE';
+    char.lastAction = `tarefa concluída`;
+    logActivity(char);
+  }
+
+  if (ev.type === 'permission_request') {
+    char.state = 'IDLE'; // shows "aguardando..." bubble
+    showToast(`⚠️ ${char.name} aguardando permissão: ${ev.tool}`, '#f59e0b');
+  }
+
+  if (chars[selIdx]?.id === char.id) updateDetail();
+}
+
 // ─── INIT ────────────────────────────────────────────────────────
 renderRoster();
 updateDetail();
 loop();
 
-// Initial activity burst
+// Demo mode — simulated activity (disabled when LIVE)
 chars.filter(c => c.active).forEach((c, i) => {
   setTimeout(() => logActivity(c), i * 300);
 });
 
-// Periodic toast notifications
-setInterval(() => {
+liveToastTimer = setInterval(() => {
+  if (liveMode) return; // skip demo toasts in live mode
   const active = chars.filter(c => c.active);
   const c = active[Math.floor(Math.random()*active.length)];
   const msgs = [
@@ -785,6 +866,9 @@ setInterval(() => {
   ];
   showToast(msgs[Math.floor(Math.random()*msgs.length)], c.color);
 }, 12000);
+
+// Try to connect to local server (non-blocking)
+connectLive();
 </script>
 </body>
 </html>
