@@ -5,7 +5,7 @@ const path     = require('path');
 const fs       = require('fs');
 const { exec } = require('child_process');
 
-// ── DIRECT SUBCOMMANDS (bypass interactive menu) ──────────────────
+// ── OFFICE/HOOKS são os únicos que saem sem menu (tomam o processo) ──
 const directCmd = process.argv[2];
 
 if (directCmd === 'office' || directCmd === 'serve') {
@@ -23,18 +23,6 @@ if (directCmd === 'hooks') {
 if (directCmd === 'hooks:remove') {
   const { removeHooks } = require('../src/hooks.js');
   removeHooks(process.cwd());
-  return;
-}
-
-if (directCmd === 'list') {
-  const { list } = require('../src/list.js');
-  list(process.argv.slice(3));
-  return;
-}
-
-if (directCmd === 'install') {
-  const { install } = require('../src/install.js');
-  install(process.argv.slice(3));
   return;
 }
 
@@ -157,10 +145,11 @@ const STACKS = {
 // ══════════════════════════════════════════════════════════════════════════════
 
 // ── QUICK INSTALL ─────────────────────────────────────────────────────────────
-async function screenQuickInstall() {
+async function screenQuickInstall(args) {
   banner();
-  console.log(chalk.bold.white('  ⚡  Início Rápido\n'));
-  info('Instalando os 13 agentes base...');
+  const installSkills = (args || []).includes('--skills');
+  console.log(chalk.bold.white('  ⚡  Instalando SkillsAgents\n'));
+  info('Copiando agentes para ' + chalk.cyan('.codex/agents/') + ' ...\n');
   br();
 
   let count = 0;
@@ -446,7 +435,21 @@ function installHooksScreen() {
 async function main() {
   banner();
 
-  // Language
+  // Se passou subcomando direto, executa e volta ao menu
+  if (directCmd === 'install') {
+    const args = process.argv.slice(3);
+    header('Instalando agentes...');
+    await screenQuickInstall(args);
+    // continua para o menu abaixo
+  }
+
+  if (directCmd === 'list') {
+    const { list } = require('../src/list.js');
+    list(process.argv.slice(3));
+    return;
+  }
+
+  // Language selection
   const { lang } = await inquirer.prompt([{
     type: 'list',
     name: 'lang',
