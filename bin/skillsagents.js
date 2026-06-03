@@ -26,6 +26,16 @@ if (directCmd === 'hooks:remove') {
   return;
 }
 
+if (directCmd === 'gen' || directCmd === 'generate') {
+  // load deps first, then run generator directly
+  const figlet   = require('figlet');
+  const chalk    = require('chalk');
+  const inquirer = require('inquirer');
+  const { exec } = require('child_process');
+  // reuse same functions — just call main flow with gen preset
+  // handled below in main()
+}
+
 const figlet   = require('figlet');
 const chalk    = require('chalk');
 const inquirer = require('inquirer');
@@ -408,6 +418,169 @@ async function screenStatus() {
   await pause();
 }
 
+// ── GENERATOR ────────────────────────────────────────────────────────────────
+async function screenGenerator() {
+  banner();
+  console.log(chalk.bold.white('  🤖  Gerador de Prompts com IA\n'));
+
+  const { loadConfig, saveConfig, generate } = require('../src/generator.js');
+  let config = loadConfig();
+
+  // ── API KEY SETUP ───────────────────────────────────────────────
+  if (!config.apiKey) {
+    console.log(chalk.yellow('  Primeira vez! Escolha seu provedor de IA:\n'));
+
+    const { provider } = await inquirer.prompt([{
+      type: 'list',
+      name: 'provider',
+      message: '  Provedor de IA:',
+      choices: [
+        { name: '  🟡  Gemini (Google) — grátis, 15 req/min', value: 'gemini' },
+        { name: '  🟣  Claude (Anthropic) — pago, mais preciso', value: 'anthropic' },
+      ],
+    }]);
+
+    const keyUrl = provider === 'gemini'
+      ? 'https://aistudio.google.com/app/apikey'
+      : 'https://console.anthropic.com/';
+
+    br();
+    info('Gere sua chave em: ' + chalk.cyan(keyUrl));
+    br();
+
+    const { apiKey } = await inquirer.prompt([{
+      type: 'password',
+      name: 'apiKey',
+      message: '  Cole sua API Key:',
+      mask: '●',
+      validate: v => v.trim().length > 10 || 'Chave inválida',
+    }]);
+
+    config = { provider, apiKey: apiKey.trim() };
+    saveConfig(config);
+    br();
+    ok('Chave salva em ' + chalk.cyan('~/.skillsagents/config.json'));
+    br();
+  }
+
+  // ── PROJECT INPUT ───────────────────────────────────────────────
+  console.log(chalk.gray('  ── Descreva seu projeto ───────────────────────────────\n'));
+  dim('Exemplos: "SaaS de gestão financeira em Next.js + FastAPI"');
+  dim('"App mobile de delivery com painel admin"');
+  dim('"Sistema de RAG com documentos PDF e busca semântica"');
+  br();
+
+  const { idea } = await inquirer.prompt([{
+    type: 'input',
+    name: 'idea',
+    message: '  Projeto:',
+    validate: v => v.trim().length > 5 || 'Descreva um pouco mais',
+  }]);
+
+  br();
+
+  // ── GENERATE ─────────────────────────────────────────────────────
+  let result;
+  try {
+    result = await generate({ idea, provider: config.provider, apiKey: config.apiKey });
+  } catch(e) {
+    br();
+    console.log(chalk.red('  ✗  Erro: ' + e.message));
+    if (e.message.includes('API') || e.message.includes('key') || e.message.includes('auth')) {
+      console.log(chalk.yellow('  Dica: sua chave pode estar inválida ou expirada.'));
+      const { reset } = await inquirer.prompt([{
+        type: 'confirm', name: 'reset',
+        message: '  Trocar a chave de API?', default: true,
+      }]);
+      if (reset) { saveConfig({}); }
+    }
+    br();
+    await pause();
+    return;
+  }
+
+  // ── DISPLAY RESULT ────────────────────────────────────────────────
+  banner();
+  console.log(chalk.bold.cyanBright('  ✦  Resultado da Orquestração\n'));
+
+  if (result.vision) {
+    console.log(chalk.bold.white('  📋  Visão da Solução\n'));
+    result.vision.split('\n').forEach(l => l && console.log(chalk.gray('  ') + l));
+    br();
+  }
+
+  if (result.agents) {
+    console.log(chalk.bold.white('  👥  Agentes Recomendados\n'));
+    result.agents.split('\n').forEach(l => {
+      if (!l.trim()) return;
+      const match = l.match(/(@\S+)/g);
+      if (match) {
+        let line = l;
+        match.forEach(m => { line = line.replace(m, chalk.cyan(m)); });
+        console.log('  ' + line);
+      } else {
+        console.log(chalk.gray('  ') + l);
+      }
+    });
+    br();
+  }
+
+  if (result.skills) {
+    console.log(chalk.bold.white('  🛠   Skills Recomendadas\n'));
+    result.skills.split('\n').forEach(l => {
+      if (!l.trim()) return;
+      const match = l.match(/(@\S+)/g);
+      if (match) {
+        let line = l;
+        match.forEach(m => { line = line.replace(m, chalk.yellow(m)); });
+        console.log('  ' + line);
+      } else {
+        console.log(chalk.gray('  ') + l);
+      }
+    });
+    br();
+  }
+
+  if (result.prompt) {
+    console.log(chalk.bold.white('  🚀  Prompt Pronto\n'));
+    console.log(chalk.gray('  ' + '─'.repeat(56)));
+    result.prompt.split('\n').forEach(l => console.log('  ' + chalk.white(l)));
+    console.log(chalk.gray('  ' + '─'.repeat(56)));
+    br();
+
+    // Copy to clipboard
+    const { copy } = await inquirer.prompt([{
+      type: 'confirm', name: 'copy',
+      message: '  Copiar prompt para o clipboard?', default: true,
+    }]);
+
+    if (copy) {
+      const clipCmd = process.platform === 'win32' ? `echo ${result.prompt} | clip`
+                    : process.platform === 'darwin' ? `echo "${result.prompt.replace(/"/g, '\\"')}" | pbcopy`
+                    : `echo "${result.prompt.replace(/"/g, '\\"')}" | xclip -selection clipboard 2>/dev/null || xdotool type "${result.prompt.slice(0,20)}"`;
+      exec(clipCmd, () => {});
+      ok('Prompt copiado! Cole no seu IDE e comece.');
+    }
+  }
+
+  br();
+
+  // Option to change key
+  const { changeKey } = await inquirer.prompt([{
+    type: 'list',
+    name: 'changeKey',
+    message: '  O que fazer agora?',
+    choices: [
+      { name: '  ← Voltar ao menu', value: 'back' },
+      { name: '  🔄  Gerar outro prompt', value: 'again' },
+      { name: '  🔑  Trocar chave de API', value: 'key' },
+    ],
+  }]);
+
+  if (changeKey === 'key') { saveConfig({}); await screenGenerator(); return; }
+  if (changeKey === 'again') { await screenGenerator(); return; }
+}
+
 // ── PIXEL OFFICE SERVER ───────────────────────────────────────────────────────
 const { spawn } = require('child_process');
 const http = require('http');
@@ -473,6 +646,12 @@ function installHooksScreen() {
 async function main() {
   banner();
 
+  // Se passou subcomando gen, vai direto ao gerador
+  if (directCmd === 'gen' || directCmd === 'generate') {
+    await screenGenerator();
+    // volta ao menu após gerar
+  }
+
   // Se passou subcomando direto, executa e volta ao menu
   if (directCmd === 'install') {
     const args = process.argv.slice(3);
@@ -515,6 +694,7 @@ async function main() {
         { name: `  🎯  Para meu projeto       ${chalk.gray('squad ideal baseado no seu stack')}`,       value: 'project' },
         // ── EXPLORAR ──────────────────────────────────────
         new inquirer.Separator(chalk.gray('  ── explorar ──────────────────────────────')),
+        { name: `  🤖  Gerar Prompt com IA   ${chalk.gray('descreva o projeto, IA monta o squad')}`,   value: 'gen'     },
         { name: `  👥  Agentes               ${chalk.gray('146 agentes disponíveis')}`,                value: 'agents'  },
         { name: `  🛠   Skills                ${chalk.gray('browse + selecione entre 1270+ skills')}`,  value: 'skills'  },
         // ── FERRAMENTAS ───────────────────────────────────
@@ -529,6 +709,7 @@ async function main() {
 
     if (action === 'exit') { console.log(); process.exit(0); }
 
+    if (action === 'gen')     await screenGenerator();
     if (action === 'quick')   await screenQuickInstall();
     if (action === 'project') await screenForMyProject();
     if (action === 'agents')  await screenAgents();
