@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>SkillsAgents — Pixel Office</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--cyan:#00f0ff;--bg:#09090b;--surface:#101216;--border:#2a2d3a;--muted:#6b7280;--text:#e6edf3;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+
+    header{position:sticky;top:0;z-index:50;background:rgba(9,9,11,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+    .logo{font-weight:800;font-size:1rem;display:flex;gap:8px;align-items:center;}
+    .logo-dot{width:9px;height:9px;background:var(--cyan);border-radius:50%;box-shadow:0 0 8px var(--cyan);animation:pulse 2s infinite;}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    .nav-links{display:flex;gap:16px;}
+    .nav-links a{color:var(--muted);text-decoration:none;font-size:.85rem;font-weight:500;transition:.15s;}
+    .nav-links a:hover{color:var(--cyan);}
+    .nav-links a.active{color:var(--cyan);}
+    .badge{background:rgba(0,240,255,.1);border:1px solid rgba(0,240,255,.3);color:var(--cyan);font-size:.62rem;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.08em;}
+
+    .layout{display:flex;flex:1;overflow:hidden;}
+
+    /* SIDEBAR */
+    .sidebar{width:240px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+    .sidebar-header{padding:14px 16px;border-bottom:1px solid var(--border);font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);}
+    .agent-list{flex:1;overflow-y:auto;padding:8px;}
+    .agent-item{padding:8px 10px;border-radius:8px;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:10px;margin-bottom:2px;}
+    .agent-item:hover{background:rgba(255,255,255,.05);}
+    .agent-item.active{background:rgba(0,240,255,.08);border:1px solid rgba(0,240,255,.2);}
+    .agent-avatar{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;}
+    .agent-info{min-width:0;}
+    .agent-name{font-size:.8rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .agent-role{font-size:.68rem;color:var(--muted);}
+    .agent-status{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-left:auto;}
+    .status-active{background:#10b981;box-shadow:0 0 6px #10b981;}
+    .status-idle{background:#6b7280;}
+    .status-thinking{background:#f59e0b;box-shadow:0 0 6px #f59e0b;animation:pulse 1s infinite;}
+
+    /* CANVAS AREA */
+    .canvas-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;}
+    .toolbar{padding:8px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0;}
+    .tool-btn{padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:.78rem;font-weight:600;cursor:pointer;transition:.15s;}
+    .tool-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+    .tool-btn.active{background:rgba(0,240,255,.1);border-color:var(--cyan);color:var(--cyan);}
+    .zoom-info{font-size:.75rem;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-left:auto;}
+    #canvas{display:block;cursor:crosshair;image-rendering:pixelated;}
+    .canvas-container{flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;background:repeating-conic-gradient(#111 0% 25%,#0e0e0e 0% 50%) 0 0/20px 20px;}
+
+    /* AGENT DETAIL PANEL */
+    .detail-panel{width:220px;flex-shrink:0;background:var(--surface);border-left:1px solid var(--border);padding:16px;display:flex;flex-direction:column;gap:12px;}
+    .detail-name{font-size:.95rem;font-weight:700;}
+    .detail-role{font-size:.75rem;color:var(--muted);}
+    .detail-state{display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,255,255,.04);border-radius:8px;border:1px solid var(--border);}
+    .detail-state-dot{width:8px;height:8px;border-radius:50%;}
+    .detail-state-label{font-size:.78rem;font-family:'JetBrains Mono',monospace;}
+    .detail-commands{font-size:.72rem;color:var(--muted);}
+    .cmd-tag{display:inline-block;background:rgba(0,240,255,.08);border:1px solid rgba(0,240,255,.15);color:var(--cyan);padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:.68rem;margin:2px;}
+    .activity-log{flex:1;overflow-y:auto;border-top:1px solid var(--border);padding-top:12px;}
+    .log-entry{font-size:.7rem;color:var(--muted);padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04);line-height:1.5;}
+    .log-entry span{color:var(--cyan);}
+    hr.div{border:none;border-top:1px solid var(--border);}
+    .section-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:6px;}
+  </style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    <span>SkillsAgents</span>
+    <span class="badge">Pixel Office</span>
+  </div>
+  <nav class="nav-links">
+    <a href="/index.html">Setup</a>
+    <a href="/generator.html">Generator</a>
+    <a href="/forge.html">Forge</a>
+    <a href="/skills.html">Skills</a>
+    <a href="/office.html" class="active">Office</a>
+  </nav>
+</header>
+
+<div class="layout">
+  <!-- LEFT SIDEBAR: agent list -->
+  <div class="sidebar">
+    <div class="sidebar-header">Agentes Online</div>
+    <div class="agent-list" id="agentList"></div>
+  </div>
+
+  <!-- CENTER: canvas -->
+  <div class="canvas-wrap">
+    <div class="toolbar">
+      <button class="tool-btn active" id="btnView" onclick="setTool('view')">👁 Visualizar</button>
+      <button class="tool-btn" id="btnEdit" onclick="setTool('edit')">✏️ Editar Layout</button>
+      <button class="tool-btn" onclick="spawnRandom()">⚡ Spawn Agente</button>
+      <button class="tool-btn" onclick="toggleSpeed()">⏩ Velocidade</button>
+      <span class="zoom-info" id="zoomInfo">Zoom: 2×</span>
+    </div>
+    <div class="canvas-container" id="canvasContainer">
+      <canvas id="canvas"></canvas>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL: selected agent detail -->
+  <div class="detail-panel">
+    <div>
+      <div class="section-label">Agente Selecionado</div>
+      <div class="detail-name" id="detailName">@master</div>
+      <div class="detail-role" id="detailRole">Master Orchestrator</div>
+    </div>
+    <div class="detail-state">
+      <div class="detail-state-dot status-active" id="detailDot"></div>
+      <div class="detail-state-label" id="detailState">TYPING</div>
+    </div>
+    <div>
+      <div class="section-label">Comandos</div>
+      <div id="detailCmds">
+        <span class="cmd-tag">*help</span>
+        <span class="cmd-tag">*squad</span>
+        <span class="cmd-tag">*plan</span>
+        <span class="cmd-tag">*yolo</span>
+      </div>
+    </div>
+    <hr class="div"/>
+    <div class="section-label">Activity Log</div>
+    <div class="activity-log" id="activityLog"></div>
+  </div>
+</div>
+
+<script>
+// ─── CONFIG ────────────────────────────────────────────────────────────────
+const TILE   = 32;
+const COLS   = 22;
+const ROWS   = 14;
+const ZOOM   = 2;
+let   zoom   = ZOOM;
+let   speed  = 1;
+let   tool   = 'view';
+let   selId  = 0;
+
+// ─── AGENTS ────────────────────────────────────────────────────────────────
+const AGENT_DEFS = [
+  { id:'master',           name:'@master',      role:'Master Orchestrator', icon:'👑', color:'#FFD700', cmds:['*help','*squad','*plan','*yolo','*swarm'] },
+  { id:'dev',              name:'@dev',          role:'Developer',           icon:'💻', color:'#00f0ff', cmds:['*develop','*build','*run-tests','*waves'] },
+  { id:'architect',        name:'@architect',    role:'Software Architect',  icon:'🏗️', color:'#818cf8', cmds:['*create-plan','*assess','*review'] },
+  { id:'qa',               name:'@qa',           role:'Quality Assurance',   icon:'✅', color:'#10b981', cmds:['*review-build','*critique','*verify'] },
+  { id:'devops',           name:'@devops',       role:'DevOps Engineer',     icon:'⚙️', color:'#f59e0b', cmds:['*deploy','*pipeline','*monitor'] },
+  { id:'pm',               name:'@pm',           role:'Product Manager',     icon:'📋', color:'#f472b6', cmds:['*create-prd','*roadmap','*brief'] },
+  { id:'analyst',          name:'@analyst',      role:'Business Analyst',    icon:'🔍', color:'#a78bfa', cmds:['*create-brief','*research','*report'] },
+  { id:'data-engineer',    name:'@data-eng',     role:'Data Engineer',       icon:'📊', color:'#34d399', cmds:['*pipeline','*model','*etl'] },
+  { id:'ux-design-expert', name:'@ux',           role:'UX Design Expert',    icon:'🎨', color:'#fb923c', cmds:['*wireframe','*design','*audit'] },
+  { id:'sm',               name:'@sm',           role:'Scrum Master',        icon:'🔄', color:'#60a5fa', cmds:['*sprint','*standup','*retro'] },
+  { id:'agent-coder',      name:'@agent-coder',  role:'Code Implementer',    icon:'🔧', color:'#4ade80', cmds:['*implement','*refactor','*optimize'] },
+  { id:'agent-reviewer',   name:'@reviewer',     role:'Code Reviewer',       icon:'🔎', color:'#c084fc', cmds:['*review','*critique','*approve'] },
+  { id:'hive-mind',        name:'@hive-mind',    role:'Hive Mind (BFT)',     icon:'🧩', color:'#f87171', cmds:['*consensus','*vote','*sync'] },
+];
+
+// ─── STATES ────────────────────────────────────────────────────────────────
+const STATES = ['TYPING','IDLE','WALKING','THINKING','READING'];
+const STATE_COLORS = { TYPING:'#10b981', IDLE:'#6b7280', WALKING:'#00f0ff', THINKING:'#f59e0b', READING:'#a78bfa' };
+
+// ─── DESK POSITIONS ────────────────────────────────────────────────────────
+const DESKS = [
+  {col:2,row:2},{col:6,row:2},{col:10,row:2},{col:14,row:2},{col:18,row:2},
+  {col:2,row:6},{col:6,row:6},{col:10,row:6},{col:14,row:6},{col:18,row:6},
+  {col:2,row:10},{col:6,row:10},{col:10,row:10},{col:14,row:10},
+];
+
+// ─── CHARACTERS ────────────────────────────────────────────────────────────
+const chars = AGENT_DEFS.map((def, i) => {
+  const desk = DESKS[i % DESKS.length];
+  return {
+    ...def,
+    x: desk.col * TILE + TILE/2,
+    y: desk.row * TILE + TILE/2,
+    tx: desk.col * TILE + TILE/2,
+    ty: desk.row * TILE + TILE/2,
+    deskX: desk.col * TILE,
+    deskY: desk.row * TILE,
+    state: STATES[Math.floor(Math.random() * 2)],
+    frame: Math.floor(Math.random() * 60),
+    dir: 'down',
+    bubble: null,
+    bubbleTimer: 0,
+    spriteIdx: i % 6,
+    active: i < 8,
+  };
+});
+
+// ─── ACTIVITY LOG ────────────────────────────────────────────────────────────
+const ACTIVITIES = [
+  c => `executando <span>*${c.cmds[0]}</span>`,
+  c => `analisando código`,
+  c => `esperando resposta`,
+  c => `<span>Use @${AGENT_DEFS[Math.floor(Math.random()*AGENT_DEFS.length)].id.split('-')[0]}</span>`,
+  c => `gerando output...`,
+  c => `lendo documentação`,
+  c => `validando resultado`,
+];
+const logEntries = [];
+function addLog(char) {
+  const fn = ACTIVITIES[Math.floor(Math.random() * ACTIVITIES.length)];
+  logEntries.unshift({ name: char.name, text: fn(char), t: Date.now() });
+  if (logEntries.length > 20) logEntries.pop();
+  renderLog();
+}
+function renderLog() {
+  const el = document.getElementById('activityLog');
+  el.innerHTML = logEntries.map(e =>
+    `<div class="log-entry">${e.name} — ${e.text}</div>`
+  ).join('');
+}
+
+// ─── SPRITES (loaded from assets) ────────────────────────────────────────────
+const spriteImgs = [];
+let spritesLoaded = 0;
+for (let i = 0; i < 6; i++) {
+  const img = new Image();
+  img.onload  = () => spritesLoaded++;
+  img.onerror = () => spritesLoaded++;
+  img.src = `/assets/characters/char_${i}.png`;
+  spriteImgs.push(img);
+}
+
+const deskImg = new Image();
+deskImg.src = '/assets/furniture/DESK/DESK_FRONT.png';
+const floorImg = new Image();
+floorImg.src = '/assets/floors/floor_0.png';
+const plantImg = new Image();
+plantImg.src = '/assets/furniture/PLANT.png';
+
+// ─── CANVAS SETUP ────────────────────────────────────────────────────────────
+const canvas = document.getElementById('canvas');
+const ctx    = canvas.getContext('2d');
+canvas.width  = COLS * TILE;
+canvas.height = ROWS * TILE;
+canvas.style.width  = (COLS * TILE * zoom) + 'px';
+canvas.style.height = (ROWS * TILE * zoom) + 'px';
+
+// ─── PIXEL-ART CHARACTER DRAWING ─────────────────────────────────────────────
+// Simple 8×12 pixel character template (2 rows: head, body)
+function drawPixelChar(x, y, color, state, frame, selected) {
+  const px = 2; // pixel size
+
+  // Shadow
+  ctx.fillStyle = 'rgba(0,0,0,0.3)';
+  ctx.beginPath();
+  ctx.ellipse(x, y + 8, 6, 3, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Selection ring
+  if (selected) {
+    ctx.strokeStyle = '#FFD700';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.ellipse(x, y + 8, 8, 4, 0, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  const bob = state === 'IDLE' ? Math.sin(frame * 0.05) * 0.5 : 0;
+  const yOff = bob;
+
+  // Body
+  const bodyH = state === 'WALKING' ? 8 : 9;
+  ctx.fillStyle = color;
+  ctx.fillRect(x - 4, y - bodyH + yOff, 8, bodyH);
+
+  // Head
+  ctx.fillStyle = '#FFDEAD';
+  ctx.fillRect(x - 4, y - bodyH - 7 + yOff, 8, 7);
+
+  // Eyes
+  ctx.fillStyle = '#111';
+  const blink = (frame % 80 < 3) ? 1 : 2;
+  ctx.fillRect(x - 2, y - bodyH - 5 + yOff, px, blink);
+  ctx.fillRect(x + 1, y - bodyH - 5 + yOff, px, blink);
+
+  // Mouth
+  if (state === 'TYPING' || state === 'THINKING') {
+    ctx.fillStyle = '#FF6B6B';
+    ctx.fillRect(x - 2, y - bodyH - 2 + yOff, 4, 1);
+  }
+
+  // Arms based on state
+  ctx.fillStyle = color;
+  if (state === 'TYPING') {
+    // Arms forward (typing)
+    const armAnim = Math.sin(frame * 0.15) * 1.5;
+    ctx.fillRect(x - 7, y - bodyH + 2 + armAnim, 3, 4);
+    ctx.fillRect(x + 4, y - bodyH + 2 - armAnim, 3, 4);
+  } else if (state === 'WALKING') {
+    const swing = Math.sin(frame * 0.2) * 3;
+    ctx.fillRect(x - 7, y - bodyH + 2 + swing, 3, 4);
+    ctx.fillRect(x + 4, y - bodyH + 2 - swing, 3, 4);
+  } else {
+    // Arms at sides
+    ctx.fillRect(x - 7, y - bodyH + 3, 3, 5);
+    ctx.fillRect(x + 4, y - bodyH + 3, 3, 5);
+  }
+
+  // Legs
+  ctx.fillStyle = '#2a2d3a';
+  if (state === 'WALKING') {
+    const legSwing = Math.sin(frame * 0.2) * 2;
+    ctx.fillRect(x - 3, y, 2, 5 + legSwing);
+    ctx.fillRect(x + 1, y, 2, 5 - legSwing);
+  } else {
+    ctx.fillRect(x - 3, y, 2, 5);
+    ctx.fillRect(x + 1, y, 2, 5);
+  }
+
+  // Thinking bubble
+  if (state === 'THINKING' && frame % 60 < 40) {
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    ctx.fillRect(x + 5, y - bodyH - 14 + yOff, 16, 10);
+    ctx.fillStyle = '#111';
+    ctx.font = '7px monospace';
+    ctx.fillText('...', x + 7, y - bodyH - 7 + yOff);
+  }
+
+  // Cursor blink for TYPING state
+  if (state === 'TYPING' && frame % 30 < 15) {
+    ctx.fillStyle = '#00f0ff';
+    ctx.fillRect(x - 2, y - bodyH - 13 + yOff, 1, 8);
+  }
+}
+
+// ─── DESK DRAWING ────────────────────────────────────────────────────────────
+function drawDesk(x, y, occupied, agentColor) {
+  // Desk surface
+  ctx.fillStyle = '#1e1b18';
+  ctx.fillRect(x + 1, y + 1, TILE - 2, TILE - 2);
+  ctx.strokeStyle = '#3a3530';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(x + 1, y + 1, TILE - 2, TILE - 2);
+
+  // Monitor
+  ctx.fillStyle = '#111';
+  ctx.fillRect(x + 6, y + 4, 20, 13);
+  ctx.fillStyle = occupied ? agentColor + '33' : '#1a1a2e';
+  ctx.fillRect(x + 7, y + 5, 18, 11);
+
+  // Monitor glow if occupied
+  if (occupied) {
+    ctx.fillStyle = agentColor + '22';
+    ctx.fillRect(x + 4, y + 2, 24, 17);
+    // Cursor blink on screen
+    if (Math.floor(Date.now() / 500) % 2 === 0) {
+      ctx.fillStyle = agentColor;
+      ctx.fillRect(x + 8, y + 14, 1, 2);
+    }
+  }
+
+  // Monitor stand
+  ctx.fillStyle = '#2a2520';
+  ctx.fillRect(x + 14, y + 17, 4, 3);
+  ctx.fillRect(x + 11, y + 20, 10, 2);
+
+  // Keyboard
+  ctx.fillStyle = '#252320';
+  ctx.fillRect(x + 7, y + 24, 18, 5);
+  ctx.strokeStyle = '#333';
+  ctx.lineWidth = .5;
+  for (let kx = 0; kx < 3; kx++) {
+    for (let ky = 0; ky < 2; ky++) {
+      ctx.strokeRect(x + 8 + kx * 5, y + 25 + ky * 2, 4, 1.5);
+    }
+  }
+}
+
+// ─── FLOOR DRAWING ────────────────────────────────────────────────────────────
+function drawFloor() {
+  // Background
+  ctx.fillStyle = '#0e1018';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Grid tiles
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      const isDark = (r + c) % 2 === 0;
+      ctx.fillStyle = isDark ? '#11131a' : '#0e1016';
+      ctx.fillRect(c * TILE, r * TILE, TILE, TILE);
+    }
+  }
+
+  // Grid lines
+  ctx.strokeStyle = 'rgba(0,240,255,0.04)';
+  ctx.lineWidth = .5;
+  for (let r = 0; r <= ROWS; r++) {
+    ctx.beginPath(); ctx.moveTo(0, r * TILE); ctx.lineTo(canvas.width, r * TILE); ctx.stroke();
+  }
+  for (let c = 0; c <= COLS; c++) {
+    ctx.beginPath(); ctx.moveTo(c * TILE, 0); ctx.lineTo(c * TILE, canvas.height); ctx.stroke();
+  }
+
+  // Logo watermark
+  ctx.fillStyle = 'rgba(0,240,255,0.03)';
+  ctx.font = 'bold 48px monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('SKILLS AGENTS', canvas.width/2, canvas.height/2 + 16);
+  ctx.textAlign = 'left';
+}
+
+// ─── NAME BADGE ───────────────────────────────────────────────────────────────
+function drawBadge(char) {
+  const label = char.name;
+  ctx.font = 'bold 6px monospace';
+  const w = ctx.measureText(label).width + 6;
+  const bx = char.x - w/2;
+  const by = char.y - 28;
+
+  ctx.fillStyle = 'rgba(0,0,0,0.75)';
+  ctx.fillRect(bx - 1, by - 7, w + 2, 9);
+  ctx.fillStyle = char.color;
+  ctx.fillText(label, bx + 2, by);
+
+  // State dot
+  const dotColor = STATE_COLORS[char.state] || '#6b7280';
+  ctx.fillStyle = dotColor;
+  ctx.beginPath();
+  ctx.arc(char.x + w/2 - 2, by - 3, 2, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+// ─── GAME LOOP ────────────────────────────────────────────────────────────────
+let frame = 0;
+function loop() {
+  frame++;
+  update();
+  render();
+  requestAnimationFrame(loop);
+}
+
+function update() {
+  chars.forEach(c => {
+    if (!c.active) return;
+    c.frame++;
+
+    // Move toward target
+    const dx = c.tx - c.x;
+    const dy = c.ty - c.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist > 1) {
+      c.x += dx * 0.05 * speed;
+      c.y += dy * 0.05 * speed;
+      c.state = 'WALKING';
+    } else {
+      c.x = c.tx;
+      c.y = c.ty;
+      if (c.state === 'WALKING') {
+        c.state = Math.random() < 0.7 ? 'TYPING' : 'IDLE';
+        addLog(c);
+      }
+    }
+
+    // Random state transitions
+    if (dist <= 1 && c.frame % (Math.floor(120 / speed)) === 0) {
+      const roll = Math.random();
+      if (roll < 0.05) {
+        // Walk to a random desk
+        const desk = DESKS[Math.floor(Math.random() * DESKS.length)];
+        c.tx = desk.col * TILE + TILE/2;
+        c.ty = desk.row * TILE + TILE/2;
+      } else if (roll < 0.15) {
+        c.state = 'THINKING';
+      } else if (roll < 0.25) {
+        c.state = 'IDLE';
+      } else if (roll < 0.3) {
+        c.state = 'READING';
+      } else {
+        c.state = 'TYPING';
+      }
+      if (roll >= 0.05) addLog(c);
+    }
+  });
+}
+
+function render() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawFloor();
+
+  // Draw desks
+  DESKS.forEach((d, i) => {
+    const char = chars.find(c => c.active && Math.abs(c.tx - (d.col*TILE+TILE/2)) < 2 && Math.abs(c.ty - (d.row*TILE+TILE/2)) < 2);
+    drawDesk(d.col * TILE, d.row * TILE, !!char, char?.color || '#fff');
+  });
+
+  // Sort by Y for z-order
+  const active = chars.filter(c => c.active).sort((a,b) => a.y - b.y);
+
+  active.forEach(c => {
+    drawPixelChar(c.x, c.y, c.color, c.state, c.frame, c.id === chars[selId]?.id);
+    drawBadge(c);
+  });
+}
+
+// ─── SIDEBAR ─────────────────────────────────────────────────────────────────
+function renderSidebar() {
+  const el = document.getElementById('agentList');
+  el.innerHTML = chars.map((c, i) => `
+    <div class="agent-item ${i === selId ? 'active' : ''}" onclick="selectAgent(${i})">
+      <div class="agent-avatar" style="background:${c.color}22;border:1px solid ${c.color}44">${c.icon}</div>
+      <div class="agent-info">
+        <div class="agent-name">${c.name}</div>
+        <div class="agent-role">${c.role}</div>
+      </div>
+      <div class="agent-status ${c.active ? (c.state==='THINKING'?'status-thinking':'status-active') : 'status-idle'}"></div>
+    </div>
+  `).join('');
+}
+
+function selectAgent(i) {
+  selId = i;
+  const c = chars[i];
+  document.getElementById('detailName').textContent = c.name;
+  document.getElementById('detailRole').textContent = c.role;
+  document.getElementById('detailState').textContent = c.state;
+  document.getElementById('detailState').style.color = STATE_COLORS[c.state];
+  const dot = document.getElementById('detailDot');
+  dot.className = 'detail-state-dot ' + (c.state==='THINKING'?'status-thinking':(c.active?'status-active':'status-idle'));
+  document.getElementById('detailCmds').innerHTML = (c.cmds||[]).map(cmd=>`<span class="cmd-tag">${cmd}</span>`).join('');
+  renderSidebar();
+}
+
+// ─── CONTROLS ─────────────────────────────────────────────────────────────────
+function setTool(t) {
+  tool = t;
+  document.getElementById('btnView').classList.toggle('active', t==='view');
+  document.getElementById('btnEdit').classList.toggle('active', t==='edit');
+  canvas.style.cursor = t === 'edit' ? 'cell' : 'crosshair';
+}
+
+let speedIdx = 0;
+const speeds = [1, 2, 4];
+function toggleSpeed() {
+  speedIdx = (speedIdx + 1) % speeds.length;
+  speed = speeds[speedIdx];
+  document.querySelector('[onclick="toggleSpeed()"]').textContent = `⏩ ×${speed}`;
+}
+
+let activeCount = 8;
+function spawnRandom() {
+  if (activeCount >= chars.length) return;
+  const c = chars[activeCount];
+  c.active = true;
+  const desk = DESKS[activeCount % DESKS.length];
+  c.x = COLS * TILE / 2;
+  c.y = -TILE;
+  c.tx = desk.col * TILE + TILE/2;
+  c.ty = desk.row * TILE + TILE/2;
+  c.state = 'WALKING';
+  activeCount++;
+  renderSidebar();
+  addLog(c);
+}
+
+// Canvas click — select agent
+canvas.addEventListener('click', e => {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const mx = (e.clientX - rect.left) * scaleX;
+  const my = (e.clientY - rect.top) * scaleY;
+
+  chars.forEach((c, i) => {
+    if (!c.active) return;
+    if (Math.abs(c.x - mx) < 12 && Math.abs(c.y - my) < 16) selectAgent(i);
+  });
+});
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+renderSidebar();
+selectAgent(0);
+loop();
+
+// Random activity every few seconds
+setInterval(() => { addLog(chars[Math.floor(Math.random() * activeCount)]); }, 3000);
+</script>
+</body>
+</html>

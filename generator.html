@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>AIOX Prompt Generator</title>
+    <title>SkillsAgents — Gerador de Prompts</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap"
         rel="stylesheet" />
@@ -332,8 +332,8 @@
         </div>
     </header>
     <div class="hero">
-        <h1>Orquestração de Agentes <span>AIOX</span></h1>
-        <p>Descreva o que você quer construir. O Orion (@aiox-master) vai analisar os 11 agentes e as 1.262 skills e
+        <h1>Orquestração de Agentes <span>SkillsAgents</span></h1>
+        <p>Descreva o que você quer construir. O Orion vai analisar os 12 agentes e as 1.270 skills e
             delegar as tarefas criando um plano de ação completo.</p>
 
         <div class="input-box">
@@ -364,7 +364,7 @@
                     <div class="mac-btn mac-min"></div>
                     <div class="mac-btn mac-max"></div>
                 </div>
-                <div class="terminal-title">orion@aiox-master: ~/orchestration</div>
+                <div class="terminal-title">orion@skillsagents: ~/orchestration</div>
             </div>
             <div id="resultBox" class="result-box">
                 <div class="markdown-body" id="resultContent"></div>
@@ -375,8 +375,8 @@
     <script>
         // Check for local storage history on load
         window.onload = () => {
-            const savedIdea = localStorage.getItem('last_aiox_idea');
-            const savedResult = localStorage.getItem('last_aiox_result');
+            const savedIdea = localStorage.getItem('last_skillsagents_idea');
+            const savedResult = localStorage.getItem('last_skillsagents_result');
 
             if (savedIdea) document.getElementById('ideaInput').value = savedIdea;
             if (savedResult) {
@@ -442,8 +442,8 @@
                 wrapper.style.display = 'block';
 
                 // Save to history
-                localStorage.setItem('last_aiox_idea', input);
-                localStorage.setItem('last_aiox_result', renderedHtml);
+                localStorage.setItem('last_skillsagents_idea', input);
+                localStorage.setItem('last_skillsagents_result', renderedHtml);
 
                 addCopyButtons();
 

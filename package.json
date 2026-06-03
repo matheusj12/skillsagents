@@ -1,0 +1,43 @@
+{
+  "name": "skillsagents",
+  "version": "1.0.0",
+  "description": "Install AI agents and skills into your project in seconds",
+  "bin": {
+    "skillsagents": "./bin/skillsagents.js"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    ".codex/agents/",
+    ".agents/"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "ai",
+    "agents",
+    "skills",
+    "cursor",
+    "claude",
+    "gemini",
+    "llm",
+    "codex"
+  ],
+  "scripts": {
+    "embed": "node scripts/embed-skills.js",
+    "embed:status": "node -e \"require('dotenv').config();const{query}=require('./src/db.js');query('SELECT COUNT(*) as total, COUNT(embedding) as indexed FROM skills').then(r=>console.log('Total:',r.rows[0].total,'Indexadas:',r.rows[0].indexed)).then(()=>process.exit(0))\""
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "dotenv": "^17.4.2",
+    "figlet": "^1.11.0",
+    "inquirer": "^8.2.7",
+    "pg": "^8.13.3"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/skillsagents/skillsagents"
+  }
+}

@@ -1,3 +1,26 @@
+import { Pool } from 'pg';
+
+const pool = new Pool({
+    host: process.env.SUPABASE_DB_HOST,
+    port: parseInt(process.env.SUPABASE_DB_PORT || '6543'),
+    database: process.env.SUPABASE_DB_NAME || 'postgres',
+    user: process.env.SUPABASE_DB_USER,
+    password: process.env.SUPABASE_DB_PASSWORD,
+    ssl: { rejectUnauthorized: false },
+    max: 3,
+});
+
+async function saveGeneration(type, input, output) {
+    try {
+        await pool.query(
+            'INSERT INTO generations (type, input, output) VALUES ($1, $2, $3)',
+            [type, input, output]
+        );
+    } catch (e) {
+        console.error('DB save error:', e.message);
+    }
+}
+
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Método não permitido' });
@@ -135,6 +158,7 @@ Para instalar esta skill no Antigravity:
         }
 
         const text = data.candidates[0].content.parts[0].text;
+        await saveGeneration(type, idea, text);
         res.status(200).json({ result: text });
     } catch (error) {
         res.status(500).json({ error: error.message });
