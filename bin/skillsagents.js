@@ -155,18 +155,21 @@ const STACKS = {
 // ══════════════════════════════════════════════════════════════════════════════
 
 // ── QUICK INSTALL ─────────────────────────────────────────────────────────────
-async function screenQuickInstall(args) {
-  banner();
-  console.log(chalk.bold.white('  ⚡  Início Rápido — Instalação\n'));
+async function screenQuickInstall() {
+  console.clear();
+  console.log(chalk.cyanBright('\n  SkillsAgents — Início Rápido\n'));
+  console.log(chalk.gray('  Instalando agentes + skills de uma vez...\n'));
+  console.log(chalk.gray('  ' + '─'.repeat(50) + '\n'));
+
   try {
     const { install } = require('../src/install.js');
-    install(args || []);
+    install(['--skills']); // agentes + skills globais
   } catch(e) {
-    br();
-    console.log(chalk.red('  ✗  Erro inesperado: ' + e.message));
-    br();
-    dim('Tente: npx --ignore-existing github:matheusj12/skillsagents install');
+    console.log(chalk.red('\n  ✗  ' + e.message));
+    console.log(chalk.yellow('  Tente: npx --ignore-existing github:matheusj12/skillsagents install'));
   }
+
+  console.log(chalk.gray('\n  ' + '─'.repeat(50)));
   br();
   await pause();
 }
@@ -640,11 +643,9 @@ async function main() {
     // volta ao menu após gerar
   }
 
-  // Se passou subcomando direto, executa e volta ao menu
+  // Se passou subcomando direto, executa e vai pro menu
   if (directCmd === 'install') {
-    const args = process.argv.slice(3);
-    header('Instalando agentes...');
-    await screenQuickInstall(args);
+    await screenQuickInstall();
     // continua para o menu abaixo
   }
 
@@ -666,15 +667,16 @@ async function main() {
     ],
   }]);
 
-  while (true) {
-    banner();
-    header();
+  // Mostra banner UMA VEZ antes do loop
+  banner();
+  header();
 
+  while (true) {
     const { action } = await inquirer.prompt([{
       type: 'list',
       name: 'action',
       message: '  O que você quer fazer?',
-      pageSize: 12,
+      pageSize: 15,
       choices: [
         // ── INSTALAR ──────────────────────────────────────
         new inquirer.Separator(chalk.gray('  ── instalar ──────────────────────────────')),
@@ -702,9 +704,13 @@ async function main() {
     if (action === 'project') await screenForMyProject();
     if (action === 'agents')  await screenAgents();
     if (action === 'skills')  await screenSkills();
-    if (action === 'office')  startOfficeServer();
+    if (action === 'office')  await startOfficeServer();
     if (action === 'hooks')   installHooksScreen();
     if (action === 'status')  await screenStatus();
+
+    // Limpa e reexibe cabeçalho antes de voltar ao menu
+    banner();
+    header();
   }
 }
 
