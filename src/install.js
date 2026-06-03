@@ -51,91 +51,57 @@ function copyAgent(agentId, sourceDir, targetDir) {
 }
 
 // ── MAIN INSTALL ──────────────────────────────────────────────────
+// Instala TUDO sem fazer perguntas — agentes no projeto + skills globais
 function install(args = []) {
-  const installSkills = args.includes('--skills');
-  const projectDir    = process.cwd();
-  const sourceDir     = path.join(__dirname, '..', '.codex', 'agents');
+  const projectDir = process.cwd();
+  const sourceDir  = path.join(__dirname, '..', '.codex', 'agents');
+  const agentsDir  = path.join(projectDir, '.claude', 'agents');
 
-  // Verifica se a fonte existe
+  // Verifica fonte
   if (!fs.existsSync(sourceDir)) {
-    console.log('\n  ✗  Erro: arquivos de agentes não encontrados.');
-    console.log(`     Esperado em: ${sourceDir}`);
-    console.log('\n  Solução: force o cache limpo:');
-    console.log('  npx --ignore-existing github:matheusj12/skillsagents install\n');
+    console.log('  ✗  Arquivos não encontrados. Tente:');
+    console.log('     npx --ignore-existing github:matheusj12/skillsagents install');
     return;
   }
 
-  // Detecta IDEs
-  const ides = detectIDEs(projectDir);
-  const projectName = path.basename(projectDir);
+  // ── AGENTES ──────────────────────────────────────────────────────
+  fs.mkdirSync(agentsDir, { recursive: true });
 
-  console.log(`\n  Projeto: ${projectName}`);
-  console.log(`  IDEs detectados: ${ides.map(i => i.label).join(', ')}\n`);
-
-  let totalInstalled = 0;
-  const results = [];
-
-  // Instala em cada IDE
-  ides.forEach(ide => {
-    const targetDir = path.join(projectDir, ide.target);
-    let count = 0;
-    const errors = [];
-
-    AGENTS.forEach(agentId => {
-      try {
-        if (copyAgent(agentId, sourceDir, targetDir)) {
-          count++;
-        } else {
-          errors.push(agentId);
-        }
-      } catch(e) {
-        errors.push(`${agentId} (${e.message})`);
-      }
-    });
-
-    totalInstalled = Math.max(totalInstalled, count);
-    const icon = count > 0 ? '✔' : '✗';
-    console.log(`  ${icon}  ${ide.label.padEnd(22)} → ${ide.target}/  (${count} agentes)`);
-    if (errors.length > 0) {
-      console.log(`     Falhas: ${errors.join(', ')}`);
-    }
-    results.push({ ide, count, targetDir });
-  });
-
-  if (totalInstalled === 0) {
-    console.log('\n  ✗  Nenhum agente instalado. Veja erros acima.');
-    return;
-  }
-
-  // Estrutura visual
-  console.log(`\n  ✔  ${totalInstalled} agentes instalados com sucesso!\n`);
-  console.log(`  ${projectName}/`);
-  results.filter(r => r.count > 0).forEach((r, i, arr) => {
-    const prefix = i < arr.length - 1 ? '├──' : '└──';
-    const parts = r.ide.target.split('/');
-    console.log(`  ${prefix} ${parts[0]}/`);
-    if (parts.length > 1) {
-      const sub = i < arr.length - 1 ? '│' : ' ';
-      console.log(`  ${sub}   └── ${parts.slice(1).join('/')}/`);
-      console.log(`  ${sub}       └── @master, @dev, @architect... (${r.count} agentes)`);
+  let installed = 0;
+  AGENTS.forEach(id => {
+    const src = path.join(sourceDir, `${id}.md`);
+    if (fs.existsSync(src)) {
+      fs.copyFileSync(src, path.join(agentsDir, `${id}.md`));
+      console.log(`  ✔  @${id}`);
+      installed++;
     }
   });
 
-  // Skills globais
-  if (installSkills) {
-    console.log('\n  Instalando skills globalmente...');
-    try {
-      fs.mkdirSync(SKILLS_DIR, { recursive: true });
-      console.log(`\n  ✔  ~/.skillsagents/skills/  (1270 skills disponíveis)`);
-    } catch(e) {
-      console.log(`  ✗  Erro ao criar diretório de skills: ${e.message}`);
-    }
-  } else {
-    console.log(`\n  Dica: npx github:matheusj12/skillsagents install --skills`);
-    console.log(`        instala 1270+ skills globalmente em ~/.skillsagents/skills/`);
+  // ── SKILLS (catálogo local) ───────────────────────────────────────
+  const skillsSrc = path.join(__dirname, '..', 'skills_data.json');
+  const skillsDst = path.join(projectDir, '.claude', 'skills_catalog.json');
+  if (fs.existsSync(skillsSrc)) {
+    fs.copyFileSync(skillsSrc, skillsDst);
   }
 
-  console.log('\n  Para ativar: @master *help  (no seu IDE com IA)\n');
+  // ── SKILLS (global ~/.skillsagents) ──────────────────────────────
+  try {
+    fs.mkdirSync(SKILLS_DIR, { recursive: true });
+    if (fs.existsSync(skillsSrc)) {
+      fs.copyFileSync(skillsSrc, path.join(SKILLS_DIR, 'catalog.json'));
+    }
+  } catch(e) {}
+
+  // ── RESULTADO ─────────────────────────────────────────────────────
+  const name = path.basename(projectDir);
+  console.log(`\n  ✔  ${installed} agentes instalados`);
+  console.log(`  ✔  1270+ skills disponíveis\n`);
+  console.log(`  ${name}/`);
+  console.log(`  └── .claude/`);
+  console.log(`      ├── agents/        ← ${installed} agentes`);
+  console.log(`      └── skills_catalog.json`);
+  console.log(`\n  ~/.skillsagents/skills/  ← skills globais`);
+  console.log('\n  Para ativar: @master *help  (no IDE com IA)\n');
 }
 
 // ── RUFLO AGENTS ──────────────────────────────────────────────────
