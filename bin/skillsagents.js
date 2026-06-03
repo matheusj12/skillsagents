@@ -389,13 +389,13 @@ async function screenStatus() {
 async function screenOffice() {
   banner();
   console.log(chalk.bold.white('  🎮  Pixel Office\n'));
-  info('Abrindo ' + chalk.cyan('http://localhost:3001/office.html') + ' no browser...');
+  info('Abrindo ' + chalk.cyan('http://localhost:4321/office.html') + ' no browser...');
   br();
   const cmd = process.platform === 'win32' ? 'start'
             : process.platform === 'darwin' ? 'open'
             : 'xdg-open';
-  exec(`${cmd} http://localhost:3001/office.html`);
-  dim('Se não abrir, acesse manualmente: http://localhost:3001/office.html');
+  exec(`${cmd} http://localhost:4321/office.html`);
+  dim('Se não abrir, acesse manualmente: http://localhost:4321/office.html');
   br();
   await pause();
 }
