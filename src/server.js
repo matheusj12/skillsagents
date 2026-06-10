@@ -1,20 +1,39 @@
 'use strict';
 
-const http    = require('http');
-const fs      = require('fs');
-const path    = require('path');
-const os      = require('os');
+const http = require('http');
+const fs   = require('fs');
+const path = require('path');
+const os   = require('os');
 const { exec } = require('child_process');
 
 const PORT       = parseInt(process.env.SKILLSAGENTS_PORT || '4321');
-const STATIC_DIR = path.join(__dirname, '..');
+const STATIC_DIR = path.resolve(__dirname, '..');
+const BODY_LIMIT = 64 * 1024; // 64 KB máximo por request
+
+// ── CORS ─────────────────────────────────────────────────────────
+// Permite apenas localhost em desenvolvimento; em produção restringe ao origin configurado.
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
+  : [`http://localhost:${PORT}`, 'http://127.0.0.1:' + PORT];
+
+function setCORSHeaders(req, res) {
+  const origin = req.headers.origin || '';
+  if (ALLOWED_ORIGINS.includes(origin) || process.env.NODE_ENV !== 'production') {
+    res.setHeader('Access-Control-Allow-Origin', origin || `http://localhost:${PORT}`);
+  }
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Vary', 'Origin');
+}
 
 // ── SSE CLIENTS ──────────────────────────────────────────────────
 const clients = new Set();
 
 function broadcast(event) {
   const data = `data: ${JSON.stringify(event)}\n\n`;
-  clients.forEach(c => { try { c.write(data); } catch(e) { clients.delete(c); } });
+  for (const c of clients) {
+    try { c.write(data); } catch (_) { clients.delete(c); }
+  }
 }
 
 // ── MIME TYPES ───────────────────────────────────────────────────
@@ -26,17 +45,33 @@ const MIME = {
   '.json': 'application/json',
 };
 
+// ── READ BODY (com limite) ───────────────────────────────────────
+function readBody(req) {
+  return new Promise((resolve, reject) => {
+    let body = '';
+    let size = 0;
+    req.on('data', chunk => {
+      size += chunk.length;
+      if (size > BODY_LIMIT) {
+        req.destroy();
+        return reject(new Error('Payload muito grande'));
+      }
+      body += chunk;
+    });
+    req.on('end', () => resolve(body));
+    req.on('error', reject);
+  });
+}
+
 // ── HTTP SERVER ──────────────────────────────────────────────────
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
   const u = new URL(req.url, `http://localhost:${PORT}`);
   const p = u.pathname;
 
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  if (req.method === 'OPTIONS') { res.writeHead(200); return res.end(); }
+  setCORSHeaders(req, res);
+  if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
 
-  // SSE — browser connects here for real-time events
+  // SSE — browser conecta aqui para eventos em tempo real
   if (p === '/events') {
     res.writeHead(200, {
       'Content-Type':  'text/event-stream',
@@ -50,36 +85,39 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // Hook endpoint — Claude Code posts here via hooks
+  // Hook endpoint — Claude Code posta aqui via hooks
   if (p === '/hook' && req.method === 'POST') {
-    let body = '';
-    req.on('data', d => body += d);
-    req.on('end', () => {
-      try {
-        const event = JSON.parse(body);
-        handleHookEvent(event);
-      } catch(e) {}
-      res.writeHead(200);
-      res.end('ok');
-    });
-    return;
+    try {
+      const raw = await readBody(req);
+      const event = JSON.parse(raw);
+      handleHookEvent(event);
+    } catch (e) {
+      // Body inválido ou muito grande — ainda retorna 200 para não bloquear Claude Code
+      console.error('[hook] Erro ao processar payload:', e.message);
+    }
+    res.writeHead(200);
+    return res.end('ok');
   }
 
   // Health check
   if (p === '/health') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     return res.end(JSON.stringify({
-      ok: true,
-      port: PORT,
+      ok:      true,
+      port:    PORT,
       clients: clients.size,
-      agents: Object.fromEntries(sessionAgents),
-      uptime: Math.floor(process.uptime()),
+      agents:  Object.fromEntries(sessionAgents),
+      uptime:  Math.floor(process.uptime()),
+      env:     process.env.NODE_ENV || 'development',
     }));
   }
 
-  // Static files
-  let filePath = path.join(STATIC_DIR, p === '/' ? 'index.html' : p);
-  if (!filePath.startsWith(STATIC_DIR)) { res.writeHead(403); return res.end('Forbidden'); }
+  // Static files — protege contra path traversal
+  const filePath = path.join(STATIC_DIR, p === '/' ? 'index.html' : p);
+  if (!filePath.startsWith(STATIC_DIR + path.sep) && filePath !== path.join(STATIC_DIR, 'index.html')) {
+    res.writeHead(403);
+    return res.end('Forbidden');
+  }
 
   if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
     const ext = path.extname(filePath);
@@ -93,23 +131,23 @@ const server = http.createServer((req, res) => {
 
 // ── TOOL → STATE MAPPING ─────────────────────────────────────────
 const TOOL_STATE = {
-  Bash:        'TYPING',
-  Read:        'READING',
-  Write:       'TYPING',
-  Edit:        'TYPING',
-  MultiEdit:   'TYPING',
-  WebSearch:   'READING',
-  WebFetch:    'READING',
-  Agent:       'THINKING',
-  TodoWrite:   'TYPING',
-  TodoRead:    'READING',
-  Glob:        'READING',
-  Grep:        'READING',
+  Bash:      'TYPING',
+  Read:      'READING',
+  Write:     'TYPING',
+  Edit:      'TYPING',
+  MultiEdit: 'TYPING',
+  WebSearch: 'READING',
+  WebFetch:  'READING',
+  Agent:     'THINKING',
+  TodoWrite: 'TYPING',
+  TodoRead:  'READING',
+  Glob:      'READING',
+  Grep:      'READING',
 };
 
 // ── SESSION → AGENT MAPPING ───────────────────────────────────────
-const sessionAgents  = new Map(); // sessionId → agentId
-const agentSessions  = new Map(); // agentId → sessionId
+const sessionAgents = new Map();
+const agentSessions = new Map();
 let agentCounter = 0;
 const AGENT_QUEUE = [
   'dev', 'architect', 'qa', 'devops', 'pm',
@@ -133,27 +171,23 @@ function handleHookEvent(raw) {
   const agentId   = resolveAgent(sessionId, envAgent);
 
   const hookType = raw.hook_event_name || raw.type || '';
-  const toolName = raw.tool_name || raw.tool || (raw.tool_input?.name) || '';
+  const toolName = raw.tool_name || raw.tool || raw.tool_input?.name || '';
 
   if (hookType === 'PreToolUse' || raw.type === 'tool_start') {
-    const state = TOOL_STATE[toolName] || 'TYPING';
-    broadcast({ type: 'tool_start', agentId, tool: toolName, state, sessionId });
+    broadcast({ type: 'tool_start', agentId, tool: toolName, state: TOOL_STATE[toolName] || 'TYPING', sessionId });
   }
-
   if (hookType === 'PostToolUse' || raw.type === 'tool_end') {
     broadcast({ type: 'tool_end', agentId, tool: toolName, state: 'IDLE', sessionId });
   }
-
   if (hookType === 'Stop' || hookType === 'SessionEnd') {
     broadcast({ type: 'agent_idle', agentId, sessionId });
   }
-
   if (hookType === 'PermissionRequest') {
     broadcast({ type: 'permission_request', agentId, tool: toolName, sessionId });
   }
 }
 
-// ── JSONL WATCHER (fallback for older Claude Code) ────────────────
+// ── JSONL WATCHER (fallback para Claude Code mais antigo) ─────────
 function watchJSONL() {
   const claudeDir = path.join(os.homedir(), '.claude', 'projects');
   if (!fs.existsSync(claudeDir)) return;
@@ -185,12 +219,12 @@ function watchJSONL() {
 
                 buf.toString('utf8').split('\n').forEach(line => {
                   if (!line.trim()) return;
-                  try { parseJSONLLine(JSON.parse(line), entry.name); } catch(e) {}
+                  try { parseJSONLLine(JSON.parse(line), entry.name); } catch (_) {}
                 });
               });
-          } catch(e) {}
+          } catch (_) {}
         });
-    } catch(e) {}
+    } catch (_) {}
   }, 500);
 }
 
@@ -199,8 +233,7 @@ function parseJSONLLine(json, projectId) {
   const agentId   = resolveAgent(sessionId);
 
   if (json.type === 'tool_use' && json.name) {
-    const state = TOOL_STATE[json.name] || 'TYPING';
-    broadcast({ type: 'tool_start', agentId, tool: json.name, state, sessionId });
+    broadcast({ type: 'tool_start', agentId, tool: json.name, state: TOOL_STATE[json.name] || 'TYPING', sessionId });
   }
   if (json.type === 'tool_result') {
     broadcast({ type: 'tool_end', agentId, state: 'IDLE', sessionId });
@@ -212,6 +245,20 @@ function parseJSONLLine(json, projectId) {
     broadcast({ type: 'agent_idle', agentId, sessionId });
   }
 }
+
+// ── GRACEFUL SHUTDOWN ────────────────────────────────────────────
+function shutdown(signal) {
+  console.log(`\n[server] ${signal} recebido — encerrando...`);
+  server.close(() => {
+    console.log('[server] Encerrado.');
+    process.exit(0);
+  });
+  // Força encerramento se demorar mais de 5s
+  setTimeout(() => process.exit(1), 5000).unref();
+}
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT',  () => shutdown('SIGINT'));
 
 // ── START ────────────────────────────────────────────────────────
 function start(options = {}) {
@@ -241,6 +288,8 @@ function start(options = {}) {
       console.error(`\n  ✗  Porta ${PORT} já está em uso.`);
       console.error(`  Tente: SKILLSAGENTS_PORT=4322 npx skillsagents office\n`);
       process.exit(1);
+    } else {
+      console.error('[server] Erro:', err.message);
     }
   });
 }

@@ -1,925 +1,896 @@
 #!/usr/bin/env node
 'use strict';
 
-const path     = require('path');
-const fs       = require('fs');
-const { exec } = require('child_process');
+const path      = require('path');
+const fs        = require('fs');
+const os        = require('os');
+const http      = require('http');
+const { exec, spawn } = require('child_process');
 
-// ── OFFICE/HOOKS são os únicos que saem sem menu (tomam o processo) ──
-const directCmd = process.argv[2];
+const ROOT = path.join(__dirname, '..');
+const PKG  = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
+const VER  = PKG.version || '1.0.0';
 
-if (directCmd === 'office' || directCmd === 'serve') {
-  const { start } = require('../src/server.js');
-  start();
+// ── CTRL+C sai limpo ──────────────────────────────────────────
+process.on('SIGINT', () => { console.log('\n'); process.exit(0); });
+
+// ── SUBCOMMANDS DIRETOS (sem menu) ────────────────────────────
+const cmd = process.argv[2];
+
+if (cmd === '--version' || cmd === '-v') { console.log(VER); process.exit(0); }
+if (cmd === '--help'    || cmd === '-h') { printHelp(); process.exit(0); }
+
+if (cmd === 'office' || cmd === 'serve') {
+  require('../src/server.js');   // chama start() via require.main check interno
   return;
 }
-
-if (directCmd === 'hooks') {
+if (cmd === 'hooks') {
   const { installHooks } = require('../src/hooks.js');
   installHooks(process.cwd());
   return;
 }
-
-if (directCmd === 'hooks:remove') {
+if (cmd === 'hooks:remove') {
   const { removeHooks } = require('../src/hooks.js');
   removeHooks(process.cwd());
   return;
 }
+if (cmd === 'install') {
+  // npx skillsagents install — sem menu, instala direto
+  const { install } = require('../src/install.js');
+  install();
+  return;
+}
+if (cmd === 'status') {
+  // npx skillsagents status
+  launchWithDeps(() => printStatusDirect());
+  return;
+}
 
-if (directCmd === 'gen' || directCmd === 'generate') {
-  // load deps first, then run generator directly
-  const figlet   = require('figlet');
+// ── DEPS (carregadas somente para o menu interativo) ──────────
+function launchWithDeps(fn) {
   const chalk    = require('chalk');
+  const figlet   = require('figlet');
   const inquirer = require('inquirer');
-  const { exec } = require('child_process');
-  // reuse same functions — just call main flow with gen preset
-  // handled below in main()
+  fn(chalk, figlet, inquirer);
 }
 
-const figlet   = require('figlet');
-const chalk    = require('chalk');
-const inquirer = require('inquirer');
+launchWithDeps(async (chalk, figlet, inquirer) => {
+  await main(chalk, figlet, inquirer);
+});
 
-const ROOT = path.join(__dirname, '..');
+// ── HELP ─────────────────────────────────────────────────────
+function printHelp() {
+  console.log(`
+  skillsagents v${VER}
 
-// ── BANNER ────────────────────────────────────────────────────────────────────
-function banner() {
-  console.clear();
-  const s = figlet.textSync('SKILLS', { font: 'ANSI Shadow', horizontalLayout: 'fitted' });
-  const a = figlet.textSync('AGENTS', { font: 'ANSI Shadow', horizontalLayout: 'fitted' });
-  console.log(chalk.cyanBright(s));
-  console.log(chalk.cyanBright(a));
-  console.log();
+  COMANDOS DIRETOS (sem menu):
+    install          Instala todos os agentes e skills no projeto atual
+    office           Inicia o Pixel Office (servidor local + browser)
+    hooks            Instala hooks no Claude Code (.claude/settings.json)
+    hooks:remove     Remove os hooks instalados
+    status           Mostra o que está instalado no projeto atual
+
+  FLAGS:
+    --version, -v    Mostra a versão
+    --help, -h       Mostra esta ajuda
+
+  SEM ARGUMENTOS:
+    Abre o menu interativo completo
+
+  EXEMPLOS:
+    npx skillsagents                  # menu interativo
+    npx skillsagents install          # instala tudo agora
+    npx skillsagents hooks            # integra com Claude Code
+    npx skillsagents office           # abre Pixel Office
+    SKILLSAGENTS_PORT=4322 npx skillsagents office
+`);
 }
 
-function header(subtitle = 'Universal AI Agent Framework') {
-  console.log(chalk.yellow(subtitle));
-  console.log(chalk.gray('CLI v1.0.0  ·  github.com/matheusj12/skillsagents'));
-  console.log(chalk.gray('─'.repeat(62)));
-  console.log();
+// ── STATUS DIRETO ─────────────────────────────────────────────
+function printStatusDirect() {
+  const cwd      = process.cwd();
+  const agentDir = path.join(cwd, '.claude', 'agents');
+  const skillDir = path.join(cwd, '.claude', 'skills');
+  const agents   = fs.existsSync(agentDir) ? fs.readdirSync(agentDir).filter(f => f.endsWith('.md')) : [];
+  const skills   = fs.existsSync(skillDir) ? fs.readdirSync(skillDir).filter(f => f.endsWith('.md')) : [];
+  const hooks    = getHooksInstalled(cwd);
+
+  console.log(`\n  skillsagents v${VER} — Status do projeto\n`);
+  console.log(`  Projeto: ${cwd}\n`);
+  console.log(`  ${ agents.length > 0 ? '✔' : '○' }  Agentes instalados   ${agents.length}`);
+  console.log(`  ${ skills.length > 0 ? '✔' : '○' }  Skills instaladas    ${skills.length}`);
+  console.log(`  ${ hooks ? '✔' : '○' }  Hooks do Claude Code ${hooks ? 'ativos' : 'não instalados'}\n`);
+
+  if (!agents.length) {
+    console.log(`  Para instalar: npx skillsagents install\n`);
+  }
 }
 
-// ── HELPERS ───────────────────────────────────────────────────────────────────
-function ok(msg)   { console.log(chalk.green('  ✔  ') + msg); }
-function info(msg) { console.log(chalk.cyan ('  →  ') + msg); }
-function dim(msg)  { console.log(chalk.gray ('     ') + msg); }
-function br()      { console.log(); }
-
-const BACK = '__back__';
-const backChoice = { name: chalk.gray('  ← Voltar'), value: BACK };
-
-async function pause() {
-  await inquirer.prompt([{ type: 'input', name: '_', message: chalk.gray('  ← Enter para voltar ao menu...') }]);
+function getHooksInstalled(dir) {
+  const p = path.join(dir, '.claude', 'settings.json');
+  if (!fs.existsSync(p)) return false;
+  try {
+    const s = JSON.parse(fs.readFileSync(p, 'utf8'));
+    return !!(s.hooks?.PreToolUse?.length);
+  } catch { return false; }
 }
 
+// ─────────────────────────────────────────────────────────────
+// CATÁLOGOS
+// ─────────────────────────────────────────────────────────────
+const BASE_AGENTS = [
+  { id:'master',           name:'@master',           role:'Master Orchestrator', icon:'👑', priority:true },
+  { id:'dev',              name:'@dev',               role:'Developer',           icon:'💻' },
+  { id:'architect',        name:'@architect',         role:'Software Architect',  icon:'🏗️' },
+  { id:'qa',               name:'@qa',                role:'Quality Assurance',   icon:'✅' },
+  { id:'devops',           name:'@devops',            role:'DevOps Engineer',     icon:'⚙️' },
+  { id:'pm',               name:'@pm',                role:'Product Manager',     icon:'📋' },
+  { id:'po',               name:'@po',                role:'Product Owner',       icon:'🎯' },
+  { id:'sm',               name:'@sm',                role:'Scrum Master',        icon:'🔄' },
+  { id:'data-engineer',    name:'@data-engineer',     role:'Data Engineer',       icon:'📊' },
+  { id:'analyst',          name:'@analyst',           role:'Business Analyst',    icon:'🔍' },
+  { id:'ux-design-expert', name:'@ux-design-expert',  role:'UX Design Expert',    icon:'🎨' },
+  { id:'squad-creator',    name:'@squad-creator',     role:'Squad Creator',       icon:'👥' },
+  { id:'aiox-master',      name:'@aiox-master',       role:'AIOX Orchestrator',   icon:'🧠' },
+];
+
+const ADVANCED_AGENTS = [
+  { id:'agent-coder',                name:'@coder',         role:'Code Implementer',   icon:'🔧', cat:'Dev'      },
+  { id:'agent-reviewer',             name:'@reviewer',      role:'Code Reviewer',      icon:'🔎', cat:'Dev'      },
+  { id:'agent-tester',               name:'@tester',        role:'QA Specialist',      icon:'🧪', cat:'Dev'      },
+  { id:'agent-researcher',           name:'@researcher',    role:'Deep Researcher',    icon:'🔬', cat:'Research' },
+  { id:'agent-planner',              name:'@planner',       role:'Strategic Planner',  icon:'🗺️', cat:'Planning' },
+  { id:'agent-sparc-coordinator',    name:'@sparc',         role:'SPARC Coordinator',  icon:'⚡', cat:'Orch'     },
+  { id:'agent-swarm',                name:'@swarm',         role:'Swarm Deployer',     icon:'🐝', cat:'Swarm'    },
+  { id:'hive-mind',                  name:'@hive-mind',     role:'Hive Mind (BFT)',    icon:'🧩', cat:'Swarm'    },
+  { id:'agent-security-manager',     name:'@security-mgr',  role:'Security Manager',   icon:'🔒', cat:'Security' },
+  { id:'agent-performance-optimizer',name:'@perf-opt',      role:'Perf Optimizer',     icon:'🚀', cat:'Perf'     },
+  { id:'agent-memory-coordinator',   name:'@memory',        role:'Memory Coordinator', icon:'🧠', cat:'Memory'   },
+  { id:'agent-github-pr-manager',    name:'@pr-manager',    role:'GitHub PR Manager',  icon:'🐙', cat:'GitHub'   },
+  { id:'agent-ops-cicd-github',      name:'@cicd',          role:'CI/CD Specialist',   icon:'⚙️', cat:'DevOps'   },
+  { id:'pair-programming',           name:'@pair',          role:'Pair Programming',   icon:'👥', cat:'Dev'      },
+  { id:'security-audit',             name:'@sec-audit',     role:'Security Audit',     icon:'🛡️', cat:'Security' },
+];
+
+const STACKS = {
+  web:      { label:'🌐  Web App (Next.js / React)',     agents:['master','architect','dev','qa','ux-design-expert'], skills:['react-patterns','nextjs-app-router-patterns','tailwind-design-system','typescript-expert'] },
+  api:      { label:'⚡  API Backend (FastAPI / Node)',   agents:['master','architect','dev','devops','qa'],           skills:['fastapi-pro','api-design-principles','api-security-best-practices','docker-expert'] },
+  mobile:   { label:'📱  App Mobile (React Native)',      agents:['master','architect','dev','qa'],                   skills:['react-native-architecture','typescript-expert'] },
+  data:     { label:'📊  Data / ML / IA',                agents:['master','data-engineer','analyst','architect'],     skills:['ai-ml','rag-engineer','postgresql-optimization'] },
+  devops:   { label:'⚙️  DevOps / Infra / Cloud',        agents:['master','devops','architect'],                     skills:['docker-expert','kubernetes-architect','github-actions-templates'] },
+  security: { label:'🔒  Segurança / Pentest',            agents:['master','qa','devops'],                            skills:['security-auditor','api-security-best-practices','auth-implementation-patterns'] },
+  saas:     { label:'🚀  SaaS / Produto B2B',             agents:['master','pm','po','architect','dev','qa'],          skills:['react-patterns','fastapi-pro','auth-implementation-patterns','postgresql-optimization'] },
+};
+
+const MODELS = [
+  { id:'gemini-2.5-flash',         label:'Gemini 2.5 Flash',   icon:'🟡', provider:'google',    desc:'Mais rápido · Grátis 15 req/min',   url:'https://aistudio.google.com/app/apikey',   keyField:'googleKey'    },
+  { id:'gemini-2.0-flash',         label:'Gemini 2.0 Flash',   icon:'🟡', provider:'google',    desc:'Multimodal · Grátis',               url:'https://aistudio.google.com/app/apikey',   keyField:'googleKey'    },
+  { id:'claude-sonnet-4-6',        label:'Claude Sonnet 4.6',  icon:'🟣', provider:'anthropic', desc:'Ideal para código complexo',        url:'https://console.anthropic.com/',           keyField:'anthropicKey' },
+  { id:'claude-haiku-4-5-20251001',label:'Claude Haiku 4.5',   icon:'🟣', provider:'anthropic', desc:'Ultra rápido e barato',             url:'https://console.anthropic.com/',           keyField:'anthropicKey' },
+  { id:'claude-opus-4-8',          label:'Claude Opus 4.8',    icon:'🟣', provider:'anthropic', desc:'Máxima inteligência',               url:'https://console.anthropic.com/',           keyField:'anthropicKey' },
+  { id:'gpt-4o',                   label:'GPT-4o',             icon:'🟢', provider:'openai',    desc:'Mais capaz da OpenAI',              url:'https://platform.openai.com/api-keys',     keyField:'openaiKey'    },
+  { id:'gpt-4o-mini',              label:'GPT-4o Mini',        icon:'🟢', provider:'openai',    desc:'Rápido e barato',                   url:'https://platform.openai.com/api-keys',     keyField:'openaiKey'    },
+  { id:'deepseek-chat',            label:'DeepSeek V3',        icon:'🔵', provider:'deepseek',  desc:'Custo ultra baixo ~$0.14/M tokens', url:'https://platform.deepseek.com/api_keys',   keyField:'deepseekKey'  },
+  { id:'deepseek-reasoner',        label:'DeepSeek R1',        icon:'🔵', provider:'deepseek',  desc:'Raciocínio passo a passo',          url:'https://platform.deepseek.com/api_keys',   keyField:'deepseekKey'  },
+  { id:'mistral-large-latest',     label:'Mistral Large',      icon:'🟠', provider:'mistral',   desc:'Excelente para código e análise',   url:'https://console.mistral.ai/api-keys',      keyField:'mistralKey'   },
+  { id:'llama-3.3-70b-versatile',  label:'Llama 3.3 70B',      icon:'⚡', provider:'groq',      desc:'Inferência ultra rápida · Grátis',  url:'https://console.groq.com/keys',            keyField:'groqKey'      },
+];
+
+const PROVIDER_LABELS = {
+  google:'🟡  Google Gemini', anthropic:'🟣  Anthropic Claude',
+  openai:'🟢  OpenAI GPT',    deepseek:'🔵  DeepSeek',
+  mistral:'🟠  Mistral AI',   groq:'⚡  Groq (Llama)',
+};
+
+// ─────────────────────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────────────────────
 function loadSkills() {
   const p = path.join(ROOT, 'skills_data.json');
   return fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf8')) : [];
 }
 
-function getInstalledAgents() {
-  const dirs = [
-    path.join(ROOT, '.codex', 'agents'),
-    path.join(ROOT, '.antigravity', 'rules', 'agents'),
-  ].filter(fs.existsSync);
-  const found = new Set();
-  dirs.forEach(d => fs.readdirSync(d).forEach(f => found.add(f.replace('.md', ''))));
-  return [...found];
-}
-
+// FIX: instala em .claude/agents (Claude Code) + outros harnesses configurados
 function installAgent(agentId) {
-  const src = path.join(ROOT, '.codex', 'agents', `${agentId}.md`);
-  if (!fs.existsSync(src)) return false;
-  const targets = [
-    path.join(process.cwd(), '.codex', 'agents'),
-    path.join(process.cwd(), '.antigravity', 'rules', 'agents'),
+  const sources = [
+    path.join(ROOT, '.codex', 'agents', `${agentId}.md`),
+    path.join(ROOT, '.agents', 'skills', agentId, 'SKILL.md'),
   ];
-  targets.forEach(d => {
+  const src = sources.find(s => fs.existsSync(s));
+  if (!src) return false;
+
+  const cwd = process.cwd();
+  const targets = [
+    path.join(cwd, '.claude', 'agents'),          // Claude Code ← principal
+    path.join(cwd, '.codex', 'agents'),            // Codex
+    path.join(cwd, '.cursor', 'agents'),           // Cursor
+    path.join(cwd, '.antigravity', 'rules', 'agents'),
+  ];
+
+  // Instala apenas nos harnesses que o projeto já usa
+  const toInstall = targets.filter((t, i) => {
+    if (i === 0) return true; // .claude sempre
+    const marker = ['.codex', '.cursor', '.antigravity'].find(m => t.includes(m));
+    return marker ? fs.existsSync(path.join(cwd, marker)) : false;
+  });
+
+  toInstall.forEach(d => {
     fs.mkdirSync(d, { recursive: true });
     fs.copyFileSync(src, path.join(d, `${agentId}.md`));
   });
   return true;
 }
 
-// ── AGENT CATALOGUE ───────────────────────────────────────────────────────────
-const BASE_AGENTS = [
-  { id:'master',           name:'@master',           role:'Master Orchestrator',  icon:'👑', priority:true },
-  { id:'dev',              name:'@dev',               role:'Developer',            icon:'💻' },
-  { id:'architect',        name:'@architect',         role:'Software Architect',   icon:'🏗️' },
-  { id:'qa',               name:'@qa',                role:'Quality Assurance',    icon:'✅' },
-  { id:'devops',           name:'@devops',            role:'DevOps Engineer',      icon:'⚙️' },
-  { id:'pm',               name:'@pm',                role:'Product Manager',      icon:'📋' },
-  { id:'po',               name:'@po',                role:'Product Owner',        icon:'🎯' },
-  { id:'sm',               name:'@sm',                role:'Scrum Master',         icon:'🔄' },
-  { id:'data-engineer',    name:'@data-engineer',     role:'Data Engineer',        icon:'📊' },
-  { id:'analyst',          name:'@analyst',           role:'Business Analyst',     icon:'🔍' },
-  { id:'ux-design-expert', name:'@ux-design-expert',  role:'UX Design Expert',     icon:'🎨' },
-  { id:'squad-creator',    name:'@squad-creator',     role:'Squad Creator',        icon:'👥' },
-  { id:'aiox-master',      name:'@aiox-master',       role:'AIOX Orchestrator',    icon:'🧠' },
-];
-
-const RUFLO_AGENTS = [
-  { id:'agent-coder',               name:'@agent-coder',               role:'Code Implementer',      icon:'🔧', cat:'Dev'       },
-  { id:'agent-reviewer',            name:'@agent-reviewer',            role:'Code Reviewer',         icon:'🔎', cat:'Dev'       },
-  { id:'agent-tester',              name:'@agent-tester',              role:'QA Specialist',         icon:'🧪', cat:'Dev'       },
-  { id:'agent-researcher',          name:'@agent-researcher',          role:'Deep Researcher',       icon:'🔬', cat:'Research'  },
-  { id:'agent-planner',             name:'@agent-planner',             role:'Strategic Planner',     icon:'🗺️', cat:'Planning'  },
-  { id:'agent-sparc-coordinator',   name:'@agent-sparc-coordinator',   role:'SPARC Coordinator',     icon:'⚡', cat:'Orch'      },
-  { id:'agent-swarm',               name:'@agent-swarm',               role:'Swarm Deployer',        icon:'🐝', cat:'Swarm'     },
-  { id:'agent-queen-coordinator',   name:'@agent-queen-coordinator',   role:'Hive Queen',            icon:'👑', cat:'Swarm'     },
-  { id:'hive-mind',                 name:'@hive-mind',                 role:'Hive Mind (BFT)',       icon:'🧩', cat:'Swarm'     },
-  { id:'agent-security-manager',    name:'@agent-security-manager',    role:'Security Manager',      icon:'🔒', cat:'Security'  },
-  { id:'agent-performance-optimizer',name:'@agent-performance-optimizer',role:'Perf Optimizer',     icon:'🚀', cat:'Perf'      },
-  { id:'agent-memory-coordinator',  name:'@agent-memory-coordinator',  role:'Memory Coordinator',    icon:'🧠', cat:'Memory'    },
-  { id:'agent-github-pr-manager',   name:'@agent-github-pr-manager',   role:'GitHub PR Manager',     icon:'🐙', cat:'GitHub'    },
-  { id:'github-code-review',        name:'@github-code-review',        role:'GitHub Code Reviewer',  icon:'🔍', cat:'GitHub'    },
-  { id:'agent-ops-cicd-github',     name:'@agent-ops-cicd-github',     role:'CI/CD Specialist',      icon:'⚙️', cat:'DevOps'    },
-  { id:'pair-programming',          name:'@pair-programming',          role:'Pair Programming',      icon:'👥', cat:'Dev'       },
-  { id:'agent-workflow-automation', name:'@agent-workflow-automation', role:'Workflow Automation',   icon:'⚡', cat:'Auto'      },
-  { id:'security-audit',            name:'@security-audit',            role:'Security Audit',        icon:'🛡️', cat:'Security'  },
-];
-
-// ── STACK RECOMMENDATIONS ────────────────────────────────────────────────────
-const STACKS = {
-  'web':      { label:'🌐  Web App (Next.js / React)',       agents:['master','architect','dev','qa','ux-design-expert'], skills:['react-patterns','nextjs-app-router-patterns','tailwind-design-system','typescript-expert'] },
-  'api':      { label:'⚡  API Backend (FastAPI / Node)',     agents:['master','architect','dev','devops','qa'],           skills:['fastapi-pro','api-design-principles','api-security-best-practices','docker-expert'] },
-  'mobile':   { label:'📱  App Mobile (React Native)',        agents:['master','architect','dev','qa'],                   skills:['agent-spec-mobile-react-native','react-native-architecture','typescript-expert'] },
-  'data':     { label:'📊  Data / ML / IA',                  agents:['master','data-engineer','analyst','architect'],     skills:['ai-ml','rag-engineer','postgresql-optimization','agent-data-ml-model'] },
-  'devops':   { label:'⚙️   DevOps / Infra / Cloud',          agents:['master','devops','architect'],                     skills:['docker-expert','kubernetes-architect','github-actions-templates','terraform-specialist'] },
-  'security': { label:'🔒  Segurança / Pentest',              agents:['master','qa','devops'],                            skills:['security-auditor','api-security-best-practices','auth-implementation-patterns','secrets-management'] },
-  'saas':     { label:'🚀  SaaS / Produto B2B',               agents:['master','pm','po','architect','dev','qa'],          skills:['react-patterns','fastapi-pro','auth-implementation-patterns','postgresql-optimization'] },
-};
-
-// ══════════════════════════════════════════════════════════════════════════════
-// SCREENS
-// ══════════════════════════════════════════════════════════════════════════════
-
-// ── QUICK INSTALL ─────────────────────────────────────────────────────────────
-async function screenQuickInstall() {
-  console.clear();
-  console.log(chalk.cyanBright('\n  SkillsAgents — Início Rápido\n'));
-  console.log(chalk.gray('  Instalando agentes + skills de uma vez...\n'));
-  console.log(chalk.gray('  ' + '─'.repeat(50) + '\n'));
-
-  try {
-    const { install } = require('../src/install.js');
-    install(['--skills']); // agentes + skills globais
-  } catch(e) {
-    console.log(chalk.red('\n  ✗  ' + e.message));
-    console.log(chalk.yellow('  Tente: npx --ignore-existing github:matheusj12/skillsagents install'));
-  }
-
-  console.log(chalk.gray('\n  ' + '─'.repeat(50)));
-  br();
-  await pause();
+function maskKey(key) {
+  const chalk = require('chalk');
+  if (!key) return chalk.red('✗ não configurada');
+  return chalk.green('✔ ') + key.slice(0,6) + '●●●●●●●●●●●' + key.slice(-4);
 }
 
-// ── FOR MY PROJECT (guided) ───────────────────────────────────────────────────
-async function screenForMyProject() {
-  banner();
+function checkServerRunning() {
+  return new Promise(resolve => {
+    const req = http.get('http://localhost:4321/health', res => resolve(res.statusCode === 200));
+    req.on('error', () => resolve(false));
+    req.setTimeout(800, () => { req.destroy(); resolve(false); });
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
+// UI PRIMITIVES
+// ─────────────────────────────────────────────────────────────
+function makePrimitives(chalk) {
+  const BACK = '__back__';
+  return {
+    BACK,
+    back:  { name: chalk.gray('  ← Voltar'), value: BACK },
+    sep:   (t = '') => new (require('inquirer').Separator)(chalk.gray(t)),
+    ok:    msg  => console.log(chalk.green('  ✔  ') + msg),
+    info:  msg  => console.log(chalk.cyan ('  →  ') + msg),
+    warn:  msg  => console.log(chalk.yellow('  ⚠  ') + msg),
+    err:   msg  => console.log(chalk.red  ('  ✗  ') + msg),
+    dim:   msg  => console.log(chalk.gray ('     ') + msg),
+    br:    ()   => console.log(),
+    pause: ()   => require('inquirer').prompt([{ type:'input', name:'_', message: chalk.gray('  ← Enter para continuar...') }]),
+    banner: (figlet) => {
+      console.clear();
+      const s = figlet.textSync('SKILLS', { font:'ANSI Shadow', horizontalLayout:'fitted' });
+      const a = figlet.textSync('AGENTS', { font:'ANSI Shadow', horizontalLayout:'fitted' });
+      console.log(chalk.cyanBright(s));
+      console.log(chalk.cyanBright(a));
+      console.log();
+    },
+    header: () => {
+      console.log(chalk.yellow('Universal AI Agent Framework'));
+      console.log(chalk.gray(`CLI v${VER}  ·  github.com/matheusj12/skillsagents`));
+      console.log(chalk.gray('─'.repeat(62)));
+      console.log();
+    },
+  };
+}
+
+// ─────────────────────────────────────────────────────────────
+// SCREENS
+// ─────────────────────────────────────────────────────────────
+async function screenQuickInstall(ui, inquirer) {
+  console.clear();
+  console.log(ui.br());
+  ui.info('Instalando todos os agentes e skills...\n');
+
+  const { install } = require('../src/install.js');
+  install();
+
+  ui.br();
+  console.log(ui.sep('─'.repeat(50)));
+  ui.br();
+  ui.ok('Próximos passos:');
+  ui.dim('1.  Abra o IDE com IA (Claude Code, Cursor, Codex...)');
+  ui.dim('2.  Digite @master *help  para ver todos os comandos');
+  ui.dim('3.  Use npx skillsagents hooks  para monitoramento em tempo real');
+  ui.br();
+  await ui.pause();
+}
+
+async function screenForMyProject(ui, inquirer, figlet, chalk) {
+  ui.banner(figlet);
   console.log(chalk.bold.white('  🎯  Para meu projeto\n'));
 
   const { stack } = await inquirer.prompt([{
-    type: 'list',
-    name: 'stack',
-    message: '  Qual é o tipo do seu projeto?',
+    type: 'list', name: 'stack',
+    message: '  Tipo do projeto:',
     choices: [
-      backChoice,
-      new inquirer.Separator(''),
-      ...Object.entries(STACKS).map(([k, v]) => ({ name: '  ' + v.label, value: k })),
+      ui.back, ui.sep(''),
+      ...Object.entries(STACKS).map(([k,v]) => ({ name: '  '+v.label, value: k })),
     ],
     pageSize: 10,
   }]);
+  if (stack === ui.BACK) return;
 
-  if (stack === BACK) return;
   const s = STACKS[stack];
-  br();
-  console.log(chalk.cyanBright('  ── Squad recomendado\n'));
+  ui.br();
+  console.log(chalk.bold.cyanBright('  Squad recomendado\n'));
   s.agents.forEach(id => {
     const a = BASE_AGENTS.find(x => x.id === id);
     if (a) console.log(`  ${a.icon}  ${chalk.cyan(a.name.padEnd(22))}  ${chalk.gray(a.role)}`);
   });
+  ui.br();
+  console.log(chalk.bold.yellow('  Skills recomendadas\n'));
+  s.skills.forEach(sk => console.log(`  ${chalk.yellow('@'+sk)}`));
+  ui.br();
 
-  br();
-  console.log(chalk.yellow('  ── Skills recomendadas\n'));
-  s.skills.forEach(sk => console.log(`  ${chalk.yellow('@' + sk)}`));
-
-  br();
-  const prompt = `@master coordenando ${s.agents.slice(1).map(x => '@'+x).join(' ')}\nUse ${s.skills.map(x => '@'+x).join(' ')}\n\nCrie o plano de execução faseado para o projeto.`;
-  console.log(chalk.gray('  ── Prompt pronto — copie e cole no seu IDE:\n'));
+  const prompt = `@master coordenando ${s.agents.slice(1).map(x=>'@'+x).join(' ')}\nUse ${s.skills.map(x=>'@'+x).join(' ')}\n\nCrie o plano de execução faseado para o projeto.`;
+  console.log(chalk.gray('  Prompt pronto:\n'));
   console.log(chalk.white('  ' + prompt.replace(/\n/g, '\n  ')));
-  br();
+  ui.br();
 
-  const { go } = await inquirer.prompt([{
-    type: 'list',
-    name: 'go',
+  const { action } = await inquirer.prompt([{
+    type: 'list', name: 'action',
     message: '  O que fazer?',
     choices: [
-      { name: '  ✔  Instalar esses agentes', value: true  },
-      { name: chalk.gray('  ← Voltar ao menu'),      value: false },
+      { name: '  ✔  Instalar squad + hooks', value: 'install' },
+      { name: '  📋  Só copiar o prompt',     value: 'copy'    },
+      { name: chalk.gray('  ← Voltar'),       value: 'back'    },
     ],
   }]);
 
-  if (go) {
-    br();
-    s.agents.forEach(id => {
-      if (installAgent(id)) {
-        const a = BASE_AGENTS.find(x => x.id === id);
-        ok(`${a?.icon || '🤖'}  ${('@'+id).padEnd(22)} ${chalk.gray('instalado')}`);
-      }
-    });
-    br();
-    ok(chalk.bold('Agentes instalados! Chame ' + chalk.cyan('@master *help') + ' no seu IDE.'));
+  if (action === 'back') return;
+
+  if (action === 'install' || action === 'copy') {
+    if (action === 'install') {
+      ui.br();
+      let done = 0;
+      s.agents.forEach(id => {
+        if (installAgent(id)) {
+          const a = BASE_AGENTS.find(x => x.id === id);
+          ui.ok(`${a?.icon||'🤖'}  ${('@'+id).padEnd(24)} ${chalk.gray('instalado')}`);
+          done++;
+        } else {
+          ui.dim(`@${id}  ${chalk.red('— não encontrado')}`);
+        }
+      });
+      ui.br();
+      ui.ok(chalk.bold(`${done} agentes instalados em .claude/agents/`));
+      ui.br();
+      ui.dim('Chame @master *help no seu IDE para começar.');
+    }
+    // Copy to clipboard
+    const clipCmd = process.platform === 'win32'
+      ? `powershell -command "Set-Clipboard '${prompt.replace(/'/g,"''")}'"`
+      : process.platform === 'darwin'
+      ? `printf '%s' "${prompt.replace(/"/g,'\\"')}" | pbcopy`
+      : `printf '%s' "${prompt.replace(/"/g,'\\"')}" | xclip -selection clipboard 2>/dev/null || true`;
+    exec(clipCmd, () => {});
+    ui.ok('Prompt copiado para o clipboard.');
   }
 
-  br();
-  await pause();
+  ui.br();
+  await ui.pause();
 }
 
-// ── AGENTS ────────────────────────────────────────────────────────────────────
-async function screenAgents() {
-  banner();
+async function screenAgents(ui, inquirer, figlet, chalk) {
+  ui.banner(figlet);
   console.log(chalk.bold.white('  👥  Agentes\n'));
 
   const { scope } = await inquirer.prompt([{
-    type: 'list',
-    name: 'scope',
-    message: '  Qual catálogo?',
+    type: 'list', name: 'scope',
+    message: '  Catálogo:',
     choices: [
-      backChoice,
-      new inquirer.Separator(''),
-      { name: `  🏠  Base (${BASE_AGENTS.length} agentes)     — @master, @dev, @architect, @qa...`, value: 'base' },
-      { name: `  🌐  Avançados (${RUFLO_AGENTS.length} agentes)   — swarm, hive-mind, coder, reviewer...`, value: 'ruflo' },
-      { name: `  📦  Todos juntos (${BASE_AGENTS.length + RUFLO_AGENTS.length} agentes)`, value: 'all' },
+      ui.back, ui.sep(''),
+      { name: `  🏠  Base (${BASE_AGENTS.length})       @master, @dev, @architect, @qa...`,               value: 'base'     },
+      { name: `  🌐  Avançados (${ADVANCED_AGENTS.length})   swarm, hive-mind, coder, reviewer...`,        value: 'advanced' },
+      { name: `  📦  Todos (${BASE_AGENTS.length + ADVANCED_AGENTS.length})`,                              value: 'all'      },
     ],
   }]);
-
-  if (scope === BACK) return;
+  if (scope === ui.BACK) return;
 
   const pool = scope === 'base' ? BASE_AGENTS
-             : scope === 'ruflo' ? RUFLO_AGENTS
-             : [...BASE_AGENTS, ...RUFLO_AGENTS];
+             : scope === 'advanced' ? ADVANCED_AGENTS
+             : [...BASE_AGENTS, ...ADVANCED_AGENTS];
 
   const { selected } = await inquirer.prompt([{
-    type: 'checkbox',
-    name: 'selected',
-    message: '  ESPAÇO para marcar · ENTER para confirmar · ESC para voltar:',
+    type: 'checkbox', name: 'selected',
+    message: '  ESPAÇO selecionar · ENTER confirmar:',
     choices: [
       ...pool.map(a => ({
-        name: `${a.icon}  ${(a.name || '@'+a.id).padEnd(32)} ${chalk.gray(a.role || a.cat || '')}`,
-        value: a.id,
+        name:    `${a.icon}  ${(a.name||'@'+a.id).padEnd(30)} ${chalk.gray(a.role||a.cat||'')}`,
+        value:   a.id,
         checked: !!a.priority,
       })),
-      new inquirer.Separator(''),
-      { name: chalk.gray('  ← Nenhum — voltar ao menu'), value: BACK },
+      ui.sep(''),
+      { name: chalk.gray('  ← Cancelar'), value: ui.BACK },
     ],
-    pageSize: 20,
+    pageSize: 22,
   }]);
 
-  if (!selected.length || selected.includes(BACK)) return;
+  if (!selected.length || selected.includes(ui.BACK)) return;
 
-  br();
+  ui.br();
   let done = 0;
   selected.forEach(id => {
-    if (installAgent(id)) { ok('@' + id); done++; }
-    else dim('@' + id + chalk.red('  — arquivo fonte não encontrado'));
+    if (installAgent(id)) { ui.ok('@'+id); done++; }
+    else ui.dim('@'+id + chalk.red('  — não encontrado'));
   });
-
-  br();
-  ok(chalk.bold(`${done} agente(s) instalados.`));
-  console.log(chalk.cyan('\n  Ative no seu IDE: ') + chalk.white('@' + selected[0] + ' *help'));
-  br();
-  await pause();
+  ui.br();
+  ui.ok(chalk.bold(`${done} agente(s) instalados em .claude/agents/`));
+  console.log(chalk.cyan('\n  Ative: ') + chalk.white('@' + selected[0] + ' *help'));
+  ui.br();
+  await ui.pause();
 }
 
-// ── SKILLS ────────────────────────────────────────────────────────────────────
-async function screenSkills() {
-  banner();
+async function screenSkills(ui, inquirer, figlet, chalk) {
+  ui.banner(figlet);
   console.log(chalk.bold.white('  🛠   Skills\n'));
 
   const skills = loadSkills();
   if (!skills.length) {
-    console.log(chalk.red('  ✗  skills_data.json não encontrado.'));
-    await pause(); return;
+    ui.err('skills_data.json não encontrado.');
+    await ui.pause(); return;
   }
 
   const cats = [...new Set(skills.map(s => s.cat))].sort();
 
   const { mode } = await inquirer.prompt([{
-    type: 'list',
-    name: 'mode',
-    message: '  Como quer explorar?',
+    type: 'list', name: 'mode',
+    message: '  Explorar por:',
     choices: [
-      backChoice,
-      new inquirer.Separator(''),
-      { name: `  🔍  Buscar por palavra-chave`, value: 'search' },
-      { name: `  📂  Filtrar por categoria (${cats.length} cats)`, value: 'cat' },
+      ui.back, ui.sep(''),
+      { name: `  🔍  Buscar por palavra-chave`,          value: 'search' },
+      { name: `  📂  Filtrar por categoria (${cats.length})`, value: 'cat' },
     ],
   }]);
-
-  if (mode === BACK) return;
+  if (mode === ui.BACK) return;
 
   let filtered = skills;
 
   if (mode === 'search') {
-    const { q } = await inquirer.prompt([{ type: 'input', name: 'q', message: '  Buscar:' }]);
-    if (q.trim()) filtered = skills.filter(s =>
-      s.name.includes(q.toLowerCase()) || (s.desc || '').toLowerCase().includes(q.toLowerCase())
+    const { q } = await inquirer.prompt([{ type:'input', name:'q', message:'  Buscar:' }]);
+    const term = q.trim().toLowerCase();
+    if (term) filtered = skills.filter(s =>
+      s.name.toLowerCase().includes(term) || (s.desc||'').toLowerCase().includes(term)
     );
   } else {
     const { cat } = await inquirer.prompt([{
-      type: 'list',
-      name: 'cat',
+      type: 'list', name: 'cat',
       message: '  Categoria:',
       choices: [
-        backChoice,
-        new inquirer.Separator(''),
+        ui.back, ui.sep(''),
         ...cats.map(c => {
           const cnt = skills.filter(s => s.cat === c).length;
-          return { name: `  ${c.padEnd(20)} ${chalk.gray(cnt + ' skills')}`, value: c };
+          return { name: `  ${c.padEnd(22)} ${chalk.gray(cnt+' skills')}`, value: c };
         }),
       ],
       pageSize: 16,
     }]);
-    if (cat === BACK) return;
+    if (cat === ui.BACK) return;
     filtered = skills.filter(s => s.cat === cat);
   }
 
   const show = filtered.slice(0, 60);
-  br();
-  info(`${chalk.white(show.length)} skills encontradas ${show.length < filtered.length ? chalk.gray('(mostrando primeiras ' + show.length + ')') : ''}`);
-  br();
+  ui.br();
+  ui.info(`${chalk.white(show.length)} skills ${show.length < filtered.length ? chalk.gray('(mostrando '+show.length+' de '+filtered.length+')') : 'encontradas'}`);
+  ui.br();
 
   const { selected } = await inquirer.prompt([{
-    type: 'checkbox',
-    name: 'selected',
-    message: '  ESPAÇO para marcar · ENTER para confirmar:',
+    type: 'checkbox', name: 'selected',
+    message: '  ESPAÇO selecionar · ENTER confirmar:',
     choices: [
       ...show.map(s => ({
-        name: `@${s.name.padEnd(44)} ${chalk.gray('['+s.cat+']')}`,
+        name:  `@${s.name.padEnd(44)} ${chalk.gray('['+s.cat+']')}`,
         value: s.name,
       })),
-      new inquirer.Separator(''),
-      { name: chalk.gray('  ← Nenhuma — voltar ao menu'), value: BACK },
+      ui.sep(''),
+      { name: chalk.gray('  ← Cancelar'), value: ui.BACK },
     ],
     pageSize: 20,
   }]);
 
-  if (!selected.length || selected.includes(BACK)) return;
+  if (!selected.length || selected.includes(ui.BACK)) return;
 
-  br();
-  console.log(chalk.yellow('  Skills selecionadas:\n'));
-  selected.forEach(s => console.log(chalk.cyan('  @' + s)));
-  br();
+  ui.br();
+  console.log(chalk.bold.yellow('  Skills selecionadas:\n'));
+  selected.forEach(s => console.log(chalk.cyan('  @'+s)));
+  ui.br();
   console.log(chalk.gray('  Cole no seu IDE:'));
-  console.log(chalk.white('  Use ' + selected.map(s => '@' + s).join(' ')));
-  br();
-  await pause();
+  console.log(chalk.white('  Use '+selected.map(s=>'@'+s).join(' ')));
+  ui.br();
+  await ui.pause();
 }
 
-// ── STATUS ────────────────────────────────────────────────────────────────────
-async function screenStatus() {
-  banner();
-  console.log(chalk.bold.white('  📊  Status da instalação\n'));
+async function screenStatus(ui, inquirer, figlet, chalk) {
+  ui.banner(figlet);
+  console.log(chalk.bold.white('  📊  Status do projeto\n'));
 
-  const agents = getInstalledAgents();
-  const rufloDir = path.join(ROOT, '.agents', 'skills');
-  const rufloCount = fs.existsSync(rufloDir) ? fs.readdirSync(rufloDir).filter(d =>
-    fs.statSync(path.join(rufloDir, d)).isDirectory()).length : 0;
-  const skills = loadSkills();
+  const cwd       = process.cwd();
+  const agentDir  = path.join(cwd, '.claude', 'agents');
+  const skillDir  = path.join(cwd, '.claude', 'skills');
+  const agentsSrc = path.join(ROOT, '.codex', 'agents');
+  const advSrc    = path.join(ROOT, '.agents', 'skills');
 
-  const rows = [
-    { label: 'Agentes base instalados', value: agents.length + ' / ' + BASE_AGENTS.length, ok: agents.length > 0 },
-    { label: 'Agentes avançados',       value: rufloCount,                                  ok: rufloCount > 0 },
-    { label: 'Skills no catálogo',      value: skills.length,                               ok: skills.length > 0 },
-    { label: 'Diretório de instalação', value: process.cwd(),                               ok: true },
-  ];
+  const agents      = fs.existsSync(agentDir)  ? fs.readdirSync(agentDir).filter(f=>f.endsWith('.md'))  : [];
+  const skills      = fs.existsSync(skillDir)  ? fs.readdirSync(skillDir).filter(f=>f.endsWith('.md'))  : [];
+  const srcAgents   = fs.existsSync(agentsSrc) ? fs.readdirSync(agentsSrc).filter(f=>f.endsWith('.md')).length : 0;
+  const advAgents   = fs.existsSync(advSrc)    ? fs.readdirSync(advSrc).filter(d=>fs.statSync(path.join(advSrc,d)).isDirectory()).length : 0;
+  const hooksActive = getHooksInstalled(cwd);
+  const catalog     = loadSkills();
+  const isLive      = await checkServerRunning();
 
-  rows.forEach(r => {
-    const icon = r.ok ? chalk.green('  ✔') : chalk.gray('  ○');
-    console.log(icon + '  ' + r.label.padEnd(28) + chalk.cyan(r.value));
-  });
+  const row = (ok, label, val) =>
+    console.log(`  ${ok?chalk.green('✔'):chalk.gray('○')}  ${label.padEnd(28)} ${chalk.cyan(String(val))}`);
 
-  br();
-  if (agents.length > 0) {
-    console.log(chalk.gray('  Agentes instalados:'));
-    agents.forEach(a => dim('@' + a));
+  row(agents.length > 0, 'Agentes instalados',    `${agents.length} (de ${srcAgents + advAgents} disponíveis)`);
+  row(skills.length > 0, 'Skills instaladas',      `${skills.length} (catálogo: ${catalog.length})`);
+  row(hooksActive,        'Hooks Claude Code',      hooksActive ? 'ativos' : 'não instalados');
+  row(isLive,             'Pixel Office',           isLive ? 'rodando em :4321' : 'offline');
+
+  ui.br();
+  console.log(chalk.gray(`  Projeto: ${cwd}`));
+
+  if (!agents.length) {
+    ui.br();
+    ui.warn('Nenhum agente instalado neste projeto.');
+    ui.dim('Para instalar: npx skillsagents install');
   }
-  br();
-  await pause();
+  if (!hooksActive) {
+    if (!agents.length) ui.br();
+    ui.dim('Para monitorar em tempo real: npx skillsagents hooks');
+  }
+
+  ui.br();
+  await ui.pause();
 }
 
-// ── CONFIG / CHAVES DE API ────────────────────────────────────────────────────
-
-const MODELS = [
-  // ── GOOGLE GEMINI ──────────────────────────────────────────────
-  { id:'gemini-2.5-flash',      label:'Gemini 2.5 Flash',      icon:'🟡', provider:'google',    desc:'Mais rápido e inteligente • Grátis 15 req/min',  url:'https://aistudio.google.com/app/apikey',      keyField:'googleKey' },
-  { id:'gemini-2.0-flash',      label:'Gemini 2.0 Flash',      icon:'🟡', provider:'google',    desc:'Multimodal, velocidade • Grátis',                url:'https://aistudio.google.com/app/apikey',      keyField:'googleKey' },
-  { id:'gemini-1.5-pro',        label:'Gemini 1.5 Pro',        icon:'🟡', provider:'google',    desc:'Contexto de 2M tokens',                          url:'https://aistudio.google.com/app/apikey',      keyField:'googleKey' },
-  // ── ANTHROPIC CLAUDE ───────────────────────────────────────────
-  { id:'claude-sonnet-4-6',     label:'Claude Sonnet 4.6',     icon:'🟣', provider:'anthropic', desc:'Mais capaz • Ideal para código complexo',        url:'https://console.anthropic.com/',              keyField:'anthropicKey' },
-  { id:'claude-haiku-4-5-20251001', label:'Claude Haiku 4.5', icon:'🟣', provider:'anthropic', desc:'Ultra rápido e barato',                          url:'https://console.anthropic.com/',              keyField:'anthropicKey' },
-  { id:'claude-opus-4-8',       label:'Claude Opus 4.8',       icon:'🟣', provider:'anthropic', desc:'Máxima inteligência',                            url:'https://console.anthropic.com/',              keyField:'anthropicKey' },
-  // ── OPENAI ────────────────────────────────────────────────────
-  { id:'gpt-4o',                label:'GPT-4o',                icon:'🟢', provider:'openai',    desc:'Mais capaz da OpenAI',                           url:'https://platform.openai.com/api-keys',        keyField:'openaiKey' },
-  { id:'gpt-4o-mini',           label:'GPT-4o Mini',           icon:'🟢', provider:'openai',    desc:'Rápido e barato',                                url:'https://platform.openai.com/api-keys',        keyField:'openaiKey' },
-  { id:'o1-mini',               label:'o1 Mini',               icon:'🟢', provider:'openai',    desc:'Raciocínio avançado',                            url:'https://platform.openai.com/api-keys',        keyField:'openaiKey' },
-  // ── DEEPSEEK ──────────────────────────────────────────────────
-  { id:'deepseek-chat',         label:'DeepSeek V3',           icon:'🔵', provider:'deepseek',  desc:'Custo ultra baixo • ~$0.14/M tokens',            url:'https://platform.deepseek.com/api_keys',      keyField:'deepseekKey' },
-  { id:'deepseek-reasoner',     label:'DeepSeek R1',           icon:'🔵', provider:'deepseek',  desc:'Raciocínio passo a passo',                       url:'https://platform.deepseek.com/api_keys',      keyField:'deepseekKey' },
-  // ── MISTRAL ───────────────────────────────────────────────────
-  { id:'mistral-large-latest',  label:'Mistral Large',         icon:'🟠', provider:'mistral',   desc:'Excelente para código e análise',                url:'https://console.mistral.ai/api-keys',         keyField:'mistralKey' },
-  { id:'mistral-small-latest',  label:'Mistral Small',         icon:'🟠', provider:'mistral',   desc:'Rápido e acessível',                             url:'https://console.mistral.ai/api-keys',         keyField:'mistralKey' },
-  // ── GROQ ──────────────────────────────────────────────────────
-  { id:'llama-3.3-70b-versatile',label:'Llama 3.3 70B (Groq)',icon:'⚡', provider:'groq',      desc:'Inferência ultra rápida • Grátis',               url:'https://console.groq.com/keys',               keyField:'groqKey' },
-  { id:'mixtral-8x7b-32768',    label:'Mixtral 8x7B (Groq)',   icon:'⚡', provider:'groq',      desc:'Rápido e gratuito via Groq',                     url:'https://console.groq.com/keys',               keyField:'groqKey' },
-];
-
-const PROVIDER_LABELS = {
-  google:    '🟡  Google Gemini',
-  anthropic: '🟣  Anthropic Claude',
-  openai:    '🟢  OpenAI GPT',
-  deepseek:  '🔵  DeepSeek',
-  mistral:   '🟠  Mistral AI',
-  groq:      '⚡  Groq (Open Source)',
-};
-
-function maskKey(key) {
-  if (!key) return chalk.red('✗ não configurada');
-  return chalk.green('✔ ') + key.slice(0, 6) + '●●●●●●●●●●●●' + key.slice(-4);
-}
-
-async function screenConfig() {
+async function screenConfig(ui, inquirer, chalk) {
   const { loadConfig, saveConfig } = require('../src/generator.js');
 
   while (true) {
     console.clear();
-    const config = loadConfig();
-    const activeModel = config.activeModel || 'gemini-2.5-flash';
-    const activeMeta  = MODELS.find(m => m.id === activeModel);
+    const config      = loadConfig();
+    const activeId    = config.activeModel || 'gemini-2.5-flash';
+    const activeMeta  = MODELS.find(m => m.id === activeId) || MODELS[0];
 
     console.log(chalk.bold.cyanBright('\n  🔑  Modelos e Chaves de API\n'));
     console.log(chalk.gray('  Config: ~/.skillsagents/config.json\n'));
-
-    // Status atual
     console.log(chalk.bold('  Modelo ativo:'));
-    console.log(`  ${activeMeta?.icon || '🤖'}  ${chalk.cyan(activeMeta?.label || activeModel)}`);
-    console.log(chalk.gray(`     ${activeMeta?.desc || ''}\n`));
-
-    // Chaves por provedor
-    console.log(chalk.bold('  Chaves configuradas:'));
-    const uniqueProviders = [...new Set(MODELS.map(m => m.provider))];
-    uniqueProviders.forEach(p => {
-      const keyField = MODELS.find(m => m.provider === p)?.keyField;
-      const key = keyField && config[keyField];
-      console.log(`  ${PROVIDER_LABELS[p]?.padEnd(26)}  ${maskKey(key)}`);
+    console.log(`  ${activeMeta.icon}  ${chalk.cyan(activeMeta.label)}  ${chalk.gray(activeMeta.desc)}`);
+    ui.br();
+    console.log(chalk.bold('  Chaves:'));
+    [...new Set(MODELS.map(m => m.provider))].forEach(p => {
+      const kf  = MODELS.find(m => m.provider === p)?.keyField;
+      console.log(`  ${(PROVIDER_LABELS[p]||p).padEnd(26)}  ${maskKey(kf && config[kf])}`);
     });
-
     console.log(chalk.gray('\n  ' + '─'.repeat(54) + '\n'));
 
     const { action } = await inquirer.prompt([{
-      type: 'list',
-      name: 'action',
-      message: '  O que você quer fazer?',
-      pageSize: 6,
+      type: 'list', name: 'action',
+      message: '  Ação:',
+      pageSize: 7,
       choices: [
-        { name: `  🎯  Selecionar modelo ativo`,  value: 'model'  },
-        { name: `  🔐  Adicionar / trocar chave`, value: 'key'    },
-        { name: `  🗑   Limpar uma chave`,         value: 'clear1' },
-        { name: `  💣  Limpar tudo`,              value: 'clear'  },
-        new inquirer.Separator(''),
+        { name: '  🎯  Selecionar modelo ativo',  value: 'model'  },
+        { name: '  🔐  Adicionar / trocar chave', value: 'key'    },
+        { name: '  🗑   Remover uma chave',        value: 'clear1' },
+        { name: '  💣  Limpar tudo',              value: 'clear'  },
+        ui.sep(''),
         { name: chalk.gray('  ← Voltar'),         value: 'back'   },
       ],
     }]);
-
     if (action === 'back') return;
 
-    // ── SELECIONAR MODELO ───────────────────────────────────────────
+    // ── SELECIONAR MODELO ─────────────────────────────────
     if (action === 'model') {
       const groups = {};
-      MODELS.forEach(m => {
-        if (!groups[m.provider]) groups[m.provider] = [];
-        groups[m.provider].push(m);
-      });
-
+      MODELS.forEach(m => { (groups[m.provider] = groups[m.provider]||[]).push(m); });
       const choices = [];
-      Object.entries(groups).forEach(([provider, models]) => {
-        choices.push(new inquirer.Separator(chalk.gray(`  ── ${PROVIDER_LABELS[provider] || provider}`)));
-        models.forEach(m => {
-          const keyField = m.keyField;
-          const hasKey   = !!config[keyField];
-          const isActive = m.id === activeModel;
-          const keyIcon  = hasKey ? chalk.green('✔') : chalk.red('✗');
-          const tick     = isActive ? chalk.cyanBright(' ← ativo') : '';
+      Object.entries(groups).forEach(([p, ms]) => {
+        choices.push(ui.sep(`  ── ${PROVIDER_LABELS[p]||p}`));
+        ms.forEach(m => {
+          const hasKey  = !!config[m.keyField];
+          const isActive = m.id === activeId;
           choices.push({
-            name:  `  ${m.icon}  ${m.label.padEnd(28)} ${keyIcon} ${chalk.gray(m.desc)}${tick}`,
+            name:  `  ${m.icon}  ${m.label.padEnd(26)} ${hasKey?chalk.green('✔'):chalk.red('✗')} key  ${chalk.gray(m.desc)}${isActive?chalk.cyanBright(' ← ativo'):''}`,
             value: m.id,
           });
         });
       });
-      choices.push(new inquirer.Separator(''));
-      choices.push({ name: chalk.gray('  ← Voltar'), value: BACK });
+      choices.push(ui.sep(''));
+      choices.push({ name: chalk.gray('  ← Voltar'), value: ui.BACK });
 
-      const { selectedModel } = await inquirer.prompt([{
-        type: 'list', name: 'selectedModel',
-        message: '  Escolha o modelo:',
-        choices,
-        pageSize: 20,
-      }]);
+      const { sel } = await inquirer.prompt([{ type:'list', name:'sel', message:'  Modelo:', choices, pageSize:20 }]);
+      if (sel === ui.BACK) continue;
 
-      if (selectedModel === BACK) continue;
-
-      const meta = MODELS.find(m => m.id === selectedModel);
+      const meta = MODELS.find(m => m.id === sel);
       const cfg  = loadConfig();
-
-      // Verifica se tem chave para esse provedor
       if (!cfg[meta.keyField]) {
-        br();
-        console.log(chalk.yellow(`  Nenhuma chave para ${PROVIDER_LABELS[meta.provider]}.`));
-        info('Gere sua chave em: ' + chalk.cyan(meta.url));
-        br();
-
+        ui.br();
+        ui.warn(`Nenhuma chave para ${PROVIDER_LABELS[meta.provider]}.`);
+        ui.info('Gere sua chave em: ' + chalk.cyan(meta.url));
+        ui.br();
         const { apiKey } = await inquirer.prompt([{
-          type: 'password', name: 'apiKey',
-          message: `  Cole a chave:`,
-          mask: '●',
+          type:'password', name:'apiKey', message:'  Cole a chave:', mask:'●',
           validate: v => v.trim().length > 10 || 'Chave muito curta',
         }]);
-
         cfg[meta.keyField] = apiKey.trim();
       }
-
-      cfg.activeModel = selectedModel;
+      cfg.activeModel = sel;
       saveConfig(cfg);
-      br();
-      ok(`Modelo ativo: ${meta.icon}  ${chalk.cyan(meta.label)}`);
-      br();
-      await pause();
+      ui.br(); ui.ok(`Modelo ativo: ${meta.icon}  ${chalk.cyan(meta.label)}`); ui.br();
+      await ui.pause();
     }
 
-    // ── ADICIONAR / TROCAR CHAVE ────────────────────────────────────
+    // ── ADD/CHANGE KEY ────────────────────────────────────
     if (action === 'key') {
-      const providerChoices = [
-        ...Object.entries(PROVIDER_LABELS).map(([id, label]) => ({
-          name: `  ${label}`,
-          value: id,
-        })),
-        new inquirer.Separator(''),
-        { name: chalk.gray('  ← Voltar'), value: BACK },
-      ];
-
       const { prov } = await inquirer.prompt([{
-        type: 'list', name: 'prov',
-        message: '  Qual provedor?',
-        choices: providerChoices,
+        type:'list', name:'prov',
+        message:'  Provedor:',
+        choices: [
+          ...Object.entries(PROVIDER_LABELS).map(([id,label]) => ({ name:'  '+label, value:id })),
+          ui.sep(''), { name: chalk.gray('  ← Voltar'), value: ui.BACK },
+        ],
       }]);
-
-      if (prov === BACK) continue;
-
+      if (prov === ui.BACK) continue;
       const meta = MODELS.find(m => m.provider === prov);
-      br();
-      info('Gere sua chave em: ' + chalk.cyan(meta.url));
-      br();
-
+      ui.br(); ui.info('Chave em: ' + chalk.cyan(meta.url)); ui.br();
       const { apiKey } = await inquirer.prompt([{
-        type: 'password', name: 'apiKey',
-        message: `  Cole a chave:`,
-        mask: '●',
+        type:'password', name:'apiKey', message:'  Cole a chave:', mask:'●',
         validate: v => v.trim().length > 6 || 'Chave muito curta',
       }]);
-
       const cfg = loadConfig();
       cfg[meta.keyField] = apiKey.trim();
       saveConfig(cfg);
-      br();
-      ok(`Chave ${PROVIDER_LABELS[prov]} salva!`);
-      br();
-      await pause();
+      ui.br(); ui.ok(`Chave ${PROVIDER_LABELS[prov]} salva.`); ui.br();
+      await ui.pause();
     }
 
-    // ── LIMPAR UMA CHAVE ────────────────────────────────────────────
+    // ── REMOVE ONE KEY ────────────────────────────────────
     if (action === 'clear1') {
       const { prov } = await inquirer.prompt([{
-        type: 'list', name: 'prov',
-        message: '  Qual chave remover?',
+        type:'list', name:'prov',
+        message:'  Remover qual?',
         choices: [
-          ...Object.entries(PROVIDER_LABELS).map(([id, label]) => ({ name: `  ${label}`, value: id })),
-          new inquirer.Separator(''),
-          { name: chalk.gray('  ← Voltar'), value: BACK },
+          ...Object.entries(PROVIDER_LABELS).map(([id,label]) => ({ name:'  '+label, value:id })),
+          ui.sep(''), { name: chalk.gray('  ← Voltar'), value: ui.BACK },
         ],
       }]);
-      if (prov === BACK) continue;
-
-      const meta = MODELS.find(m => m.provider === prov);
-      const cfg  = loadConfig();
-      delete cfg[meta.keyField];
-      saveConfig(cfg);
-      ok(`Chave ${PROVIDER_LABELS[prov]} removida.`);
-      await pause();
+      if (prov === ui.BACK) continue;
+      const cfg = loadConfig();
+      const kf  = MODELS.find(m => m.provider === prov)?.keyField;
+      if (kf) { delete cfg[kf]; saveConfig(cfg); }
+      ui.ok(`Chave ${PROVIDER_LABELS[prov]} removida.`);
+      await ui.pause();
     }
 
-    // ── LIMPAR TUDO ─────────────────────────────────────────────────
+    // ── CLEAR ALL ─────────────────────────────────────────
     if (action === 'clear') {
       const { confirm } = await inquirer.prompt([{
-        type: 'confirm', name: 'confirm',
-        message: '  Remover TODAS as chaves e configurações?', default: false,
+        type:'confirm', name:'confirm',
+        message:'  Remover TODAS as chaves?', default: false,
       }]);
-      if (confirm) { saveConfig({}); ok('Configurações limpas.'); await pause(); }
+      if (confirm) { saveConfig({}); ui.ok('Configurações limpas.'); await ui.pause(); }
     }
   }
 }
 
-// ── GENERATOR ────────────────────────────────────────────────────────────────
-async function screenGenerator() {
-  banner();
+async function screenGenerator(ui, inquirer, figlet, chalk) {
+  ui.banner(figlet);
   console.log(chalk.bold.white('  🤖  Gerador de Prompts com IA\n'));
 
   const { loadConfig, saveConfig, generate } = require('../src/generator.js');
-  let config = loadConfig();
-
-  // ── API KEY SETUP ───────────────────────────────────────────────
-  const activeModelId = config.activeModel || 'gemini-2.5-flash';
-  const activeMeta    = MODELS.find(m => m.id === activeModelId) || MODELS[0];
-  const activeKey     = config[activeMeta.keyField];
+  const config      = loadConfig();
+  const activeId    = config.activeModel || 'gemini-2.5-flash';
+  const activeMeta  = MODELS.find(m => m.id === activeId) || MODELS[0];
+  const activeKey   = config[activeMeta.keyField];
 
   if (!activeKey) {
-    br();
-    console.log(chalk.yellow(`  Nenhuma chave para ${PROVIDER_LABELS[activeMeta.provider]}.\n`));
-    console.log(chalk.gray('  Configure em: ') + chalk.cyan('Menu → 🔑 Chaves de API'));
-    br();
-    const { goConfig } = await inquirer.prompt([{
-      type: 'confirm', name: 'goConfig',
-      message: '  Configurar agora?', default: true,
+    ui.br();
+    ui.warn(`Nenhuma chave para ${PROVIDER_LABELS[activeMeta.provider]}.`);
+    ui.dim('Configure em: Menu → 🔑 Chaves de API');
+    ui.br();
+    const { go } = await inquirer.prompt([{
+      type:'confirm', name:'go', message:'  Configurar agora?', default:true,
     }]);
-    if (goConfig) await screenConfig();
+    if (go) await screenConfig(ui, inquirer, chalk);
     return;
   }
 
-  info(`Modelo: ${activeMeta.icon}  ${chalk.cyan(activeMeta.label)}`);
-
-  // ── PROJECT INPUT ───────────────────────────────────────────────
-  console.log(chalk.gray('  ── Descreva seu projeto ───────────────────────────────\n'));
-  dim('Exemplos: "SaaS de gestão financeira em Next.js + FastAPI"');
-  dim('"App mobile de delivery com painel admin"');
-  dim('"Sistema de RAG com documentos PDF e busca semântica"');
-  br();
+  ui.info(`Modelo: ${activeMeta.icon}  ${chalk.cyan(activeMeta.label)}`);
+  console.log(chalk.gray('\n  ── Descreva seu projeto ──────────────────────────────\n'));
+  ui.dim('Ex: "SaaS de finanças em Next.js + FastAPI"');
+  ui.dim('Ex: "App mobile de delivery com painel admin"');
+  ui.dim('Ex: "Sistema RAG com PDFs e busca semântica"');
+  ui.br();
 
   const { idea } = await inquirer.prompt([{
-    type: 'input',
-    name: 'idea',
-    message: '  Projeto:',
+    type:'input', name:'idea',
+    message:'  Projeto:',
     validate: v => v.trim().length > 5 || 'Descreva um pouco mais',
   }]);
+  ui.br();
 
-  br();
-
-  // ── GENERATE ─────────────────────────────────────────────────────
   let result;
   try {
-    result = await generate({ idea, model: activeModelId, provider: activeMeta.provider, apiKey: activeKey });
+    result = await generate({ idea, model: activeId, provider: activeMeta.provider, apiKey: activeKey });
   } catch(e) {
-    br();
-    console.log(chalk.red('  ✗  Erro: ' + e.message));
-    if (e.message.includes('API') || e.message.includes('key') || e.message.includes('auth')) {
-      console.log(chalk.yellow('  Dica: sua chave pode estar inválida ou expirada.'));
-      const { reset } = await inquirer.prompt([{
-        type: 'confirm', name: 'reset',
-        message: '  Trocar a chave de API?', default: true,
-      }]);
-      if (reset) { saveConfig({}); }
+    ui.br(); ui.err('Erro: ' + e.message);
+    if (/api|key|auth/i.test(e.message)) {
+      ui.warn('Sua chave pode estar inválida ou expirada.');
+      const { reset } = await inquirer.prompt([{ type:'confirm', name:'reset', message:'  Trocar a chave?', default:true }]);
+      if (reset) saveConfig({});
     }
-    br();
-    await pause();
-    return;
+    ui.br(); await ui.pause(); return;
   }
 
-  // ── DISPLAY RESULT ────────────────────────────────────────────────
-  banner();
-  console.log(chalk.bold.cyanBright('  ✦  Resultado da Orquestração\n'));
+  ui.banner(figlet);
+  console.log(chalk.bold.cyanBright('  ✦  Orion — Resultado\n'));
 
   if (result.vision) {
     console.log(chalk.bold.white('  📋  Visão da Solução\n'));
     result.vision.split('\n').forEach(l => l && console.log(chalk.gray('  ') + l));
-    br();
+    ui.br();
   }
-
   if (result.agents) {
     console.log(chalk.bold.white('  👥  Agentes Recomendados\n'));
     result.agents.split('\n').forEach(l => {
       if (!l.trim()) return;
-      const match = l.match(/(@\S+)/g);
-      if (match) {
-        let line = l;
-        match.forEach(m => { line = line.replace(m, chalk.cyan(m)); });
-        console.log('  ' + line);
-      } else {
-        console.log(chalk.gray('  ') + l);
-      }
+      let line = l;
+      (l.match(/(@\S+)/g)||[]).forEach(m => { line = line.replace(m, chalk.cyan(m)); });
+      console.log('  ' + line);
     });
-    br();
+    ui.br();
   }
-
   if (result.skills) {
     console.log(chalk.bold.white('  🛠   Skills Recomendadas\n'));
     result.skills.split('\n').forEach(l => {
       if (!l.trim()) return;
-      const match = l.match(/(@\S+)/g);
-      if (match) {
-        let line = l;
-        match.forEach(m => { line = line.replace(m, chalk.yellow(m)); });
-        console.log('  ' + line);
-      } else {
-        console.log(chalk.gray('  ') + l);
-      }
+      let line = l;
+      (l.match(/(@\S+)/g)||[]).forEach(m => { line = line.replace(m, chalk.yellow(m)); });
+      console.log('  ' + line);
     });
-    br();
+    ui.br();
   }
-
   if (result.prompt) {
     console.log(chalk.bold.white('  🚀  Prompt Pronto\n'));
-    console.log(chalk.gray('  ' + '─'.repeat(56)));
+    console.log(chalk.gray('  ' + '─'.repeat(58)));
     result.prompt.split('\n').forEach(l => console.log('  ' + chalk.white(l)));
-    console.log(chalk.gray('  ' + '─'.repeat(56)));
-    br();
+    console.log(chalk.gray('  ' + '─'.repeat(58)));
+    ui.br();
 
-    // Copy to clipboard
     const { copy } = await inquirer.prompt([{
-      type: 'confirm', name: 'copy',
-      message: '  Copiar prompt para o clipboard?', default: true,
+      type:'confirm', name:'copy', message:'  Copiar prompt para o clipboard?', default:true,
     }]);
-
     if (copy) {
-      const clipCmd = process.platform === 'win32' ? `echo ${result.prompt} | clip`
-                    : process.platform === 'darwin' ? `echo "${result.prompt.replace(/"/g, '\\"')}" | pbcopy`
-                    : `echo "${result.prompt.replace(/"/g, '\\"')}" | xclip -selection clipboard 2>/dev/null || xdotool type "${result.prompt.slice(0,20)}"`;
+      const p = result.prompt.replace(/"/g,'\\"');
+      const clipCmd = process.platform === 'win32'
+        ? `powershell -command "Set-Clipboard '${result.prompt.replace(/'/g,"''")}'"`
+        : process.platform === 'darwin'
+        ? `printf '%s' "${p}" | pbcopy`
+        : `printf '%s' "${p}" | xclip -selection clipboard 2>/dev/null || true`;
       exec(clipCmd, () => {});
-      ok('Prompt copiado! Cole no seu IDE e comece.');
+      ui.ok('Copiado! Cole no seu IDE e comece.');
     }
   }
 
-  br();
-
-  // Option to change key
-  const { changeKey } = await inquirer.prompt([{
-    type: 'list',
-    name: 'changeKey',
-    message: '  O que fazer agora?',
+  ui.br();
+  const { next } = await inquirer.prompt([{
+    type:'list', name:'next',
+    message:'  O que fazer?',
     choices: [
-      { name: '  ← Voltar ao menu', value: 'back' },
-      { name: '  🔄  Gerar outro prompt', value: 'again' },
-      { name: '  🔑  Trocar chave de API', value: 'key' },
+      { name:'  ← Voltar ao menu',   value:'back'  },
+      { name:'  🔄  Gerar de novo',  value:'again' },
+      { name:'  🔑  Trocar modelo',  value:'key'   },
     ],
   }]);
-
-  if (changeKey === 'key') { await screenConfig(); return; }
-  if (changeKey === 'again') { await screenGenerator(); return; }
+  if (next === 'key')   { await screenConfig(ui, inquirer, chalk); return; }
+  if (next === 'again') { await screenGenerator(ui, inquirer, figlet, chalk); }
 }
 
-// ── PIXEL OFFICE SERVER ───────────────────────────────────────────────────────
-const { spawn } = require('child_process');
-const http = require('http');
+async function screenOffice(ui, inquirer, chalk) {
+  console.clear();
+  console.log(chalk.bold.white('\n  🎮  Pixel Office\n'));
 
-function isServerRunning(cb) {
-  const req = http.get('http://localhost:4321/health', res => {
-    cb(res.statusCode === 200);
-  });
-  req.on('error', () => cb(false));
-  req.setTimeout(800, () => { req.destroy(); cb(false); });
-}
+  const running = await checkServerRunning();
 
-async function startOfficeServer() {
-  banner();
-  console.log(chalk.bold.white('  🎮  Pixel Office\n'));
-
-  isServerRunning(async (running) => {
-    if (running) {
-      ok('Servidor já está rodando em ' + chalk.cyan('http://localhost:4321'));
-      br();
+  if (running) {
+    ui.ok('Servidor já rodando em ' + chalk.cyan('http://localhost:4321'));
+  } else {
+    ui.info('Iniciando servidor na porta ' + chalk.cyan('4321') + '...');
+    const child = spawn(process.execPath, [path.join(ROOT, 'src', 'server.js')], {
+      detached: true, stdio: 'ignore',
+      env: { ...process.env, SKILLSAGENTS_PORT:'4321' },
+    });
+    child.unref();
+    // Aguarda servidor subir
+    await new Promise(r => setTimeout(r, 1000));
+    const up = await checkServerRunning();
+    if (up) {
+      ui.ok('Servidor iniciado (PID ' + child.pid + ')');
     } else {
-      info('Iniciando servidor em background na porta ' + chalk.cyan('4321') + '...');
-      br();
-
-      const child = spawn(process.execPath, [path.join(ROOT, 'src', 'server.js')], {
-        detached: true,
-        stdio: 'ignore',
-        env: { ...process.env },
-      });
-      child.unref();
-
-      // Aguarda o servidor subir
-      await new Promise(r => setTimeout(r, 1000));
-      ok('Servidor iniciado (PID ' + child.pid + ')');
+      ui.warn('Servidor pode estar demorando — verifique manualmente.');
     }
+  }
 
-    // Abre o browser
-    const openCmd = process.platform === 'win32' ? 'start'
-                  : process.platform === 'darwin' ? 'open'
-                  : 'xdg-open';
-    exec(`${openCmd} http://localhost:4321/office.html`);
-    ok('Abrindo ' + chalk.cyan('http://localhost:4321/office.html') + ' no browser...');
-    br();
-    dim('Para parar o servidor: feche o terminal ou rode ' + chalk.yellow('killall node'));
-    br();
-    await pause();
-  });
+  const openCmd = process.platform === 'win32' ? 'start'
+                : process.platform === 'darwin' ? 'open'
+                : 'xdg-open';
+  exec(`${openCmd} http://localhost:4321/office.html`);
+  ui.ok('Abrindo ' + chalk.cyan('http://localhost:4321/office.html') + ' no browser');
+  ui.br();
+  ui.dim('Para parar: feche o terminal ou rode  kill $(lsof -ti:4321)');
+  ui.dim('Para instalar hooks e ver agentes reais: npx skillsagents hooks');
+  ui.br();
+  await ui.pause();
 }
 
-// ── INSTALL HOOKS ─────────────────────────────────────────────────────────────
-function installHooksScreen() {
-  banner();
-  console.log(chalk.bold.white('  🔗  Integração com Claude Code\n'));
-  info('Instalando hooks em ' + chalk.cyan('.claude/settings.json') + '...');
-  br();
+async function screenHooks(ui, inquirer, chalk) {
+  console.clear();
+  console.log(chalk.bold.white('\n  🔗  Integração com Claude Code\n'));
+  ui.info('Instalando hooks em ' + chalk.cyan('.claude/settings.json') + '...\n');
   const { installHooks } = require('../src/hooks.js');
   installHooks(process.cwd());
+  ui.br();
+  ui.dim('Próximos passos:');
+  ui.dim('1.  Abra uma sessão do Claude Code neste projeto');
+  ui.dim('2.  Rode: npx skillsagents office  (abre o Pixel Office)');
+  ui.dim('3.  Agentes aparecem em tempo real enquanto você trabalha');
+  ui.br();
+  await ui.pause();
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
+// ─────────────────────────────────────────────────────────────
 // MAIN LOOP
-// ══════════════════════════════════════════════════════════════════════════════
-async function main() {
-  banner();
+// ─────────────────────────────────────────────────────────────
+async function main(chalk, figlet, inquirer) {
+  const ui = makePrimitives(chalk);
 
-  // Se passou subcomando gen, vai direto ao gerador
-  if (directCmd === 'gen' || directCmd === 'generate') {
-    await screenGenerator();
-    // volta ao menu após gerar
+  // Subcomando gen direto
+  if (cmd === 'gen' || cmd === 'generate') {
+    await screenGenerator(ui, inquirer, figlet, chalk);
+    process.exit(0);
   }
 
-  // Se passou subcomando direto, executa e vai pro menu
-  if (directCmd === 'install') {
-    await screenQuickInstall();
-    // continua para o menu abaixo
-  }
-
-  if (directCmd === 'list') {
-    const { list } = require('../src/list.js');
-    list(process.argv.slice(3));
-    return;
-  }
-
-  // Language selection
-  const { lang } = await inquirer.prompt([{
-    type: 'list',
-    name: 'lang',
-    message: '  Idioma / Language:',
-    choices: [
-      { name: '  🇧🇷  Português', value: 'pt' },
-      { name: '  🇺🇸  English',   value: 'en' },
-      { name: '  🇪🇸  Español',   value: 'es' },
-    ],
-  }]);
-
-  // Mostra banner UMA VEZ antes do loop
-  banner();
-  header();
+  ui.banner(figlet);
+  ui.header();
 
   while (true) {
     const { action } = await inquirer.prompt([{
-      type: 'list',
-      name: 'action',
+      type: 'list', name: 'action',
       message: '  O que você quer fazer?',
-      pageSize: 15,
+      pageSize: 16,
       choices: [
-        // ── INSTALAR ──────────────────────────────────────
-        new inquirer.Separator(chalk.gray('  ── instalar ──────────────────────────────')),
-        { name: `  ⚡  Início Rápido         ${chalk.gray('instala todos os agentes agora')}`,         value: 'quick'   },
-        { name: `  🎯  Para meu projeto       ${chalk.gray('squad ideal baseado no seu stack')}`,       value: 'project' },
-        // ── EXPLORAR ──────────────────────────────────────
-        new inquirer.Separator(chalk.gray('  ── explorar ──────────────────────────────')),
-        { name: `  🤖  Gerar Prompt com IA   ${chalk.gray('descreva o projeto, IA monta o squad')}`,   value: 'gen'     },
-        { name: `  👥  Agentes               ${chalk.gray('146 agentes disponíveis')}`,                value: 'agents'  },
-        { name: `  🛠   Skills                ${chalk.gray('browse + selecione entre 1270+ skills')}`,  value: 'skills'  },
-        // ── FERRAMENTAS ───────────────────────────────────
-        new inquirer.Separator(chalk.gray('  ── ferramentas ────────────────────────────')),
+        ui.sep('  ── instalar ────────────────────────────────────'),
+        { name: `  ⚡  Início Rápido         ${chalk.gray('instala todos os agentes agora')}`,           value: 'quick'   },
+        { name: `  🎯  Para meu projeto       ${chalk.gray('squad ideal baseado no seu stack')}`,         value: 'project' },
+        ui.sep('  ── explorar ────────────────────────────────────'),
+        { name: `  🤖  Gerar Prompt com IA   ${chalk.gray('descreva o projeto, IA monta o squad')}`,     value: 'gen'     },
+        { name: `  👥  Agentes               ${chalk.gray('146 agentes disponíveis')}`,                  value: 'agents'  },
+        { name: `  🛠   Skills               ${chalk.gray('browse + selecione entre 1270+ skills')}`,    value: 'skills'  },
+        ui.sep('  ── ferramentas ─────────────────────────────────'),
         { name: `  🎮  Pixel Office           ${chalk.gray('inicia servidor local + abre no browser')}`, value: 'office'  },
         { name: `  🔗  Instalar Hooks         ${chalk.gray('integra com Claude Code em tempo real')}`,   value: 'hooks'   },
-        { name: `  🔑  Chaves de API          ${chalk.gray('Gemini · Claude · GPT')}`,                   value: 'config'  },
+        { name: `  🔑  Chaves de API          ${chalk.gray('Gemini · Claude · GPT · DeepSeek...')}`,     value: 'config'  },
         { name: `  📊  Status                 ${chalk.gray('veja o que está instalado')}`,               value: 'status'  },
-        new inquirer.Separator(''),
-        { name: `  ✕   Sair`,                                                                           value: 'exit'    },
+        ui.sep(''),
+        { name: `  ✕   Sair`,                                                                            value: 'exit'    },
       ],
     }]);
 
     if (action === 'exit') { console.log(); process.exit(0); }
 
-    if (action === 'gen')     await screenGenerator();
-    if (action === 'quick')   await screenQuickInstall();
-    if (action === 'project') await screenForMyProject();
-    if (action === 'agents')  await screenAgents();
-    if (action === 'skills')  await screenSkills();
-    if (action === 'config')  await screenConfig();
-    if (action === 'office')  await startOfficeServer();
-    if (action === 'hooks')   installHooksScreen();
-    if (action === 'status')  await screenStatus();
+    if (action === 'quick')   await screenQuickInstall(ui, inquirer);
+    if (action === 'project') await screenForMyProject(ui, inquirer, figlet, chalk);
+    if (action === 'agents')  await screenAgents(ui, inquirer, figlet, chalk);
+    if (action === 'skills')  await screenSkills(ui, inquirer, figlet, chalk);
+    if (action === 'gen')     await screenGenerator(ui, inquirer, figlet, chalk);
+    if (action === 'config')  await screenConfig(ui, inquirer, chalk);
+    if (action === 'office')  await screenOffice(ui, inquirer, chalk);
+    if (action === 'hooks')   await screenHooks(ui, inquirer, chalk);
+    if (action === 'status')  await screenStatus(ui, inquirer, figlet, chalk);
 
-    // Limpa e reexibe cabeçalho antes de voltar ao menu
-    banner();
-    header();
+    // Volta ao menu — banner apenas 1x
+    console.clear();
+    ui.header();
   }
 }
 
-main().catch(e => {
-  console.error(chalk.red('\n  Erro: ' + e.message));
+main.catch = e => {
+  const chalk = require('chalk');
+  console.error(chalk.red('\n  Erro fatal: ' + e.message));
   process.exit(1);
-});
+};

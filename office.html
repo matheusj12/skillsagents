@@ -9,96 +9,118 @@
     :root {
       --bg:#080a0f; --surface:#0d1117; --border:#1e2d3d;
       --cyan:#00f0ff; --purple:#7c3aed; --green:#10b981;
-      --text:#e2e8f0; --muted:#64748b;
+      --orange:#f59e0b; --red:#ef4444;
+      --text:#e2e8f0; --muted:#64748b; --muted-hex:#64748b;
     }
     *{margin:0;padding:0;box-sizing:border-box;}
     body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
 
-    /* NAV */
-    header{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:rgba(8,10,15,.95);border-bottom:1px solid var(--border);flex-shrink:0;z-index:10;}
+    /* ── NAV ──────────────────────────────────────────────────── */
+    header{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:rgba(8,10,15,.97);border-bottom:1px solid var(--border);flex-shrink:0;z-index:10;}
     .logo{font-weight:800;font-size:.95rem;display:flex;align-items:center;gap:8px;}
     .logo-dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);animation:glow 2s infinite;}
     @keyframes glow{0%,100%{opacity:1}50%{opacity:.4}}
-    .nav-right{display:flex;align-items:center;gap:10px;}
+    .nav-right{display:flex;align-items:center;gap:8px;}
     .nav-btn{padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:.78rem;font-weight:600;cursor:pointer;transition:.15s;font-family:inherit;}
     .nav-btn:hover{border-color:var(--cyan);color:var(--cyan);}
     .nav-btn.active{background:rgba(0,240,255,.1);border-color:var(--cyan);color:var(--cyan);}
-    .badge{padding:3px 8px;border-radius:20px;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;}
 
-    /* LAYOUT */
-    .workspace{flex:1;display:flex;overflow:hidden;}
+    /* ── CONNECTION STATUS ───────────────────────────────────── */
+    #conn-bar{height:28px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:.68rem;font-weight:600;font-family:'JetBrains Mono',monospace;flex-shrink:0;transition:background .4s,border-color .4s;}
+    #conn-bar.demo{background:rgba(245,158,11,.07);border-bottom:1px solid rgba(245,158,11,.2);color:var(--orange);}
+    #conn-bar.live{background:rgba(16,185,129,.07);border-bottom:1px solid rgba(16,185,129,.2);color:var(--green);}
+    #conn-bar.reconnecting{background:rgba(239,68,68,.07);border-bottom:1px solid rgba(239,68,68,.15);color:var(--red);}
+    .conn-dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:6px;flex-shrink:0;}
+    .conn-dot.demo{background:var(--orange);animation:glow 1.5s infinite;}
+    .conn-dot.live{background:var(--green);animation:glow 1s infinite;}
+    .conn-dot.reconnecting{background:var(--red);}
+    #conn-hint{font-size:.65rem;color:var(--muted);font-family:'JetBrains Mono',monospace;}
 
-    /* LEFT SIDEBAR */
-    .sidebar{width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
-    .sidebar-head{padding:12px 14px;border-bottom:1px solid var(--border);font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);display:flex;justify-content:space-between;align-items:center;}
-    .online-badge{font-size:.65rem;background:rgba(16,185,129,.15);color:#10b981;padding:2px 7px;border-radius:10px;font-weight:700;}
-    .agent-scroll{flex:1;overflow-y:auto;padding:6px;}
-    .agent-item{padding:7px 10px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:9px;margin-bottom:2px;transition:.15s;border:1px solid transparent;}
+    /* ── LAYOUT ──────────────────────────────────────────────── */
+    .workspace{flex:1;display:flex;overflow:hidden;min-height:0;}
+
+    /* ── LEFT SIDEBAR ────────────────────────────────────────── */
+    .sidebar{width:210px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+    .sidebar-head{padding:10px 14px;border-bottom:1px solid var(--border);font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);display:flex;justify-content:space-between;align-items:center;}
+    .online-badge{font-size:.63rem;background:rgba(16,185,129,.15);color:#10b981;padding:2px 7px;border-radius:10px;font-weight:700;transition:all .3s;}
+    .agent-scroll{flex:1;overflow-y:auto;padding:5px;}
+    .agent-item{padding:6px 9px;border-radius:7px;cursor:pointer;display:flex;align-items:center;gap:8px;margin-bottom:2px;transition:.15s;border:1px solid transparent;}
     .agent-item:hover{background:rgba(255,255,255,.04);}
     .agent-item.selected{background:rgba(0,240,255,.06);border-color:rgba(0,240,255,.2);}
     .agent-avatar{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;}
     .agent-meta{min-width:0;flex:1;}
-    .agent-name{font-size:.78rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    .agent-role{font-size:.65rem;color:var(--muted);}
+    .agent-name{font-size:.77rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .agent-role{font-size:.63rem;color:var(--muted);}
     .status-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
     .s-active{background:#10b981;box-shadow:0 0 5px #10b981;}
     .s-idle{background:var(--muted);}
     .s-think{background:#f59e0b;animation:glow .8s infinite;}
-    .zone-label{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:10px 14px 4px;opacity:.7;}
+    .zone-label{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:8px 12px 3px;opacity:.6;}
 
-    /* CANVAS AREA */
-    .canvas-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;}
-    .toolbar{padding:7px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0;background:rgba(13,17,23,.8);}
+    /* ── CANVAS AREA ─────────────────────────────────────────── */
+    .canvas-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+    .toolbar{padding:6px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;flex-shrink:0;background:rgba(13,17,23,.8);}
     .canvas-container{flex:1;overflow:auto;background:var(--bg);display:flex;align-items:center;justify-content:center;position:relative;}
     #canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;cursor:default;}
 
-    /* BOTTOM FEED */
-    .feed{height:110px;flex-shrink:0;border-top:1px solid var(--border);background:rgba(13,17,23,.9);display:flex;flex-direction:column;overflow:hidden;}
-    .feed-head{padding:6px 16px;border-bottom:1px solid var(--border);font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);display:flex;align-items:center;gap:8px;}
+    /* ── BOTTOM FEED ─────────────────────────────────────────── */
+    .feed{height:100px;flex-shrink:0;border-top:1px solid var(--border);background:rgba(13,17,23,.9);display:flex;flex-direction:column;overflow:hidden;}
+    .feed-head{padding:5px 14px;border-bottom:1px solid var(--border);font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);display:flex;align-items:center;gap:8px;}
     .feed-head::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green);flex-shrink:0;}
-    .feed-list{flex:1;overflow-y:auto;padding:4px 12px;}
-    .feed-item{display:flex;align-items:baseline;gap:8px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.03);font-size:.72rem;line-height:1.5;}
-    .feed-time{color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:.65rem;flex-shrink:0;}
+    .feed-list{flex:1;overflow-y:auto;padding:3px 10px;}
+    .feed-item{display:flex;align-items:baseline;gap:7px;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.02);font-size:.7rem;line-height:1.5;}
+    .feed-time{color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:.62rem;flex-shrink:0;}
     .feed-agent{font-weight:700;flex-shrink:0;}
     .feed-msg{color:var(--muted);}
     .feed-cmd{color:var(--cyan);font-family:'JetBrains Mono',monospace;}
 
-    /* RIGHT PANEL */
-    .detail{width:200px;flex-shrink:0;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;padding:14px;gap:12px;overflow-y:auto;}
-    .detail-name{font-size:.95rem;font-weight:800;letter-spacing:-.01em;}
-    .detail-role{font-size:.72rem;color:var(--muted);margin-top:2px;}
-    .state-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:6px;font-size:.72rem;font-weight:700;font-family:'JetBrains Mono',monospace;border:1px solid;}
-    .section-head{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-top:4px;}
-    .cmd-list{display:flex;flex-direction:column;gap:4px;}
-    .cmd-tag{padding:4px 8px;border-radius:5px;background:rgba(0,240,255,.06);border:1px solid rgba(0,240,255,.15);color:var(--cyan);font-family:'JetBrains Mono',monospace;font-size:.7rem;cursor:pointer;transition:.15s;}
+    /* ── RIGHT PANEL ─────────────────────────────────────────── */
+    .detail{width:195px;flex-shrink:0;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;padding:13px;gap:11px;overflow-y:auto;}
+    .detail-name{font-size:.93rem;font-weight:800;letter-spacing:-.01em;}
+    .detail-role{font-size:.7rem;color:var(--muted);margin-top:2px;}
+    .state-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:6px;font-size:.7rem;font-weight:700;font-family:'JetBrains Mono',monospace;border:1px solid;transition:all .3s;}
+    .section-head{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-top:2px;}
+    .cmd-list{display:flex;flex-direction:column;gap:3px;}
+    .cmd-tag{padding:3px 8px;border-radius:5px;background:rgba(0,240,255,.06);border:1px solid rgba(0,240,255,.15);color:var(--cyan);font-family:'JetBrains Mono',monospace;font-size:.68rem;cursor:pointer;transition:.15s;}
     .cmd-tag:hover{background:rgba(0,240,255,.12);}
     .divider{border:none;border-top:1px solid var(--border);}
-    .token-bar-wrap{margin-top:2px;}
-    .token-label{font-size:.65rem;color:var(--muted);display:flex;justify-content:space-between;}
+    .token-bar-wrap{margin-top:1px;}
+    .token-label{font-size:.63rem;color:var(--muted);display:flex;justify-content:space-between;}
     .token-bar{height:4px;border-radius:2px;background:rgba(255,255,255,.08);margin-top:4px;overflow:hidden;}
-    .token-fill{height:100%;border-radius:2px;background:var(--green);transition:width .5s;}
+    .token-fill{height:100%;border-radius:2px;background:var(--green);transition:width .6s,background .3s;}
     .scrollbar-thin::-webkit-scrollbar{width:3px;}
     .scrollbar-thin::-webkit-scrollbar-track{background:transparent;}
     .scrollbar-thin::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
 
-    /* NOTIFICATION TOAST */
-    #toast{position:fixed;top:62px;right:16px;z-index:100;display:flex;flex-direction:column;gap:6px;pointer-events:none;}
-    .toast-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:.75rem;display:flex;gap:8px;align-items:center;animation:slideIn .3s ease;box-shadow:0 4px 16px rgba(0,0,0,.4);}
-    @keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+    /* ── TOAST ───────────────────────────────────────────────── */
+    #toast{position:fixed;top:90px;right:16px;z-index:100;display:flex;flex-direction:column;gap:6px;pointer-events:none;max-width:280px;}
+    .toast-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 13px;font-size:.73rem;display:flex;gap:8px;align-items:center;animation:slideIn .25s ease;box-shadow:0 4px 16px rgba(0,0,0,.5);}
+    @keyframes slideIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+
+    /* ── KEYBOARD HINT ───────────────────────────────────────── */
+    #kbd-hint{position:fixed;bottom:112px;left:50%;transform:translateX(-50%);font-size:.62rem;color:rgba(255,255,255,.2);font-family:'JetBrains Mono',monospace;pointer-events:none;transition:opacity .5s;}
+    kbd{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:3px;padding:1px 5px;}
   </style>
 </head>
 <body>
 
+<!-- HEADER -->
 <header>
-  <div class="logo"><div class="logo-dot"></div>SkillsAgents <span style="font-weight:400;color:var(--muted);font-size:.82rem;">— Pixel Office</span></div>
-  <div class="nav-right">
-    <button class="nav-btn active" id="btnView" onclick="setTool('view')">👁 Visualizar</button>
-    <button class="nav-btn" id="btnFollow" onclick="toggleFollow()">📍 Seguir agente</button>
+  <div class="logo"><div class="logo-dot"></div>SkillsAgents <span style="font-weight:400;color:var(--muted);font-size:.8rem;">— Pixel Office</span></div>
+  <div class="nav-right" id="navRight">
+    <button class="nav-btn active" onclick="setTool('view')">👁 Visualizar</button>
+    <button class="nav-btn" id="btnFollow" onclick="toggleFollow()">📍 Seguir</button>
     <button class="nav-btn" onclick="spawnNext()">⚡ Spawn</button>
     <button class="nav-btn" onclick="cycleSpeed()" id="btnSpeed">1× velocidade</button>
     <a href="/" class="nav-btn">← Voltar</a>
   </div>
 </header>
+
+<!-- CONNECTION STATUS BAR -->
+<div id="conn-bar" class="demo">
+  <span><span class="conn-dot demo" id="connDot"></span><span id="connLabel">DEMO MODE</span></span>
+  <span id="conn-hint">Inicie o servidor: <strong>npx skillsagents office</strong></span>
+</div>
 
 <div class="workspace">
 
@@ -111,12 +133,16 @@
     <div class="agent-scroll scrollbar-thin" id="rosterList"></div>
   </div>
 
-  <!-- CENTER: CANVAS + BOTTOM FEED -->
+  <!-- CENTER: CANVAS + FEED -->
   <div class="canvas-wrap">
+    <div class="toolbar">
+      <button class="nav-btn" onclick="zoomIn()">＋</button>
+      <button class="nav-btn" onclick="zoomOut()">－</button>
+      <button class="nav-btn" onclick="resetZoom()">⊡ Reset</button>
+    </div>
     <div class="canvas-container" id="canvasContainer">
       <canvas id="canvas"></canvas>
     </div>
-    <!-- COMMAND FEED -->
     <div class="feed">
       <div class="feed-head">Activity Feed</div>
       <div class="feed-list scrollbar-thin" id="feedList"></div>
@@ -142,62 +168,64 @@
     <div class="cmd-list" id="dCmds"></div>
     <hr class="divider"/>
     <div class="section-head">Última ação</div>
-    <div id="dLastAction" style="font-size:.72rem;color:var(--muted);line-height:1.5;"></div>
+    <div id="dLastAction" style="font-size:.7rem;color:var(--muted);line-height:1.5;"></div>
   </div>
-</div>
+
+</div><!-- .workspace -->
 
 <div id="toast"></div>
+<div id="kbd-hint"><kbd>←</kbd><kbd>→</kbd> navegar agentes &nbsp;·&nbsp; <kbd>Space</kbd> spawn &nbsp;·&nbsp; <kbd>S</kbd> velocidade</div>
 
 <script>
-// ─── CONSTANTS ────────────────────────────────────────────────────
-const TILE = 32, COLS = 24, ROWS = 16, BASE_ZOOM = 2;
-let zoom = BASE_ZOOM, speed = 1, follow = false, selIdx = 0;
+// ═══════════════════════════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════════════════════════
+const TILE = 32, COLS = 24, ROWS = 16;
+const MUTED_COLOR = '#64748b';   // FIX: CSS vars não funcionam em JS template literals
 
-// ─── ZONES ───────────────────────────────────────────────────────
+let zoom = 2, speed = 1, followMode = false, selIdx = 0;
+
+// ═══════════════════════════════════════════════════════════════
+// ZONES & DESKS
+// ═══════════════════════════════════════════════════════════════
 const ZONES = [
-  { name:'DEV',     c1:0,  r1:0,  c2:7,  r2:8,  color:'rgba(0,240,255,0.035)' },
-  { name:'DESIGN',  c1:8,  r1:0,  c2:15, r2:8,  color:'rgba(168,85,247,0.035)' },
-  { name:'OPS',     c1:16, r1:0,  c2:23, r2:8,  color:'rgba(245,158,11,0.03)' },
-  { name:'MASTER',  c1:9,  r1:4,  c2:15, r2:9,  color:'rgba(255,215,0,0.04)' },
-  { name:'MEETING', c1:17, r1:9,  c2:23, r2:15, color:'rgba(16,185,129,0.04)' },
+  { name:'DEV',     c1:0,  r1:0,  c2:7,  r2:8,  color:'rgba(0,240,255,0.03)'  },
+  { name:'DESIGN',  c1:8,  r1:0,  c2:15, r2:8,  color:'rgba(168,85,247,0.03)' },
+  { name:'OPS',     c1:16, r1:0,  c2:23, r2:8,  color:'rgba(245,158,11,0.025)'},
+  { name:'MASTER',  c1:9,  r1:4,  c2:15, r2:9,  color:'rgba(255,215,0,0.035)' },
+  { name:'MEETING', c1:17, r1:9,  c2:23, r2:15, color:'rgba(16,185,129,0.035)'},
   { name:'CAFÉ',    c1:0,  r1:10, c2:6,  r2:15, color:'rgba(251,146,60,0.03)' },
 ];
 
-// ─── DESK POSITIONS ───────────────────────────────────────────────
 const DESKS = [
-  // Dev zone
-  {col:1,row:1}, {col:4,row:1}, {col:1,row:5}, {col:4,row:5},
-  // Design zone
-  {col:9,row:1}, {col:12,row:1}, {col:9,row:5},
-  // Ops zone
-  {col:17,row:1}, {col:20,row:1}, {col:17,row:5}, {col:20,row:5},
-  // Master station (center)
-  {col:11,row:6},
-  // Extra
-  {col:12,row:5},
+  {col:1,row:1},{col:4,row:1},{col:1,row:5},{col:4,row:5},
+  {col:9,row:1},{col:12,row:1},{col:9,row:5},
+  {col:17,row:1},{col:20,row:1},{col:17,row:5},{col:20,row:5},
+  {col:11,row:6},{col:12,row:5},
 ];
 
-// ─── AGENT DEFINITIONS ───────────────────────────────────────────
-const AGENTS = [
-  { id:'master',           name:'@master',     role:'Master Orchestrator', icon:'👑', color:'#FFD700', cmds:['*squad','*plan','*yolo','*swarm','*help'],    zone:'MASTER'  },
-  { id:'dev',              name:'@dev',         role:'Developer',           icon:'💻', color:'#00f0ff', cmds:['*develop','*build','*run-tests','*waves'],    zone:'DEV'     },
-  { id:'architect',        name:'@architect',   role:'Software Architect',  icon:'🏗️', color:'#818cf8', cmds:['*create-plan','*assess','*review'],          zone:'DEV'     },
-  { id:'qa',               name:'@qa',          role:'Quality Assurance',   icon:'✅', color:'#10b981', cmds:['*review-build','*verify','*critique'],       zone:'OPS'     },
-  { id:'devops',           name:'@devops',      role:'DevOps Engineer',     icon:'⚙️', color:'#f59e0b', cmds:['*deploy','*pipeline','*monitor'],            zone:'OPS'     },
-  { id:'pm',               name:'@pm',          role:'Product Manager',     icon:'📋', color:'#f472b6', cmds:['*create-prd','*roadmap','*brief'],           zone:'DESIGN'  },
-  { id:'ux-design-expert', name:'@ux',          role:'UX Design Expert',    icon:'🎨', color:'#fb923c', cmds:['*wireframe','*design','*audit'],             zone:'DESIGN'  },
-  { id:'analyst',          name:'@analyst',     role:'Business Analyst',    icon:'🔍', color:'#a78bfa', cmds:['*create-brief','*research','*report'],       zone:'DESIGN'  },
-  { id:'data-engineer',    name:'@data-eng',    role:'Data Engineer',       icon:'📊', color:'#34d399', cmds:['*pipeline','*model','*etl'],                zone:'OPS'     },
-  { id:'sm',               name:'@sm',          role:'Scrum Master',        icon:'🔄', color:'#60a5fa', cmds:['*sprint','*standup','*retro'],               zone:'DESIGN'  },
-  { id:'agent-coder',      name:'@coder',       role:'Code Implementer',    icon:'🔧', color:'#4ade80', cmds:['*implement','*refactor','*optimize'],        zone:'DEV'     },
-  { id:'agent-reviewer',   name:'@reviewer',    role:'Code Reviewer',       icon:'🔎', color:'#c084fc', cmds:['*review','*approve'],                       zone:'DEV'     },
-  { id:'hive-mind',        name:'@hive-mind',   role:'Hive Mind (BFT)',     icon:'🧩', color:'#f87171', cmds:['*consensus','*vote','*sync'],               zone:'OPS'     },
+// ═══════════════════════════════════════════════════════════════
+// AGENT DEFINITIONS
+// ═══════════════════════════════════════════════════════════════
+const AGENT_DEFS = [
+  { id:'master',           name:'@master',     role:'Master Orchestrator', icon:'👑', color:'#FFD700', cmds:['*squad','*plan','*yolo','*swarm','*help'],       zone:'MASTER'  },
+  { id:'dev',              name:'@dev',         role:'Developer',           icon:'💻', color:'#00f0ff', cmds:['*develop','*build','*run-tests','*waves'],       zone:'DEV'     },
+  { id:'architect',        name:'@architect',   role:'Software Architect',  icon:'🏗️', color:'#818cf8', cmds:['*create-plan','*assess','*review'],             zone:'DEV'     },
+  { id:'qa',               name:'@qa',          role:'Quality Assurance',   icon:'✅', color:'#10b981', cmds:['*review-build','*verify','*critique'],          zone:'OPS'     },
+  { id:'devops',           name:'@devops',      role:'DevOps Engineer',     icon:'⚙️', color:'#f59e0b', cmds:['*deploy','*pipeline','*monitor'],               zone:'OPS'     },
+  { id:'pm',               name:'@pm',          role:'Product Manager',     icon:'📋', color:'#f472b6', cmds:['*create-prd','*roadmap','*brief'],              zone:'DESIGN'  },
+  { id:'ux-design-expert', name:'@ux',          role:'UX Design Expert',    icon:'🎨', color:'#fb923c', cmds:['*wireframe','*design','*audit'],                zone:'DESIGN'  },
+  { id:'analyst',          name:'@analyst',     role:'Business Analyst',    icon:'🔍', color:'#a78bfa', cmds:['*create-brief','*research','*report'],          zone:'DESIGN'  },
+  { id:'data-engineer',    name:'@data-eng',    role:'Data Engineer',       icon:'📊', color:'#34d399', cmds:['*pipeline','*model','*etl'],                   zone:'OPS'     },
+  { id:'sm',               name:'@sm',          role:'Scrum Master',        icon:'🔄', color:'#60a5fa', cmds:['*sprint','*standup','*retro'],                  zone:'DESIGN'  },
+  { id:'agent-coder',      name:'@coder',       role:'Code Implementer',    icon:'🔧', color:'#4ade80', cmds:['*implement','*refactor','*optimize'],           zone:'DEV'     },
+  { id:'agent-reviewer',   name:'@reviewer',    role:'Code Reviewer',       icon:'🔎', color:'#c084fc', cmds:['*review','*approve'],                          zone:'DEV'     },
+  { id:'hive-mind',        name:'@hive-mind',   role:'Hive Mind (BFT)',     icon:'🧩', color:'#f87171', cmds:['*consensus','*vote','*sync'],                  zone:'OPS'     },
 ];
 
 const STATES      = ['TYPING','IDLE','WALKING','THINKING','READING'];
 const STATE_COLOR = { TYPING:'#10b981', IDLE:'#6b7280', WALKING:'#00f0ff', THINKING:'#f59e0b', READING:'#a78bfa' };
 
-// ─── CODE SNIPPETS for monitors ────────────────────────────────
 const CODE_LINES = [
   'const agent = new Agent("@master")',
   'await squad.execute(task)',
@@ -205,7 +233,7 @@ const CODE_LINES = [
   'if (err) throw new AgentError(err)',
   'const { agents } = useSkillsAgents()',
   'await Promise.all(squad.map(run))',
-  'db.query(SELECT * FROM agents)',
+  "db.query('SELECT * FROM agents')",
   'console.log("✔ deployed")',
   'git push origin main',
   'npm run build && npm test',
@@ -217,17 +245,18 @@ const CODE_LINES = [
   'docker build -t skillsagents .',
 ];
 
-// ─── ACTIVITY MESSAGES ───────────────────────────────────────────
 const ACTIVITIES = {
-  TYPING:   a => [`executando`, `*${a.cmds[Math.floor(Math.random()*a.cmds.length)]}`],
-  THINKING: a => [`analisando`, `contexto do projeto`],
-  READING:  a => [`lendo`, `documentação @${['react-patterns','fastapi-pro','docker-expert'][Math.floor(Math.random()*3)]}`],
-  WALKING:  a => [`movendo para`, `próxima tarefa`],
-  IDLE:     a => [`aguardando`, `próximo comando`],
+  TYPING:   a => ['executando', `*${a.cmds[Math.floor(Math.random()*a.cmds.length)]}`],
+  THINKING: _a => ['analisando', 'contexto do projeto'],
+  READING:  _a => ['lendo', `@${['react-patterns','fastapi-pro','docker-expert'][Math.floor(Math.random()*3)]}`],
+  WALKING:  _a => ['movendo para', 'próxima tarefa'],
+  IDLE:     _a => ['aguardando', 'próximo comando'],
 };
 
-// ─── CHARACTER STATE ──────────────────────────────────────────────
-const chars = AGENTS.map((def, i) => {
+// ═══════════════════════════════════════════════════════════════
+// CHARACTER STATE
+// ═══════════════════════════════════════════════════════════════
+const chars = AGENT_DEFS.map((def, i) => {
   const desk = DESKS[i % DESKS.length];
   return {
     ...def,
@@ -246,40 +275,41 @@ const chars = AGENTS.map((def, i) => {
   };
 });
 
-// ─── CANVAS SETUP ─────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// CANVAS SETUP
+// ═══════════════════════════════════════════════════════════════
 const canvas = document.getElementById('canvas');
 const ctx    = canvas.getContext('2d');
 ctx.imageSmoothingEnabled = false;
 canvas.width  = COLS * TILE;
 canvas.height = ROWS * TILE;
+
 function applyZoom() {
   canvas.style.width  = (COLS * TILE * zoom) + 'px';
   canvas.style.height = (ROWS * TILE * zoom) + 'px';
 }
 applyZoom();
 
-// ─── FLOOR DRAWING ────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// DRAWING: FLOOR
+// ═══════════════════════════════════════════════════════════════
 function drawFloor() {
-  // Base tiles
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
       ctx.fillStyle = (r + c) % 2 === 0 ? '#0c0f16' : '#0a0d14';
-      ctx.fillRect(c * TILE, r * TILE, TILE, TILE);
+      ctx.fillRect(c*TILE, r*TILE, TILE, TILE);
     }
   }
-  // Zone overlays
   ZONES.forEach(z => {
     ctx.fillStyle = z.color;
     ctx.fillRect(z.c1*TILE, z.r1*TILE, (z.c2-z.c1+1)*TILE, (z.r2-z.r1+1)*TILE);
-    // Zone label
-    ctx.fillStyle = 'rgba(255,255,255,0.08)';
+    ctx.fillStyle = 'rgba(255,255,255,0.07)';
     ctx.font = 'bold 7px monospace';
     ctx.textAlign = 'center';
     ctx.fillText(z.name, ((z.c1+z.c2)/2+.5)*TILE, (z.r1+.7)*TILE);
     ctx.textAlign = 'left';
   });
-  // Subtle grid
-  ctx.strokeStyle = 'rgba(0,240,255,0.03)';
+  ctx.strokeStyle = 'rgba(0,240,255,0.025)';
   ctx.lineWidth = .5;
   for (let r = 0; r <= ROWS; r++) {
     ctx.beginPath(); ctx.moveTo(0, r*TILE); ctx.lineTo(canvas.width, r*TILE); ctx.stroke();
@@ -287,17 +317,16 @@ function drawFloor() {
   for (let c = 0; c <= COLS; c++) {
     ctx.beginPath(); ctx.moveTo(c*TILE, 0); ctx.lineTo(c*TILE, canvas.height); ctx.stroke();
   }
-  // Meeting room border
-  ctx.strokeStyle = 'rgba(16,185,129,0.2)';
+  // Meeting room
+  ctx.strokeStyle = 'rgba(16,185,129,0.18)';
   ctx.lineWidth = 1;
   ctx.strokeRect(17*TILE, 9*TILE, 7*TILE, 7*TILE);
-  // Meeting table
   ctx.fillStyle = '#1a2030';
   ctx.fillRect(18*TILE+4, 10*TILE+4, 5*TILE-8, 4*TILE-8);
-  ctx.strokeStyle = 'rgba(16,185,129,0.15)';
+  ctx.strokeStyle = 'rgba(16,185,129,0.1)';
   ctx.lineWidth = 1;
   ctx.strokeRect(18*TILE+4, 10*TILE+4, 5*TILE-8, 4*TILE-8);
-  // Café items
+  // Coffee machine
   drawCoffee(2*TILE+8, 11*TILE+4);
   // Plants
   drawPlant(0, 0);
@@ -307,24 +336,20 @@ function drawFloor() {
 }
 
 function drawCoffee(x, y) {
-  // Machine body
   ctx.fillStyle = '#1e2535';
   ctx.fillRect(x, y, 22, 26);
-  ctx.strokeStyle = 'rgba(251,146,60,.3)';
+  ctx.strokeStyle = 'rgba(251,146,60,.25)';
   ctx.lineWidth = 1;
   ctx.strokeRect(x, y, 22, 26);
-  // Screen
-  ctx.fillStyle = 'rgba(251,146,60,.2)';
+  ctx.fillStyle = 'rgba(251,146,60,.18)';
   ctx.fillRect(x+3, y+3, 16, 8);
-  // Steam
   const t = Date.now() / 300;
-  ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+  ctx.strokeStyle = 'rgba(255,255,255,0.25)';
   ctx.lineWidth = 1;
   for (let i = 0; i < 3; i++) {
-    const sx = x + 6 + i*4;
-    const wave = Math.sin(t + i) * 2;
+    const sx = x+6+i*4, wave = Math.sin(t+i)*2;
     ctx.beginPath();
-    ctx.moveTo(sx + wave, y - 2);
+    ctx.moveTo(sx+wave, y-2);
     ctx.bezierCurveTo(sx+wave+2, y-5, sx+wave-2, y-8, sx+wave, y-11);
     ctx.stroke();
   }
@@ -334,299 +359,229 @@ function drawPlant(x, y) {
   ctx.fillStyle = '#0d1a0d';
   ctx.fillRect(x+10, y+22, 12, 8);
   ctx.fillStyle = '#0a2a12';
-  ctx.beginPath();
-  ctx.ellipse(x+16, y+18, 8, 12, 0, 0, Math.PI*2);
-  ctx.fill();
+  ctx.beginPath(); ctx.ellipse(x+16, y+18, 8, 12, 0, 0, Math.PI*2); ctx.fill();
   ctx.fillStyle = '#0d3a18';
-  ctx.beginPath();
-  ctx.ellipse(x+10, y+14, 6, 9, -0.4, 0, Math.PI*2);
-  ctx.fill();
-  ctx.beginPath();
-  ctx.ellipse(x+22, y+14, 6, 9, 0.4, 0, Math.PI*2);
-  ctx.fill();
+  ctx.beginPath(); ctx.ellipse(x+10, y+14, 6, 9, -0.4, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(x+22, y+14, 6, 9, 0.4, 0, Math.PI*2); ctx.fill();
 }
 
-// ─── DESK DRAWING ─────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// DRAWING: DESK
+// ═══════════════════════════════════════════════════════════════
 function drawDesk(x, y, char) {
-  const occupied = !!char;
-  const color = char?.color || '#555';
-
-  // Desk body
+  const color = char?.color || '#334';
   ctx.fillStyle = '#141924';
   ctx.fillRect(x+1, y+2, TILE-2, TILE-4);
-  ctx.strokeStyle = occupied ? color + '33' : '#1e2533';
+  ctx.strokeStyle = char ? color+'33' : '#1e2533';
   ctx.lineWidth = 1;
   ctx.strokeRect(x+1, y+2, TILE-2, TILE-4);
-
-  // Monitor frame
+  // Monitor
   ctx.fillStyle = '#0d1117';
   ctx.fillRect(x+5, y+3, TILE-10, 14);
-  // Monitor glow + content
-  if (occupied) {
-    ctx.fillStyle = color + '15';
+  if (char) {
+    ctx.fillStyle = color+'15';
     ctx.fillRect(x+5, y+3, TILE-10, 14);
-    // Scrolling code lines
-    const lineH = 2.5;
-    const codeColor = color + 'cc';
-    ctx.font = '2.5px monospace';
-    ctx.fillStyle = codeColor;
     const offset = (char.frame * 0.04) % CODE_LINES.length;
     for (let i = 0; i < 4; i++) {
-      const line = CODE_LINES[(Math.floor(offset + i + char.codeOffset)) % CODE_LINES.length];
-      const opacity = i === 0 ? '99' : i === 3 ? '44' : 'bb';
-      ctx.fillStyle = color + opacity;
-      ctx.fillText(line.slice(0, 14), x+6, y+5+i*lineH);
+      const line = CODE_LINES[(Math.floor(offset+i+char.codeOffset)) % CODE_LINES.length];
+      ctx.fillStyle = color + (i===0?'99':i===3?'44':'bb');
+      ctx.font = '2.5px monospace';
+      ctx.fillText(line.slice(0,14), x+6, y+5+i*2.5);
     }
-    // Cursor blink
-    if (char.state === 'TYPING' && Math.floor(Date.now()/400) % 2 === 0) {
-      ctx.fillStyle = color;
-      ctx.fillRect(x+6, y+14, 1, 2);
+    if (char.state === 'TYPING' && Math.floor(Date.now()/400)%2===0) {
+      ctx.fillStyle = color; ctx.fillRect(x+6, y+14, 1, 2);
     }
-    // Glow around monitor
     const grd = ctx.createRadialGradient(x+TILE/2, y+10, 2, x+TILE/2, y+10, 18);
-    grd.addColorStop(0, color + '18');
-    grd.addColorStop(1, 'transparent');
-    ctx.fillStyle = grd;
-    ctx.fillRect(x, y, TILE, 20);
+    grd.addColorStop(0, color+'14'); grd.addColorStop(1,'transparent');
+    ctx.fillStyle = grd; ctx.fillRect(x, y, TILE, 20);
   }
-  // Monitor stand
   ctx.fillStyle = '#1a2030';
   ctx.fillRect(x+13, y+17, 6, 3);
   ctx.fillRect(x+10, y+19, 12, 2);
-  // Keyboard
-  ctx.fillStyle = '#1a2030';
   ctx.fillRect(x+5, y+24, TILE-10, 4);
-  // Selected agent halo
   if (char && chars[selIdx]?.id === char.id) {
-    ctx.strokeStyle = char.color + 'aa';
-    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = char.color+'aa'; ctx.lineWidth = 1.5;
     ctx.strokeRect(x+.5, y+.5, TILE-1, TILE-1);
   }
 }
 
-// ─── CHARACTER DRAWING ────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// DRAWING: CHARACTER
+// ═══════════════════════════════════════════════════════════════
 function drawChar(c, selected) {
   const x = c.x, y = c.y;
-  const bob = c.state === 'IDLE' ? Math.sin(c.frame * 0.05) * 0.5 : 0;
-  const isWalk = c.state === 'WALKING';
+  const bob  = c.state === 'IDLE' ? Math.sin(c.frame*0.05)*0.5 : 0;
+  const walk = c.state === 'WALKING';
   const bodyH = 9;
 
   // Shadow
-  ctx.fillStyle = 'rgba(0,0,0,0.35)';
-  ctx.beginPath();
-  ctx.ellipse(x, y+8, 7, 3, 0, 0, Math.PI*2);
-  ctx.fill();
+  ctx.fillStyle = 'rgba(0,0,0,0.3)';
+  ctx.beginPath(); ctx.ellipse(x, y+8, 7, 3, 0, 0, Math.PI*2); ctx.fill();
 
   // Selection ring
   if (selected) {
-    ctx.strokeStyle = c.color;
-    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = c.color; ctx.lineWidth = 1.5;
     ctx.setLineDash([2,2]);
-    ctx.beginPath();
-    ctx.ellipse(x, y+6, 12, 6, 0, 0, Math.PI*2);
-    ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(x, y+6, 12, 6, 0, 0, Math.PI*2); ctx.stroke();
     ctx.setLineDash([]);
   }
 
   const yb = bob;
   // Body
-  ctx.fillStyle = c.color + 'dd';
-  ctx.fillRect(x-4, y-bodyH+yb, 8, bodyH);
-  // Shirt detail
-  ctx.fillStyle = c.color + '66';
-  ctx.fillRect(x-2, y-bodyH+2+yb, 4, 3);
-
+  ctx.fillStyle = c.color+'dd'; ctx.fillRect(x-4, y-bodyH+yb, 8, bodyH);
+  ctx.fillStyle = c.color+'66'; ctx.fillRect(x-2, y-bodyH+2+yb, 4, 3);
   // Head
-  ctx.fillStyle = '#FDDBB5';
-  ctx.fillRect(x-4, y-bodyH-7+yb, 8, 7);
+  ctx.fillStyle = '#FDDBB5'; ctx.fillRect(x-4, y-bodyH-7+yb, 8, 7);
   // Eyes
-  const blink = (c.frame % 90 < 4) ? 0.5 : 1.5;
+  const blink = (c.frame%90 < 4) ? 0.5 : 1.5;
   ctx.fillStyle = '#1a1a2e';
   ctx.fillRect(x-3, y-bodyH-5+yb, 2, blink);
   ctx.fillRect(x+1, y-bodyH-5+yb, 2, blink);
   // Mouth
-  if (c.state === 'TYPING' || c.state === 'THINKING') {
-    ctx.fillStyle = '#c0706a';
-    ctx.fillRect(x-1, y-bodyH-2+yb, 3, 1);
+  if (c.state==='TYPING'||c.state==='THINKING') {
+    ctx.fillStyle='#c0706a'; ctx.fillRect(x-1, y-bodyH-2+yb, 3, 1);
   }
-
-  // Role accessory
-  if (c.id === 'master') {
-    // Crown pixel art
-    ctx.fillStyle = '#FFD700';
-    ctx.fillRect(x-3, y-bodyH-10+yb, 2, 3);
-    ctx.fillRect(x-1, y-bodyH-11+yb, 2, 4);
-    ctx.fillRect(x+1, y-bodyH-10+yb, 2, 3);
-  } else if (c.id === 'architect' || c.id === 'agent-reviewer') {
-    // Glasses
-    ctx.strokeStyle = '#aaa';
-    ctx.lineWidth = .8;
-    ctx.strokeRect(x-4, y-bodyH-6+yb, 3, 2);
-    ctx.strokeRect(x+1, y-bodyH-6+yb, 3, 2);
-    ctx.beginPath();
-    ctx.moveTo(x-1, y-bodyH-5+yb);
-    ctx.lineTo(x+1, y-bodyH-5+yb);
-    ctx.stroke();
-  } else if (c.id === 'devops' || c.id === 'hive-mind') {
-    // Headset dot
-    ctx.fillStyle = '#f59e0b';
-    ctx.fillRect(x+3, y-bodyH-4+yb, 2, 4);
-    ctx.fillRect(x+4, y-bodyH-5+yb, 1, 1);
+  // Accessories
+  if (c.id==='master') {
+    ctx.fillStyle='#FFD700';
+    ctx.fillRect(x-3,y-bodyH-10+yb,2,3); ctx.fillRect(x-1,y-bodyH-11+yb,2,4); ctx.fillRect(x+1,y-bodyH-10+yb,2,3);
+  } else if (c.id==='architect'||c.id==='agent-reviewer') {
+    ctx.strokeStyle='#aaa'; ctx.lineWidth=.8;
+    ctx.strokeRect(x-4,y-bodyH-6+yb,3,2); ctx.strokeRect(x+1,y-bodyH-6+yb,3,2);
+    ctx.beginPath(); ctx.moveTo(x-1,y-bodyH-5+yb); ctx.lineTo(x+1,y-bodyH-5+yb); ctx.stroke();
+  } else if (c.id==='devops'||c.id==='hive-mind') {
+    ctx.fillStyle='#f59e0b';
+    ctx.fillRect(x+3,y-bodyH-4+yb,2,4); ctx.fillRect(x+4,y-bodyH-5+yb,1,1);
   }
-
   // Arms
-  ctx.fillStyle = c.color + 'cc';
-  if (c.state === 'TYPING') {
-    const aa = Math.sin(c.frame * 0.15) * 1.5;
-    ctx.fillRect(x-7, y-bodyH+2+yb+aa, 3, 4);
-    ctx.fillRect(x+4, y-bodyH+2+yb-aa, 3, 4);
-  } else if (isWalk) {
-    const aa = Math.sin(c.frame * 0.25) * 3;
-    ctx.fillRect(x-7, y-bodyH+2+yb+aa, 3, 5);
-    ctx.fillRect(x+4, y-bodyH+2+yb-aa, 3, 5);
+  ctx.fillStyle = c.color+'cc';
+  if (c.state==='TYPING') {
+    const aa = Math.sin(c.frame*0.15)*1.5;
+    ctx.fillRect(x-7,y-bodyH+2+yb+aa,3,4); ctx.fillRect(x+4,y-bodyH+2+yb-aa,3,4);
+  } else if (walk) {
+    const aa = Math.sin(c.frame*0.25)*3;
+    ctx.fillRect(x-7,y-bodyH+2+yb+aa,3,5); ctx.fillRect(x+4,y-bodyH+2+yb-aa,3,5);
   } else {
-    ctx.fillRect(x-7, y-bodyH+3+yb, 3, 5);
-    ctx.fillRect(x+4, y-bodyH+3+yb, 3, 5);
+    ctx.fillRect(x-7,y-bodyH+3+yb,3,5); ctx.fillRect(x+4,y-bodyH+3+yb,3,5);
   }
-
   // Legs
-  ctx.fillStyle = '#2a3045';
-  if (isWalk) {
-    const la = Math.sin(c.frame * 0.25) * 3;
-    ctx.fillRect(x-3, y, 3, 5+la);
-    ctx.fillRect(x+1, y, 3, 5-la);
+  ctx.fillStyle='#2a3045';
+  if (walk) {
+    const la=Math.sin(c.frame*0.25)*3;
+    ctx.fillRect(x-3,y,3,5+la); ctx.fillRect(x+1,y,3,5-la);
   } else {
-    ctx.fillRect(x-3, y, 3, 5);
-    ctx.fillRect(x+1, y, 3, 5);
+    ctx.fillRect(x-3,y,3,5); ctx.fillRect(x+1,y,3,5);
   }
-
   // Thinking bubble
-  if (c.state === 'THINKING') {
-    const bubbleAlpha = 0.5 + 0.5 * Math.sin(c.frame * 0.08);
-    ctx.globalAlpha = bubbleAlpha;
-    ctx.fillStyle = '#1e2535';
-    ctx.fillRect(x+5, y-bodyH-17+yb, 22, 12);
-    ctx.strokeStyle = c.color + '66';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(x+5, y-bodyH-17+yb, 22, 12);
-    ctx.fillStyle = c.color;
-    ctx.font = '6px monospace';
-    ctx.fillText('...', x+10, y-bodyH-9+yb);
-    ctx.globalAlpha = 1;
+  if (c.state==='THINKING') {
+    const alpha = 0.5+0.5*Math.sin(c.frame*0.08);
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle='#1e2535'; ctx.fillRect(x+5,y-bodyH-17+yb,22,12);
+    ctx.strokeStyle=c.color+'66'; ctx.lineWidth=1;
+    ctx.strokeRect(x+5,y-bodyH-17+yb,22,12);
+    ctx.fillStyle=c.color; ctx.font='6px monospace';
+    ctx.fillText('...',x+10,y-bodyH-9+yb);
+    ctx.globalAlpha=1;
   }
-
-  // Permission waiting bubble
-  if (c.state === 'IDLE' && c.frame % 200 < 60) {
-    ctx.globalAlpha = 0.8;
-    ctx.fillStyle = '#1e2535';
-    ctx.fillRect(x+5, y-bodyH-17+yb, 28, 11);
-    ctx.strokeStyle = '#f59e0b55';
-    ctx.lineWidth = .8;
-    ctx.strokeRect(x+5, y-bodyH-17+yb, 28, 11);
-    ctx.fillStyle = '#f59e0b';
-    ctx.font = '5px monospace';
-    ctx.fillText('aguardando...', x+7, y-bodyH-10+yb);
-    ctx.globalAlpha = 1;
+  // Waiting bubble
+  if (c.state==='IDLE'&&c.frame%200<60) {
+    ctx.globalAlpha=0.75;
+    ctx.fillStyle='#1e2535'; ctx.fillRect(x+5,y-bodyH-17+yb,28,11);
+    ctx.strokeStyle='#f59e0b55'; ctx.lineWidth=.8;
+    ctx.strokeRect(x+5,y-bodyH-17+yb,28,11);
+    ctx.fillStyle='#f59e0b'; ctx.font='5px monospace';
+    ctx.fillText('aguardando...',x+7,y-bodyH-10+yb);
+    ctx.globalAlpha=1;
   }
 }
 
-// ─── NAME BADGE ───────────────────────────────────────────────────
 function drawBadge(c) {
   ctx.font = 'bold 5.5px monospace';
   const w = ctx.measureText(c.name).width + 6;
   const bx = c.x - w/2, by = c.y - 32;
-
-  ctx.fillStyle = 'rgba(0,0,0,0.8)';
+  ctx.fillStyle = 'rgba(0,0,0,0.82)';
   ctx.fillRect(bx-1, by-6.5, w+2, 8);
   ctx.fillStyle = c.color;
   ctx.fillText(c.name, bx+2, by);
-
   const sc = STATE_COLOR[c.state] || '#6b7280';
   ctx.fillStyle = sc;
-  ctx.beginPath();
-  ctx.arc(bx+w-1, by-3, 2, 0, Math.PI*2);
-  ctx.fill();
+  ctx.beginPath(); ctx.arc(bx+w-1, by-3, 2, 0, Math.PI*2); ctx.fill();
 }
 
-// ─── MASTER CONNECTION LINES ──────────────────────────────────────
 function drawMasterLines() {
   if (chars[selIdx]?.id !== 'master') return;
   const master = chars[0];
   chars.forEach((c, i) => {
-    if (!c.active || i === 0) return;
-    ctx.strokeStyle = master.color + '22';
-    ctx.lineWidth = .5;
-    ctx.setLineDash([3, 5]);
-    ctx.beginPath();
-    ctx.moveTo(master.x, master.y);
-    ctx.lineTo(c.x, c.y);
-    ctx.stroke();
+    if (!c.active || i===0) return;
+    ctx.strokeStyle = master.color+'1e'; ctx.lineWidth=.5;
+    ctx.setLineDash([3,5]);
+    ctx.beginPath(); ctx.moveTo(master.x, master.y); ctx.lineTo(c.x, c.y); ctx.stroke();
     ctx.setLineDash([]);
   });
 }
 
-// ─── UPDATE ───────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// UPDATE
+// ═══════════════════════════════════════════════════════════════
 function update() {
   chars.forEach(c => {
     if (!c.active) return;
     c.frame++;
     const dx = c.tx - c.x, dy = c.ty - c.y;
-    const dist = Math.sqrt(dx*dx + dy*dy);
+    const dist = Math.sqrt(dx*dx+dy*dy);
     if (dist > 1) {
-      c.x += dx * 0.06 * speed;
-      c.y += dy * 0.06 * speed;
+      c.x += dx*0.06*speed; c.y += dy*0.06*speed;
       c.state = 'WALKING';
     } else {
       c.x = c.tx; c.y = c.ty;
       if (c.state === 'WALKING') {
-        c.state = Math.random() < 0.6 ? 'TYPING' : 'IDLE';
+        c.state = Math.random()<0.6 ? 'TYPING' : 'IDLE';
         logActivity(c);
       }
     }
-    const interval = Math.floor(180 / speed);
-    if (dist <= 1 && c.frame % interval === 0) {
+    const interval = Math.floor(180/speed);
+    if (dist<=1 && c.frame%interval===0) {
       const r = Math.random();
       if (r < 0.06) {
         const desk = DESKS[Math.floor(Math.random()*DESKS.length)];
-        c.tx = desk.col*TILE + TILE/2;
-        c.ty = desk.row*TILE + TILE/2;
+        c.tx = desk.col*TILE+TILE/2; c.ty = desk.row*TILE+TILE/2;
       } else {
         const prev = c.state;
-        c.state = r < 0.15 ? 'THINKING' : r < 0.25 ? 'IDLE' : r < 0.3 ? 'READING' : 'TYPING';
+        c.state = r<0.15?'THINKING':r<0.25?'IDLE':r<0.3?'READING':'TYPING';
         if (c.state !== prev) logActivity(c);
       }
-      c.tokens = Math.min(100, c.tokens + (Math.random() > 0.5 ? 5 : -3));
+      c.tokens = Math.min(100, c.tokens + (Math.random()>.5?5:-3));
     }
   });
 }
 
-// ─── RENDER ───────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════════
 function render() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawFloor();
-
-  // Draw all desks
-  DESKS.forEach((d, i) => {
-    const owner = chars.find(c => c.active && Math.abs(c.tx - (d.col*TILE+TILE/2)) < 2 && Math.abs(c.ty - (d.row*TILE+TILE/2)) < 2);
-    drawDesk(d.col*TILE, d.row*TILE, owner || null);
+  DESKS.forEach(d => {
+    const owner = chars.find(c => c.active && Math.abs(c.tx-(d.col*TILE+TILE/2))<2 && Math.abs(c.ty-(d.row*TILE+TILE/2))<2);
+    drawDesk(d.col*TILE, d.row*TILE, owner||null);
   });
-
   drawMasterLines();
-
-  // Sort by y for z-order
-  const active = chars.filter(c => c.active).sort((a,b) => a.y - b.y);
-  active.forEach(c => {
-    drawChar(c, c.id === chars[selIdx]?.id);
+  chars.filter(c=>c.active).sort((a,b)=>a.y-b.y).forEach(c => {
+    drawChar(c, c.id===chars[selIdx]?.id);
     drawBadge(c);
   });
 }
 
-// ─── ACTIVITY FEED ────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// ACTIVITY FEED
+// ═══════════════════════════════════════════════════════════════
 const feedItems = [];
 function logActivity(c) {
-  const [verb, obj] = ACTIVITIES[c.state]?.(c) || ['trabalhando', ''];
-  const entry = { time: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit',second:'2-digit'}), agent: c, verb, obj };
-  feedItems.unshift(entry);
+  const [verb, obj] = ACTIVITIES[c.state]?.(c) || ['trabalhando',''];
+  feedItems.unshift({
+    time: new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}),
+    agent: c, verb, obj,
+  });
   if (feedItems.length > 30) feedItems.pop();
   c.lastAction = `${verb} ${obj}`;
   renderFeed();
@@ -634,8 +589,7 @@ function logActivity(c) {
 }
 
 function renderFeed() {
-  const el = document.getElementById('feedList');
-  el.innerHTML = feedItems.slice(0,15).map(e => `
+  document.getElementById('feedList').innerHTML = feedItems.slice(0,15).map(e => `
     <div class="feed-item">
       <span class="feed-time">${e.time}</span>
       <span class="feed-agent" style="color:${e.agent.color}">${e.agent.name}</span>
@@ -644,48 +598,50 @@ function renderFeed() {
     </div>`).join('');
 }
 
-// ─── ROSTER SIDEBAR ───────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// ROSTER SIDEBAR  — FIX: usar MUTED_COLOR em vez de var(--muted)
+// ═══════════════════════════════════════════════════════════════
 function renderRoster() {
   const el = document.getElementById('rosterList');
   const activeCount = chars.filter(c => c.active).length;
   document.getElementById('onlineCount').textContent = activeCount + ' online';
 
   const groups = { DEV:[], DESIGN:[], OPS:[], MASTER:[] };
-  chars.forEach((c, i) => groups[c.zone]?.push({ c, i }));
+  chars.forEach((c,i) => groups[c.zone]?.push({c,i}));
 
   el.innerHTML = Object.entries(groups).map(([zone, items]) =>
     items.length ? `
       <div class="zone-label">${zone}</div>
-      ${items.map(({ c, i }) => `
-        <div class="agent-item ${i === selIdx ? 'selected' : ''}" onclick="selectAgent(${i})">
+      ${items.map(({c,i}) => `
+        <div class="agent-item${i===selIdx?' selected':''}" onclick="selectAgent(${i})">
           <div class="agent-avatar" style="background:${c.color}22;border:1px solid ${c.color}44">${c.icon}</div>
           <div class="agent-meta">
-            <div class="agent-name" style="color:${c.active?c.color:var(--muted)}">${c.name}</div>
+            <div class="agent-name" style="color:${c.active ? c.color : MUTED_COLOR}">${c.name}</div>
             <div class="agent-role">${c.role}</div>
           </div>
-          <div class="status-dot ${!c.active ? 's-idle' : c.state==='THINKING' ? 's-think' : 's-active'}"></div>
+          <div class="status-dot ${!c.active?'s-idle':c.state==='THINKING'?'s-think':'s-active'}"></div>
         </div>`).join('')}` : ''
   ).join('');
 }
 
-// ─── DETAIL PANEL ─────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// DETAIL PANEL
+// ═══════════════════════════════════════════════════════════════
 function updateDetail() {
   const c = chars[selIdx];
+  if (!c) return;
   document.getElementById('dName').textContent = c.name;
   document.getElementById('dRole').textContent = c.role;
   const sc = STATE_COLOR[c.state] || '#6b7280';
   document.getElementById('dStateLabel').textContent = c.state;
-  document.getElementById('dStateDot').style.background = sc;
-  document.getElementById('dStateDot').style.boxShadow = `0 0 5px ${sc}`;
-  document.getElementById('dState').style.color = sc;
-  document.getElementById('dState').style.borderColor = sc + '44';
-  document.getElementById('dState').style.background = sc + '11';
-  const pct = Math.min(100, Math.max(5, c.tokens || 20));
-  document.getElementById('dTokenPct').textContent = pct + '%';
-  document.getElementById('dTokenFill').style.width = pct + '%';
-  document.getElementById('dTokenFill').style.background = pct > 80 ? '#ef4444' : pct > 60 ? '#f59e0b' : '#10b981';
-  document.getElementById('dCmds').innerHTML = (c.cmds||[]).map(cmd =>
-    `<div class="cmd-tag">${cmd}</div>`).join('');
+  document.getElementById('dStateDot').style.cssText = `width:6px;height:6px;border-radius:50%;background:${sc};box-shadow:0 0 5px ${sc};`;
+  const dState = document.getElementById('dState');
+  dState.style.color = sc; dState.style.borderColor = sc+'44'; dState.style.background = sc+'11';
+  const pct = Math.min(100, Math.max(5, c.tokens||20));
+  document.getElementById('dTokenPct').textContent = pct+'%';
+  document.getElementById('dTokenFill').style.width = pct+'%';
+  document.getElementById('dTokenFill').style.background = pct>80?'#ef4444':pct>60?'#f59e0b':'#10b981';
+  document.getElementById('dCmds').innerHTML = (c.cmds||[]).map(cmd=>`<div class="cmd-tag">${cmd}</div>`).join('');
   document.getElementById('dLastAction').textContent = c.lastAction || '—';
 }
 
@@ -693,18 +649,27 @@ function selectAgent(i) {
   selIdx = i;
   renderRoster();
   updateDetail();
+  // Camera follow
+  if (followMode) scrollToAgent(chars[i]);
 }
 
-// ─── CONTROLS ─────────────────────────────────────────────────────
-const speeds = [1,2,4,0.5];
-let speedIdx = 0;
+function scrollToAgent(c) {
+  const cont = document.getElementById('canvasContainer');
+  const sx = c.x * zoom - cont.clientWidth/2;
+  const sy = c.y * zoom - cont.clientHeight/2;
+  cont.scrollTo({ left: Math.max(0,sx), top: Math.max(0,sy), behavior: 'smooth' });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CONTROLS
+// ═══════════════════════════════════════════════════════════════
+const speeds = [1,2,4,0.5]; let speedIdx = 0;
 function cycleSpeed() {
-  speedIdx = (speedIdx + 1) % speeds.length;
+  speedIdx = (speedIdx+1) % speeds.length;
   speed = speeds[speedIdx];
   document.getElementById('btnSpeed').textContent = `${speed}× velocidade`;
 }
 
-let followMode = false;
 function toggleFollow() {
   followMode = !followMode;
   document.getElementById('btnFollow').classList.toggle('active', followMode);
@@ -712,93 +677,134 @@ function toggleFollow() {
 
 let spawnIdx = 9;
 function spawnNext() {
-  if (spawnIdx >= chars.length) return;
+  if (spawnIdx >= chars.length) { showToast('Todos os agentes já estão online!', '#64748b'); return; }
   chars[spawnIdx].active = true;
   chars[spawnIdx].x = canvas.width/2;
   chars[spawnIdx].y = -TILE;
   chars[spawnIdx].state = 'WALKING';
+  showToast(`✨ ${chars[spawnIdx].name} entrou no escritório`, chars[spawnIdx].color);
   spawnIdx++;
   renderRoster();
-  showToast(`✨ ${chars[spawnIdx-1].name} entrou no escritório`, chars[spawnIdx-1].color);
 }
 
-function setTool(t) {
-  canvas.style.cursor = t === 'edit' ? 'cell' : 'default';
-}
+function zoomIn()    { zoom = Math.min(4, zoom+0.5); applyZoom(); }
+function zoomOut()   { zoom = Math.max(1, zoom-0.5); applyZoom(); }
+function resetZoom() { zoom = 2; applyZoom(); }
+function setTool(t)  { canvas.style.cursor = t==='edit'?'cell':'default'; }
 
-// Click on canvas to select agent
+// Click to select
 canvas.addEventListener('click', e => {
   const rect = canvas.getBoundingClientRect();
-  const scaleX = canvas.width / rect.width;
-  const scaleY = canvas.height / rect.height;
-  const mx = (e.clientX - rect.left) * scaleX;
-  const my = (e.clientY - rect.top) * scaleY;
-  chars.forEach((c, i) => {
+  const mx = (e.clientX-rect.left) * (canvas.width/rect.width);
+  const my = (e.clientY-rect.top)  * (canvas.height/rect.height);
+  chars.forEach((c,i) => {
     if (!c.active) return;
-    if (Math.abs(c.x-mx) < 14 && Math.abs(c.y-my) < 18) selectAgent(i);
+    if (Math.abs(c.x-mx)<14 && Math.abs(c.y-my)<18) selectAgent(i);
   });
 });
 
-// ─── TOAST NOTIFICATIONS ──────────────────────────────────────────
-function showToast(msg, color = '#00f0ff') {
+// Keyboard navigation
+document.addEventListener('keydown', e => {
+  const active = chars.filter(c=>c.active);
+  const activeIdx = active.findIndex(c=>c===chars[selIdx]);
+  if (e.key==='ArrowRight'||e.key==='ArrowDown') {
+    const next = active[(activeIdx+1)%active.length];
+    selectAgent(chars.indexOf(next));
+  }
+  if (e.key==='ArrowLeft'||e.key==='ArrowUp') {
+    const prev = active[(activeIdx-1+active.length)%active.length];
+    selectAgent(chars.indexOf(prev));
+  }
+  if (e.key===' ') { e.preventDefault(); spawnNext(); }
+  if (e.key==='s'||e.key==='S') cycleSpeed();
+  if (e.key==='f'||e.key==='F') toggleFollow();
+  if (e.key==='+'||e.key==='=') zoomIn();
+  if (e.key==='-') zoomOut();
+});
+
+// ═══════════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════════
+function showToast(msg, color='#00f0ff') {
   const toast = document.getElementById('toast');
   const el = document.createElement('div');
   el.className = 'toast-item';
-  el.style.borderColor = color + '44';
-  el.innerHTML = `<span style="color:${color};font-size:.9rem">●</span> ${msg}`;
+  el.style.borderColor = color+'44';
+  el.innerHTML = `<span style="color:${color};font-size:.85rem">●</span> ${msg}`;
   toast.appendChild(el);
   setTimeout(() => el.remove(), 3500);
 }
 
-// ─── GAME LOOP ────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// CONNECTION STATUS
+// ═══════════════════════════════════════════════════════════════
+function setConnStatus(mode) {
+  const bar = document.getElementById('conn-bar');
+  const dot = document.getElementById('connDot');
+  const lbl = document.getElementById('connLabel');
+  const hint = document.getElementById('conn-hint');
+  bar.className = mode;
+  dot.className = 'conn-dot '+mode;
+  if (mode==='live') {
+    lbl.textContent = '● LIVE — Sessão real conectada';
+    hint.textContent = 'Eventos do Claude Code chegando em tempo real';
+  } else if (mode==='reconnecting') {
+    lbl.textContent = '● RECONECTANDO...';
+    hint.textContent = 'Servidor não encontrado — inicie: npx skillsagents office';
+  } else {
+    lbl.textContent = '● DEMO MODE';
+    hint.textContent = 'Inicie o servidor: npx skillsagents office';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GAME LOOP
+// ═══════════════════════════════════════════════════════════════
 let lastRoster = 0;
 function loop() {
   update();
   render();
   const now = Date.now();
-  if (now - lastRoster > 1000) {
+  if (now-lastRoster > 1000) {
     renderRoster();
     updateDetail();
+    if (followMode) scrollToAgent(chars[selIdx]);
     lastRoster = now;
   }
   requestAnimationFrame(loop);
 }
 
-// ─── LIVE MODE (SSE from local server) ───────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// LIVE MODE (SSE)
+// ═══════════════════════════════════════════════════════════════
 let liveMode = false;
-let liveToastTimer = null;
+let demoTimer = null;
+let retryCount = 0;
 
 function connectLive() {
-  const PORT = 4321;
-  const evtSource = new EventSource(`http://localhost:${PORT}/events`);
+  const evtSource = new EventSource('http://localhost:4321/events');
 
   evtSource.onopen = () => {
-    liveMode = true;
-    // Stop demo simulation
-    clearInterval(liveToastTimer);
-    // Show LIVE badge
-    const badge = document.createElement('span');
-    badge.id = 'live-badge';
-    badge.className = 'badge';
-    badge.style.cssText = 'background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3);';
-    badge.textContent = '● LIVE';
-    document.querySelector('.nav-right').prepend(badge);
-    showToast('🟢 Conectado ao servidor local — modo LIVE ativo', '#10b981');
+    liveMode = true; retryCount = 0;
+    setConnStatus('live');
+    if (demoTimer) { clearInterval(demoTimer); demoTimer = null; }
+    showToast('🟢 Modo LIVE ativo — agentes reais conectados', '#10b981');
   };
 
   evtSource.onmessage = e => {
-    const ev = JSON.parse(e.data);
-    handleLiveEvent(ev);
+    try { handleLiveEvent(JSON.parse(e.data)); } catch(_) {}
   };
 
   evtSource.onerror = () => {
+    evtSource.close();
     if (liveMode) {
       liveMode = false;
-      const badge = document.getElementById('live-badge');
-      if (badge) badge.remove();
+      setConnStatus('reconnecting');
+      showToast('🔴 Servidor desconectado — tentando reconectar...', '#ef4444');
     }
-    // Retry in 3s
-    setTimeout(connectLive, 3000);
+    retryCount++;
+    const delay = Math.min(30000, 2000 * retryCount);
+    setTimeout(() => { setConnStatus(liveMode?'live':'demo'); connectLive(); }, delay);
   };
 }
 
@@ -808,66 +814,61 @@ function handleLiveEvent(ev) {
   if (ev.type === 'agent_online') {
     const c = chars.find(x => x.id === ev.agentId);
     if (c && !c.active) {
-      c.active = true;
-      c.state = 'IDLE';
-      spawnIdx = Math.max(spawnIdx, chars.indexOf(c) + 1);
+      c.active = true; c.state = 'IDLE';
+      spawnIdx = Math.max(spawnIdx, chars.indexOf(c)+1);
       renderRoster();
       showToast(`✨ ${c.name} entrou no escritório (sessão real)`, c.color);
     }
     return;
   }
-
   if (!char) return;
 
   if (ev.type === 'tool_start') {
     char.state = ev.state || 'TYPING';
-    char.lastAction = `${ev.tool} — ${ev.state}`;
+    char.lastAction = {
+      Bash:'executando Bash', Read:'lendo arquivo', Write:'escrevendo arquivo',
+      Edit:'editando código', Agent:'despachando sub-agente', WebSearch:'pesquisando na web',
+    }[ev.tool] || `${ev.tool} — ${ev.state}`;
     logActivity(char);
-    if (ev.tool === 'Bash')    char.lastAction = `executando Bash`;
-    if (ev.tool === 'Read')    char.lastAction = `lendo arquivo`;
-    if (ev.tool === 'Write')   char.lastAction = `escrevendo arquivo`;
-    if (ev.tool === 'Edit')    char.lastAction = `editando código`;
-    if (ev.tool === 'Agent')   char.lastAction = `despachando sub-agente`;
-    if (ev.tool === 'WebSearch') char.lastAction = `pesquisando na web`;
   }
-
-  if (ev.type === 'tool_end' || ev.type === 'agent_idle') {
+  if (ev.type==='tool_end'||ev.type==='agent_idle') {
+    char.state = 'IDLE'; char.lastAction = 'tarefa concluída';
+    logActivity(char);
+  }
+  if (ev.type==='permission_request') {
     char.state = 'IDLE';
-    char.lastAction = `tarefa concluída`;
-    logActivity(char);
-  }
-
-  if (ev.type === 'permission_request') {
-    char.state = 'IDLE'; // shows "aguardando..." bubble
     showToast(`⚠️ ${char.name} aguardando permissão: ${ev.tool}`, '#f59e0b');
   }
-
   if (chars[selIdx]?.id === char.id) updateDetail();
 }
 
-// ─── INIT ────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
 renderRoster();
 updateDetail();
 loop();
 
-// Demo mode — simulated activity (disabled when LIVE)
-chars.filter(c => c.active).forEach((c, i) => {
-  setTimeout(() => logActivity(c), i * 300);
-});
+// Demo activity burst
+chars.filter(c=>c.active).forEach((c,i) => setTimeout(()=>logActivity(c), i*280));
 
-liveToastTimer = setInterval(() => {
-  if (liveMode) return; // skip demo toasts in live mode
-  const active = chars.filter(c => c.active);
+// Demo toasts periódicos
+demoTimer = setInterval(() => {
+  if (liveMode) return;
+  const active = chars.filter(c=>c.active);
   const c = active[Math.floor(Math.random()*active.length)];
   const msgs = [
     `${c.name} completou uma tarefa`,
-    `${c.name} está ${c.state === 'TYPING' ? 'codando' : c.state === 'THINKING' ? 'analisando' : 'em pausa'}`,
+    `${c.name} está ${c.state==='TYPING'?'codando':c.state==='THINKING'?'analisando':'em pausa'}`,
     `Nova ação de ${c.name}`,
   ];
   showToast(msgs[Math.floor(Math.random()*msgs.length)], c.color);
-}, 12000);
+}, 14000);
 
-// Try to connect to local server (non-blocking)
+// Esconde hint de teclado após 5s
+setTimeout(() => { document.getElementById('kbd-hint').style.opacity = '0'; }, 5000);
+
+// Tenta conectar ao servidor local
 connectLive();
 </script>
 </body>
