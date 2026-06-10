@@ -455,6 +455,100 @@
       background: linear-gradient(90deg, transparent, var(--border2), transparent);
     }
 
+    /* ── TUTORIAL ───────────────────────────────────────────── */
+    .tut-block {
+      margin-bottom: 32px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: border-color .2s;
+    }
+    .tut-block:hover { border-color: rgba(0,240,255,.18); }
+    .tut-header {
+      display: flex; align-items: flex-start; gap: 20px;
+      padding: 24px 28px 20px;
+    }
+    .tut-num {
+      font-size: 2rem; font-weight: 900; font-family: var(--mono);
+      background: linear-gradient(135deg, var(--cyan), var(--purple2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1; flex-shrink: 0; min-width: 44px;
+    }
+    .tut-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 4px; }
+    .tut-sub   { font-size: .83rem; color: var(--muted); }
+    .tut-code-wrap { padding: 0 28px 20px; }
+    .tut-code {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      padding: 13px 20px;
+      font-family: var(--mono); font-size: .9rem;
+      cursor: pointer; position: relative;
+      transition: border-color .2s;
+    }
+    .tut-code:hover { border-color: rgba(0,240,255,.35); }
+    .tut-code .t-prompt { color: var(--muted); }
+    .tut-code .t-cmd    { color: var(--cyan); }
+    .tut-code .copy-hint {
+      position: absolute; right: 16px;
+      font-size: .72rem; color: var(--muted);
+      opacity: 0; transition: opacity .2s;
+    }
+    .tut-code:hover .copy-hint { opacity: 1; }
+    .tut-output {
+      margin: 0 28px 20px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      font-family: var(--mono); font-size: .8rem;
+      line-height: 1.9;
+    }
+    .tut-out-line { display: flex; align-items: center; gap: 8px; }
+    .tut-ok  { color: var(--green); font-weight: 700; }
+    .tut-dim { color: #374151; }
+    .tut-note {
+      margin: 0 28px 24px;
+      padding: 12px 16px;
+      background: rgba(0,240,255,.04);
+      border: 1px solid rgba(0,240,255,.1);
+      border-radius: 8px;
+      font-size: .82rem; color: var(--muted); line-height: 1.6;
+    }
+    .tut-note code {
+      font-family: var(--mono); color: var(--cyan);
+      background: rgba(0,240,255,.08);
+      padding: 1px 6px; border-radius: 4px;
+    }
+    .tut-commands-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 48px;
+    }
+    .tut-cmd-card {
+      padding: 20px 22px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      cursor: pointer;
+      transition: border-color .2s, transform .2s;
+    }
+    .tut-cmd-card:hover {
+      border-color: rgba(0,240,255,.25);
+      transform: translateY(-2px);
+    }
+    .tut-cmd-icon { font-size: 1.5rem; margin-bottom: 10px; }
+    .tut-cmd-code {
+      font-family: var(--mono); font-size: .78rem;
+      color: var(--cyan); font-weight: 600;
+      margin-bottom: 8px; line-height: 1.5;
+    }
+    .tut-cmd-desc { font-size: .78rem; color: var(--muted); line-height: 1.5; }
+
     /* ── SCROLLBAR ───────────────────────────────────────────── */
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
@@ -478,11 +572,11 @@
     SkillsAgents
   </div>
   <div class="nav-links">
+    <a href="#tutorial">Tutorial</a>
     <a href="/office.html">Office</a>
     <a href="/generator.html">Generator</a>
-    <a href="/forge.html">Forge</a>
     <a href="/skills.html">Skills</a>
-    <a href="/office.html" class="nav-cta">Abrir Office →</a>
+    <a href="#tutorial" class="nav-cta">Começar →</a>
   </div>
 </nav>
 
@@ -515,9 +609,9 @@
   </div>
 
   <div class="hero-actions">
-    <a href="/office.html" class="btn-primary">🎮 Abrir Pixel Office</a>
+    <a href="#tutorial" class="btn-primary">🚀 Ver Tutorial Completo</a>
+    <a href="/office.html" class="btn-secondary">🎮 Abrir Pixel Office</a>
     <a href="/generator.html" class="btn-secondary">🤖 Gerar Prompt com IA</a>
-    <a href="/skills.html" class="btn-secondary">🛠 Ver todas as Skills</a>
   </div>
 
   <div class="stats-bar">
@@ -677,37 +771,215 @@
   <div class="container">
     <div class="section-tag">Como funciona</div>
     <h2>Do zero ao primeiro agente<br/><span class="gradient-text">em 10 segundos.</span></h2>
-    <p class="section-sub">Sem configuração manual. Funciona no Cursor, Claude Code, Gemini, Windsurf e qualquer IDE com IA.</p>
+    <p class="section-sub">Sem configuração manual. Funciona no Claude Code, Cursor, Codex, Gemini e qualquer IDE com IA.</p>
 
     <div class="steps">
       <div class="step">
         <div class="step-num">1</div>
-        <h3>Instale os agentes</h3>
-        <p>Um comando cria a pasta <code style="color:var(--cyan)">.codex/agents/</code> com todos os agentes prontos para uso.</p>
+        <h3>Instale no projeto</h3>
+        <p>Na pasta do seu projeto, um comando instala 148 agentes e 1262 skills em <code style="color:var(--cyan)">.claude/agents/</code>.</p>
         <div class="step-code">
           <span style="color:var(--muted)">$</span> npx github:matheusj12/skillsagents install<br/>
-          <span class="step-output">✔ skillsagents installed<br/>✔ 13 agents ready in .codex/agents/</span>
+          <span class="step-output">✔ 148 agentes instalados<br/>✔ 1262 skills instaladas</span>
         </div>
       </div>
       <div class="step">
         <div class="step-num">2</div>
-        <h3>Instale as 1270+ skills</h3>
-        <p>Skills instaladas globalmente em <code style="color:var(--cyan)">~/.skillsagents/skills/</code> — disponíveis em todos os seus projetos.</p>
+        <h3>Abra o Claude Code</h3>
+        <p>Os agentes ficam em <code style="color:var(--cyan)">.claude/agents/</code> — o Claude Code lê automaticamente ao iniciar.</p>
         <div class="step-code">
-          <span style="color:var(--muted)">$</span> npx github:matheusj12/skillsagents install --skills<br/>
-          <span class="step-output">✔ 1270 skills installed globally</span>
+          <span style="color:var(--muted)">$</span> claude<br/>
+          <span class="step-output">✔ 148 agents loaded from .claude/agents/</span>
         </div>
       </div>
       <div class="step">
         <div class="step-num">3</div>
         <h3>Chame o @master</h3>
-        <p>No seu IDE com IA, chame o @master — ele monta o squad e define o plano para qualquer projeto.</p>
+        <p>Digite <code style="color:var(--cyan)">@master *help</code> no Claude Code — ele mostra todos os comandos e monta o squad ideal.</p>
         <div class="step-code">
-          <span style="color:var(--muted)">&gt; você:</span> @master *squad meu projeto<br/>
-          <span class="step-output">✅ SkillsAgents v1.0.0 — 146 agents online</span>
+          <span style="color:var(--muted)">&gt;</span> @master *help<br/>
+          <span class="step-output">👑 Master online — 146 agents, 1262 skills</span>
         </div>
       </div>
     </div>
+  </div>
+</section>
+
+<div class="line-divider"></div>
+
+<!-- ── TUTORIAL COMPLETO ──────────────────────────────────────────── -->
+<section class="how-section" id="tutorial">
+  <div class="container">
+    <div class="section-tag">Tutorial Completo</div>
+    <h2>Passo a passo<br/><span class="gradient-text">do zero ao funcionando.</span></h2>
+    <p class="section-sub">Siga este tutorial e tenha agentes reais trabalhando no seu projeto em menos de 2 minutos.</p>
+
+    <!-- STEP 1 -->
+    <div class="tut-block">
+      <div class="tut-header">
+        <div class="tut-num">01</div>
+        <div>
+          <div class="tut-title">Vá para o seu projeto</div>
+          <div class="tut-sub">Terminal na pasta onde você vai desenvolver</div>
+        </div>
+      </div>
+      <div class="tut-code-wrap">
+        <div class="tut-code" onclick="copyCmd(this,'cd meu-projeto')">
+          <span class="t-prompt">$</span> <span class="t-cmd">cd meu-projeto</span>
+          <span class="copy-hint">copiar</span>
+        </div>
+      </div>
+      <div class="tut-note">
+        💡 Se não tem projeto ainda: <code>mkdir meu-projeto && cd meu-projeto</code>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="tut-block">
+      <div class="tut-header">
+        <div class="tut-num">02</div>
+        <div>
+          <div class="tut-title">Instale os agentes e skills</div>
+          <div class="tut-sub">Cria .claude/agents/ com 148 agentes + .claude/skills/ com 1262 skills</div>
+        </div>
+      </div>
+      <div class="tut-code-wrap">
+        <div class="tut-code" onclick="copyCmd(this,'npx github:matheusj12/skillsagents install')">
+          <span class="t-prompt">$</span> <span class="t-cmd">npx github:matheusj12/skillsagents install</span>
+          <span class="copy-hint">copiar</span>
+        </div>
+      </div>
+      <div class="tut-output">
+        <div class="tut-out-line"><span class="tut-ok">✔</span> @master</div>
+        <div class="tut-out-line"><span class="tut-ok">✔</span> @dev</div>
+        <div class="tut-out-line"><span class="tut-ok">✔</span> @architect</div>
+        <div class="tut-out-line tut-dim">... e mais 145 agentes</div>
+        <div class="tut-out-line"><span class="tut-ok">✔</span> 1262 skills instaladas</div>
+        <div class="tut-out-line tut-dim">meu-projeto/.claude/agents/ ← 148 agentes</div>
+        <div class="tut-out-line tut-dim">meu-projeto/.claude/skills/ ← 1262 skills</div>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="tut-block">
+      <div class="tut-header">
+        <div class="tut-num">03</div>
+        <div>
+          <div class="tut-title">Instale os hooks (opcional mas recomendado)</div>
+          <div class="tut-sub">Ativa o monitoramento em tempo real no Pixel Office</div>
+        </div>
+      </div>
+      <div class="tut-code-wrap">
+        <div class="tut-code" onclick="copyCmd(this,'npx github:matheusj12/skillsagents hooks')">
+          <span class="t-prompt">$</span> <span class="t-cmd">npx github:matheusj12/skillsagents hooks</span>
+          <span class="copy-hint">copiar</span>
+        </div>
+      </div>
+      <div class="tut-output">
+        <div class="tut-out-line"><span class="tut-ok">✔</span> Hooks instalados!</div>
+        <div class="tut-out-line tut-dim">Arquivo: .claude/settings.json</div>
+      </div>
+      <div class="tut-note">
+        💡 Os hooks conectam o Claude Code ao Pixel Office — cada ação do Claude aparece em tempo real no painel visual.
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="tut-block">
+      <div class="tut-header">
+        <div class="tut-num">04</div>
+        <div>
+          <div class="tut-title">Abra o Claude Code no projeto</div>
+          <div class="tut-sub">Os agentes são carregados automaticamente de .claude/agents/</div>
+        </div>
+      </div>
+      <div class="tut-code-wrap">
+        <div class="tut-code" onclick="copyCmd(this,'claude')">
+          <span class="t-prompt">$</span> <span class="t-cmd">claude</span>
+          <span class="copy-hint">copiar</span>
+        </div>
+      </div>
+      <div class="tut-note">
+        💡 Não tem Claude Code? Instale com: <code>npm install -g @anthropic-ai/claude-code</code>
+        <br/>Também funciona na extensão Claude Code para VSCode.
+      </div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="tut-block">
+      <div class="tut-header">
+        <div class="tut-num">05</div>
+        <div>
+          <div class="tut-title">Chame o @master e comece</div>
+          <div class="tut-sub">Dentro do Claude Code, use @master para orquestrar tudo</div>
+        </div>
+      </div>
+      <div class="tut-code-wrap">
+        <div class="tut-code" onclick="copyCmd(this,'@master *help')">
+          <span class="t-prompt">&gt;</span> <span class="t-cmd">@master *help</span>
+          <span class="copy-hint">copiar</span>
+        </div>
+      </div>
+      <div class="tut-output">
+        <div class="tut-out-line"><span class="tut-ok">👑</span> Master Orchestrator online</div>
+        <div class="tut-out-line tut-dim">146 agentes · 1262 skills · modo autônomo</div>
+        <div class="tut-out-line" style="color:var(--cyan)">Comandos disponíveis:</div>
+        <div class="tut-out-line tut-dim">*squad &lt;projeto&gt;  — monta o squad ideal</div>
+        <div class="tut-out-line tut-dim">*plan &lt;objetivo&gt; — plano faseado completo</div>
+        <div class="tut-out-line tut-dim">*swarm &lt;meta&gt;   — lança swarm autônomo</div>
+        <div class="tut-out-line tut-dim">*yolo           — modo 100% autônomo</div>
+      </div>
+    </div>
+
+    <!-- STEP 6 — PIXEL OFFICE -->
+    <div class="tut-block">
+      <div class="tut-header">
+        <div class="tut-num">06</div>
+        <div>
+          <div class="tut-title">Abra o Pixel Office (opcional)</div>
+          <div class="tut-sub">Visualize os agentes trabalhando em tempo real</div>
+        </div>
+      </div>
+      <div class="tut-code-wrap" style="display:flex;gap:12px;flex-wrap:wrap;">
+        <div class="tut-code" style="flex:1;min-width:280px;" onclick="copyCmd(this,'npx github:matheusj12/skillsagents office')">
+          <span class="t-prompt">$</span> <span class="t-cmd">npx github:matheusj12/skillsagents office</span>
+          <span class="copy-hint">copiar</span>
+        </div>
+      </div>
+      <div class="tut-output">
+        <div class="tut-out-line"><span class="tut-ok">✔</span> Servidor iniciado em localhost:4321</div>
+        <div class="tut-out-line"><span class="tut-ok">✔</span> Abrindo http://localhost:4321/office.html</div>
+        <div class="tut-out-line tut-dim">Barra verde LIVE → eventos do Claude chegando</div>
+      </div>
+      <div class="tut-note">
+        💡 Deixe o servidor rodando num terminal separado. Enquanto você usa o Claude Code, os agentes aparecem animados no Pixel Office.
+      </div>
+    </div>
+
+    <!-- QUICK COMMANDS -->
+    <div class="tut-commands-grid">
+      <div class="tut-cmd-card" onclick="copyCmd(this,'@master *squad meu SaaS B2B em Next.js')">
+        <div class="tut-cmd-icon">🎯</div>
+        <div class="tut-cmd-code">@master *squad meu SaaS B2B em Next.js</div>
+        <div class="tut-cmd-desc">Monta o squad ideal + skills para o projeto</div>
+      </div>
+      <div class="tut-cmd-card" onclick="copyCmd(this,'@dev implementa autenticação JWT')">
+        <div class="tut-cmd-icon">💻</div>
+        <div class="tut-cmd-code">@dev implementa autenticação JWT</div>
+        <div class="tut-cmd-desc">Developer implementa com TDD e boas práticas</div>
+      </div>
+      <div class="tut-cmd-card" onclick="copyCmd(this,'@architect define a arquitetura do sistema')">
+        <div class="tut-cmd-icon">🏗️</div>
+        <div class="tut-cmd-code">@architect define a arquitetura</div>
+        <div class="tut-cmd-desc">Decisões de arquitetura e documentação técnica</div>
+      </div>
+      <div class="tut-cmd-card" onclick="copyCmd(this,'@qa revisa o código e escreve os testes')">
+        <div class="tut-cmd-icon">✅</div>
+        <div class="tut-cmd-code">@qa revisa e escreve os testes</div>
+        <div class="tut-cmd-desc">Revisão de código, cobertura e qualidade</div>
+      </div>
+    </div>
+
   </div>
 </section>
 
@@ -754,9 +1026,9 @@
     SkillsAgents
   </div>
   <div class="footer-links">
+    <a href="#tutorial">Tutorial</a>
     <a href="/office.html">Office</a>
     <a href="/generator.html">Generator</a>
-    <a href="/forge.html">Forge</a>
     <a href="/skills.html">Skills</a>
     <a href="https://github.com/matheusj12/skillsagents" target="_blank">GitHub</a>
   </div>
@@ -818,7 +1090,7 @@ const observer = new IntersectionObserver(entries => {
   });
 }, { threshold: 0.1 });
 
-document.querySelectorAll('.step, .agent-card, .office-feat, .master-cmd').forEach(el => {
+document.querySelectorAll('.step, .agent-card, .office-feat, .master-cmd, .tut-block, .tut-cmd-card').forEach(el => {
   el.style.opacity = '0';
   el.style.transform = 'translateY(16px)';
   el.style.transition = 'opacity .5s ease, transform .5s ease';
