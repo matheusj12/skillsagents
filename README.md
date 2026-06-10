@@ -15,13 +15,13 @@ SkillsAgents é um CLI que instala agentes e skills de IA diretamente no seu pro
 ## Instalação
 
 ```bash
-npm install -g skillsagents
+npm install -g github:matheusj12/skillsagents
 ```
 
-Ou use sem instalar:
+Ou use diretamente sem instalar:
 
 ```bash
-npx skillsagents
+npx github:matheusj12/skillsagents
 ```
 
 ---
@@ -33,7 +33,7 @@ npx skillsagents
 cd meu-projeto
 
 # 2. Instale todos os agentes e skills
-skillsagents install
+github:matheusj12/skillsagents install
 
 # 3. Integre com o Claude Code (tempo real)
 skillsagents hooks
@@ -51,7 +51,7 @@ Abra o Claude Code e chame `@master *help` para começar.
 | Comando | O que faz |
 |---------|-----------|
 | `skillsagents` | Abre o menu interativo completo |
-| `skillsagents install` | Instala todos os agentes e skills no projeto |
+| `github:matheusj12/skillsagents install` | Instala todos os agentes e skills no projeto |
 | `skillsagents hooks` | Integra com Claude Code via hooks em tempo real |
 | `skillsagents hooks:remove` | Remove os hooks instalados |
 | `skillsagents office` | Inicia o Pixel Office (servidor + abre no browser) |
@@ -163,7 +163,7 @@ skillsagents --version
 skillsagents status
 
 # Instale agentes no projeto de teste
-skillsagents install
+github:matheusj12/skillsagents install
 skillsagents status   # deve mostrar os agentes instalados
 
 # Suba o Pixel Office

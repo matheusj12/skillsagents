@@ -35,13 +35,13 @@ if (cmd === 'hooks:remove') {
   return;
 }
 if (cmd === 'install') {
-  // npx skillsagents install — sem menu, instala direto
+  // npx github:matheusj12/skillsagents install — sem menu, instala direto
   const { install } = require('../src/install.js');
   install();
   return;
 }
 if (cmd === 'status') {
-  // npx skillsagents status
+  // npx github:matheusj12/skillsagents status
   launchWithDeps(() => printStatusDirect());
   return;
 }
@@ -78,11 +78,11 @@ function printHelp() {
     Abre o menu interativo completo
 
   EXEMPLOS:
-    npx skillsagents                  # menu interativo
-    npx skillsagents install          # instala tudo agora
-    npx skillsagents hooks            # integra com Claude Code
-    npx skillsagents office           # abre Pixel Office
-    SKILLSAGENTS_PORT=4322 npx skillsagents office
+    npx github:matheusj12/skillsagents                  # menu interativo
+    npx github:matheusj12/skillsagents install          # instala tudo agora
+    npx github:matheusj12/skillsagents hooks            # integra com Claude Code
+    npx github:matheusj12/skillsagents office           # abre Pixel Office
+    SKILLSAGENTS_PORT=4322 npx github:matheusj12/skillsagents office
 `);
 }
 
@@ -102,7 +102,7 @@ function printStatusDirect() {
   console.log(`  ${ hooks ? '✔' : '○' }  Hooks do Claude Code ${hooks ? 'ativos' : 'não instalados'}\n`);
 
   if (!agents.length) {
-    console.log(`  Para instalar: npx skillsagents install\n`);
+    console.log(`  Para instalar: npx github:matheusj12/skillsagents install\n`);
   }
 }
 
@@ -285,7 +285,7 @@ async function screenQuickInstall(ui, inquirer) {
   ui.ok('Próximos passos:');
   ui.dim('1.  Abra o IDE com IA (Claude Code, Cursor, Codex...)');
   ui.dim('2.  Digite @master *help  para ver todos os comandos');
-  ui.dim('3.  Use npx skillsagents hooks  para monitoramento em tempo real');
+  ui.dim('3.  Use npx github:matheusj12/skillsagents hooks  para monitoramento em tempo real');
   ui.br();
   await ui.pause();
 }
@@ -527,11 +527,11 @@ async function screenStatus(ui, inquirer, figlet, chalk) {
   if (!agents.length) {
     ui.br();
     ui.warn('Nenhum agente instalado neste projeto.');
-    ui.dim('Para instalar: npx skillsagents install');
+    ui.dim('Para instalar: npx github:matheusj12/skillsagents install');
   }
   if (!hooksActive) {
     if (!agents.length) ui.br();
-    ui.dim('Para monitorar em tempo real: npx skillsagents hooks');
+    ui.dim('Para monitorar em tempo real: npx github:matheusj12/skillsagents hooks');
   }
 
   ui.br();
@@ -813,7 +813,7 @@ async function screenOffice(ui, inquirer, chalk) {
   ui.ok('Abrindo ' + chalk.cyan('http://localhost:4321/office.html') + ' no browser');
   ui.br();
   ui.dim('Para parar: feche o terminal ou rode  kill $(lsof -ti:4321)');
-  ui.dim('Para instalar hooks e ver agentes reais: npx skillsagents hooks');
+  ui.dim('Para instalar hooks e ver agentes reais: npx github:matheusj12/skillsagents hooks');
   ui.br();
   await ui.pause();
 }
@@ -827,7 +827,7 @@ async function screenHooks(ui, inquirer, chalk) {
   ui.br();
   ui.dim('Próximos passos:');
   ui.dim('1.  Abra uma sessão do Claude Code neste projeto');
-  ui.dim('2.  Rode: npx skillsagents office  (abre o Pixel Office)');
+  ui.dim('2.  Rode: npx github:matheusj12/skillsagents office  (abre o Pixel Office)');
   ui.dim('3.  Agentes aparecem em tempo real enquanto você trabalha');
   ui.br();
   await ui.pause();

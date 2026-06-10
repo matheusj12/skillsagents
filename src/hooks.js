@@ -59,7 +59,7 @@ function installHooks(projectDir = process.cwd()) {
   console.log(chalk.white('  Arquivo: ') + chalk.cyan(settingsPath));
   console.log();
   console.log(chalk.white('  Próximos passos:'));
-  console.log(chalk.gray('  1.') + ' Rode ' + chalk.cyan('npx skillsagents office') + chalk.gray(' (inicia o servidor)'));
+  console.log(chalk.gray('  1.') + ' Rode ' + chalk.cyan('npx github:matheusj12/skillsagents office') + chalk.gray(' (inicia o servidor)'));
   console.log(chalk.gray('  2.') + ' Abra uma sessão do Claude Code neste projeto');
   console.log(chalk.gray('  3.') + ' Os agentes aparecem no Pixel Office em tempo real');
   console.log();
