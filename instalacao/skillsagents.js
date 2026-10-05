@@ -76,11 +76,10 @@ function install() {
 
   fs.writeFileSync(MANIFEST, JSON.stringify({ version: VER, files: next }, null, 2) + '\n');
 
-  console.log(chalk.green('  ✔  SkillsAgents instalado em ') + chalk.cyan('.skillsagents/'));
+  console.log(chalk.green('  ✓ SkillsAgents pronto'));
   for (const rel of preserved) console.log(chalk.yellow('  ⚠  ') + `mantido (modificado por você): ${rel}`);
   console.log();
-  console.log('  No Maestri, envie ao Ranjel:');
-  console.log(chalk.bold('  Leia o .skillsagents/START.md e siga as instruções.'));
+  console.log(chalk.bold('  Leia .skillsagents/START.md e siga as instruções.'));
   console.log();
 }
 
