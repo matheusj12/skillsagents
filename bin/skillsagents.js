@@ -12,7 +12,6 @@ const VER = PKG.version || '1.0.0';
 const cmd = process.argv[2];
 if (cmd === '--version' || cmd === '-v') { console.log(VER); process.exit(0); }
 
-console.clear();
 console.log(chalk.cyanBright(figlet.textSync('SKILLS', { font: 'ANSI Shadow', horizontalLayout: 'fitted' })));
 console.log(chalk.cyanBright(figlet.textSync('AGENTS', { font: 'ANSI Shadow', horizontalLayout: 'fitted' })));
 console.log();
