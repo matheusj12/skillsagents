@@ -1,0 +1,706 @@
+{
+  "schema_version": "1.0",
+  "repositories": [
+    {
+      "id": "caveman",
+      "name": "Caveman",
+      "url": "https://github.com/JuliusBrussee/caveman",
+      "owner": "JuliusBrussee",
+      "type": "tool",
+      "category": "12-agent-tools",
+      "description": "Skill, plugin and local proxy for coding agents that shorten agent output and compress tool output (logs, JSON, diffs). Adopted as the team's token-efficiency tool; setup in maestri_ia_terminais/CONTEXT_POLICY.md.",
+      "use_for": [
+        "token optimization",
+        "context reduction",
+        "coding-agent efficiency",
+        "tool-output compression",
+        "multi-agent cost control"
+      ],
+      "priority": "trusted"
+    },
+    {
+      "id": "browser-harness",
+      "name": "Browser Harness",
+      "url": "https://github.com/browser-use/browser-harness",
+      "owner": "browser-use",
+      "type": "tool",
+      "category": "12-agent-tools",
+      "description": "Self-healing harness that lets LLM agents drive a browser.",
+      "use_for": [
+        "browser automation",
+        "browser agents",
+        "CDP browser control",
+        "agent browser interaction",
+        "browser testing"
+      ],
+      "priority": "trusted"
+    },
+    {
+      "id": "aiox-core",
+      "name": "AIOX Core",
+      "url": "https://github.com/SynkraAI/aiox-core",
+      "owner": "SynkraAI",
+      "type": "agent-framework",
+      "category": "12-agent-tools",
+      "description": "Core framework of Synkra AIOX, an AI-orchestrated system for full-stack development.",
+      "use_for": [
+        "agent architecture",
+        "multi-agent systems",
+        "agent orchestration",
+        "agent framework research"
+      ],
+      "priority": "community"
+    },
+    {
+      "id": "ruflo",
+      "name": "Ruflo",
+      "url": "https://github.com/ruvnet/ruflo",
+      "owner": "ruvnet",
+      "type": "agent-framework",
+      "category": "12-agent-tools",
+      "description": "Agent harness for multi-agent swarms and coordinated autonomous workflows. Architectural reference only.",
+      "use_for": [
+        "multi-agent orchestration",
+        "agent coordination",
+        "swarm architecture",
+        "persistent agent memory",
+        "agent routing",
+        "MCP architecture"
+      ],
+      "priority": "community"
+    },
+    {
+      "id": "cloudflare-agentic-inbox",
+      "name": "Cloudflare Agentic Inbox",
+      "url": "https://github.com/cloudflare/agentic-inbox",
+      "owner": "cloudflare",
+      "type": "examples",
+      "category": "12-agent-tools",
+      "description": "Self-hosted email client with an AI agent on Cloudflare Workers. Architecture example, not a base framework.",
+      "use_for": [
+        "agentic application architecture",
+        "email agents",
+        "Cloudflare Workers agents",
+        "Durable Objects patterns",
+        "agent state architecture"
+      ],
+      "priority": "trusted"
+    },
+    {
+      "id": "ecc",
+      "name": "ECC",
+      "url": "https://github.com/affaan-m/ECC",
+      "owner": "affaan-m",
+      "type": "agent-framework",
+      "category": "12-agent-tools",
+      "description": "Agent harness with skills, memory, security and research-first development workflows. Study only; do not copy prompts or configs.",
+      "use_for": [
+        "agent workflows",
+        "coding agents",
+        "context engineering",
+        "agent memory",
+        "engineering workflows",
+        "agent security patterns",
+        "continuous agent improvement"
+      ],
+      "priority": "community"
+    },
+    {
+      "id": "scrapling",
+      "name": "Scrapling",
+      "url": "https://github.com/D4Vinci/Scrapling",
+      "owner": "D4Vinci",
+      "type": "tool",
+      "category": "12-agent-tools",
+      "description": "Adaptive web scraping framework, from single requests to full crawls.",
+      "use_for": [
+        "web scraping",
+        "adaptive scraping",
+        "web crawling",
+        "browser automation",
+        "research automation",
+        "data extraction",
+        "agent web research"
+      ],
+      "priority": "trusted"
+    },
+    {
+      "id": "rtk",
+      "name": "RTK",
+      "url": "https://github.com/rtk-ai/rtk",
+      "owner": "rtk-ai",
+      "type": "tool",
+      "category": "12-agent-tools",
+      "description": "CLI proxy that reduces LLM token use on common dev commands. Comparison candidate; does not replace Caveman.",
+      "use_for": [
+        "token optimization",
+        "coding-agent efficiency",
+        "context optimization",
+        "tool output optimization"
+      ],
+      "priority": "experimental"
+    },
+    {
+      "id": "crewai",
+      "name": "CrewAI",
+      "url": "https://github.com/crewAIInc/crewAI",
+      "owner": "crewAIInc",
+      "type": "agent-framework",
+      "category": "12-agent-tools",
+      "description": "Framework for orchestrating role-based autonomous AI agents.",
+      "use_for": [
+        "multi-agent systems",
+        "agent orchestration",
+        "agent collaboration",
+        "role-based agents",
+        "task delegation",
+        "multi-agent workflow design"
+      ],
+      "priority": "trusted"
+    },
+    {
+      "id": "scrapegraph-ai",
+      "name": "ScrapeGraphAI",
+      "url": "https://github.com/ScrapeGraphAI/Scrapegraph-ai",
+      "owner": "ScrapeGraphAI",
+      "type": "tool",
+      "category": "12-agent-tools",
+      "description": "Python scraping library that uses LLMs to extract structured data.",
+      "use_for": [
+        "AI web scraping",
+        "LLM-assisted extraction",
+        "web research",
+        "structured data extraction",
+        "scraping pipelines"
+      ],
+      "priority": "trusted"
+    },
+    {
+      "id": "system-prompts-leaks",
+      "name": "system_prompts_leaks",
+      "url": "https://github.com/asgeirtj/system_prompts_leaks",
+      "owner": "asgeirtj",
+      "type": "research",
+      "category": "16-research-evaluation",
+      "description": "Collection of published system prompts from AI products. NOT authoritative, NOT a Skill, NOT a template: never copy into agents, prompts, CLAUDE.md or Skills.",
+      "use_for": [
+        "comparative prompt research",
+        "agent architecture research",
+        "prompt pattern analysis",
+        "system prompt research"
+      ],
+      "priority": "community"
+    },
+    {
+      "id": "system-design-primer",
+      "name": "System Design Primer",
+      "url": "https://github.com/donnemartin/system-design-primer",
+      "owner": "donnemartin",
+      "type": "reference",
+      "category": "01-architecture",
+      "description": "Guide to designing large-scale systems.",
+      "use_for": [
+        "system design",
+        "distributed systems",
+        "scalability",
+        "architecture patterns"
+      ],
+      "priority": "trusted"
+    },
+    {
+      "id": "awesome-scalability",
+      "name": "Awesome Scalability",
+      "url": "https://github.com/binhnguyennus/awesome-scalability",
+      "owner": "binhnguyennus",
+      "type": "reference",
+      "category": "01-architecture",
+      "description": "Curated reading list on scalable, reliable and performant large-scale systems.",
+      "use_for": [
+        "scalability",
+        "distributed systems",
+        "architecture patterns"
+      ],
+      "priority": "trusted"
+    },
+    {
+      "id": "transformers",
+      "name": "Hugging Face Transformers",
+      "url": "https://github.com/huggingface/transformers",
+      "owner": "huggingface",
+      "type": "library",
+      "category": "02-ai-engineering",
+      "description": "Model-definition library for state-of-the-art ML models (text, vision, audio, multimodal).",
+      "use_for": [
+        "LLMs",
+        "transformers",
+        "model inference"
+      ],
+      "priority": "official"
+    },
+    {
+      "id": "ollama",
+      "name": "Ollama",
+      "url": "https://github.com/ollama/ollama",
+      "owner": "ollama",
+      "type": "tool",
+      "category": "02-ai-engineering",
+      "description": "Runs open-weight language models locally.",
+      "use_for": [
+        "local AI",
+        "model inference",
+        "LLMs"
+      ],
+      "priority": "official"
+    },
+    {
+      "id": "generative-ai-for-beginners",
+      "name": "Generative AI for Beginners",
+      "url": "https://github.com/microsoft/generative-ai-for-beginners",
+      "owner": "microsoft",
+      "type": "reference",
+      "category": "02-ai-engineering",
+      "description": "Microsoft course with 21 lessons on building generative AI applications. Educational material.",
+      "use_for": [
+        "generative AI engineering",
+        "LLMs"
+      ],
+      "priority": "trusted"
+    },
+    {
+      "id": "pgvector",
+      "name": "pgvector",
+      "url": "https://github.com/pgvector/pgvector",
+      "owner": "pgvector",
+      "type": "library",
+      "category": "03-rag-knowledge",
+      "description": "Vector similarity search extension for PostgreSQL.",
+      "use_for": [
+        "vector search",
+        "embeddings",
+        "RAG",
+        "vector storage"
+      ],
+      "priority": "official"
+    },
+    {
+      "id": "qdrant",
+      "name": "Qdrant",
+      "url": "https://github.com/qdrant/qdrant",
+      "owner": "qdrant",
+      "type": "tool",
+      "category": "03-rag-knowledge",
+      "description": "Vector database and vector search engine.",
+      "use_for": [
+        "vector search",
+        "semantic search",
+        "embeddings",
+        "RAG",
+        "vector storage"
+      ],
+      "priority": "official"
+    },
+    {
+      "id": "paddleocr",
+      "name": "PaddleOCR",
+      "url": "https://github.com/PaddlePaddle/PaddleOCR",
+      "owner": "PaddlePaddle",
+      "type": "library",
+      "category": "04-vision-document-ai",
+      "description": "OCR and document parsing toolkit that turns PDFs and images into structured data.",
+      "use_for": [
+        "OCR",
+        "document AI",
+        "document extraction"
+      ],
+      "priority": "official"
+    },
+    {
+      "id": "opencv",
+      "name": "OpenCV",
+      "url": "https://github.com/opencv/opencv",
+      "owner": "opencv",
+      "type": "library",
+      "category": "04-vision-document-ai",
+      "description": "Open-source computer vision library.",
+      "use_for": [
+        "computer vision",
+        "image processing"
+      ],
+      "priority": "official"
+    },
+    {
+      "id": "fastapi",
+      "name": "FastAPI",
+      "url": "https://github.com/fastapi/fastapi",
+      "owner": "fastapi",
+      "type": "framework",
+      "category": "05-backend",
+      "description": "Python web framework for building APIs.",
+      "use_for": [
+        "backend engineering",
+        "API design",
+        "web services"
+      ],
+      "priority": "official"
+    },
+    {
+      "id": "rails",
+      "name": "Ruby on Rails",
+      "url": "https://github.com/rails/rails",
+      "owner": "rails",
+      "type": "framework",
+      "category": "05-backend",
+      "description": "Ruby web application framework.",
+      "use_for": [
+        "backend engineering",
+        "web services"
+      ],
+      "priority": "official"
+    },
+    {
+      "id": "public-apis",
+      "name": "public-apis",
+      "url": "https://github.com/public-apis/public-apis",
+      "owner": "public-apis",
+      "type": "reference",
+      "category": "05-backend",
+      "description": "Curated list of free public APIs.",
+      "use_for": [
+        "API discovery"
+      ],
+      "priority": "trusted"
+    },
+    {
+      "id": "react",
+      "name": "React",
+      "url": "https://github.com/react/react",
+      "owner": "react",
+      "type": "library",
+      "category": "06-frontend",
+      "description": "Library for web and native user interfaces.",
+      "use_for": [
+        "frontend engineering",
+        "component architecture",
+        "UI engineering"
+      ],
+      "priority": "official"
+    },
+    {
+      "id": "shadcn-ui",
+      "name": "shadcn/ui",
+      "url": "https://github.com/shadcn-ui/ui",
+      "owner": "shadcn-ui",
+      "type": "library",
+      "category": "06-frontend",
+      "description": "Composable, accessible components distributed as source code.",
+      "use_for": [
+        "component architecture",
+        "design systems",
+        "UI engineering"
+      ],
+      "priority": "official"
+    },
+    {
+      "id": "postgresql",
+      "name": "PostgreSQL",
+      "url": "https://github.com/postgres/postgres",
+      "owner": "postgres",
+      "type": "tool",
+      "category": "07-database-data",
+      "description": "Read-only GitHub mirror of the official PostgreSQL source repository.",
+      "use_for": [
+        "relational databases",
+        "SQL",
+        "data architecture"
+      ],
+      "priority": "official"
+    },
+    {
+      "id": "redis",
+      "name": "Redis",
+      "url": "https://github.com/redis/redis",
+      "owner": "redis",
+      "type": "tool",
+      "category": "07-database-data",
+      "description": "In-memory data store.",
+      "use_for": [
+        "caching",
+        "data architecture"
+      ],
+      "priority": "official"
+    },
+    {
+      "id": "pytest",
+      "name": "pytest",
+      "url": "https://github.com/pytest-dev/pytest",
+      "owner": "pytest-dev",
+      "type": "framework",
+      "category": "08-testing-qa",
+      "description": "Python testing framework.",
+      "use_for": [
+        "automated testing",
+        "Python testing",
+        "QA engineering"
+      ],
+      "priority": "official"
+    },
+    {
+      "id": "playwright",
+      "name": "Playwright",
+      "url": "https://github.com/microsoft/playwright",
+      "owner": "microsoft",
+      "type": "framework",
+      "category": "08-testing-qa",
+      "description": "Web testing and automation framework for Chromium, Firefox and WebKit.",
+      "use_for": [
+        "browser testing",
+        "E2E",
+        "automated testing",
+        "QA engineering"
+      ],
+      "priority": "official"
+    },
+    {
+      "id": "owasp-cheat-sheet-series",
+      "name": "OWASP Cheat Sheet Series",
+      "url": "https://github.com/OWASP/CheatSheetSeries",
+      "owner": "OWASP",
+      "type": "reference",
+      "category": "09-security",
+      "description": "Concise OWASP guidance on application security topics. Primary source for security best practices.",
+      "use_for": [
+        "application security",
+        "secure coding",
+        "vulnerability prevention"
+      ],
+      "priority": "official"
+    },
+    {
+      "id": "trivy",
+      "name": "Trivy",
+      "url": "https://github.com/aquasecurity/trivy",
+      "owner": "aquasecurity",
+      "type": "tool",
+      "category": "09-security",
+      "description": "Scanner for vulnerabilities, misconfigurations, secrets and SBOM in containers, Kubernetes and code.",
+      "use_for": [
+        "container security",
+        "dependency security",
+        "vulnerability prevention"
+      ],
+      "priority": "official"
+    },
+    {
+      "id": "docker-compose",
+      "name": "Docker Compose",
+      "url": "https://github.com/docker/compose",
+      "owner": "docker",
+      "type": "tool",
+      "category": "10-devops",
+      "description": "Defines and runs multi-container applications with Docker.",
+      "use_for": [
+        "containers",
+        "deployment",
+        "infrastructure"
+      ],
+      "priority": "official"
+    },
+    {
+      "id": "kubernetes",
+      "name": "Kubernetes",
+      "url": "https://github.com/kubernetes/kubernetes",
+      "owner": "kubernetes",
+      "type": "tool",
+      "category": "10-devops",
+      "description": "Container scheduling and orchestration system.",
+      "use_for": [
+        "orchestration",
+        "containers",
+        "deployment",
+        "infrastructure"
+      ],
+      "priority": "official"
+    },
+    {
+      "id": "awesome-selfhosted",
+      "name": "Awesome Self-Hosted",
+      "url": "https://github.com/awesome-selfhosted/awesome-selfhosted",
+      "owner": "awesome-selfhosted",
+      "type": "reference",
+      "category": "10-devops",
+      "description": "Curated list of free software services and web apps that can be self-hosted.",
+      "use_for": [
+        "self-hosting",
+        "infrastructure"
+      ],
+      "priority": "trusted"
+    },
+    {
+      "id": "terraform",
+      "name": "Terraform",
+      "url": "https://github.com/hashicorp/terraform",
+      "owner": "hashicorp",
+      "type": "tool",
+      "category": "11-cloud",
+      "description": "Infrastructure as code tool.",
+      "use_for": [
+        "infrastructure as code",
+        "cloud infrastructure",
+        "deployment"
+      ],
+      "priority": "official"
+    },
+    {
+      "id": "mcp-servers",
+      "name": "Model Context Protocol Servers",
+      "url": "https://github.com/modelcontextprotocol/servers",
+      "owner": "modelcontextprotocol",
+      "type": "examples",
+      "category": "12-agent-tools",
+      "description": "Official reference implementations of MCP servers.",
+      "use_for": [
+        "MCP servers",
+        "MCP architecture",
+        "agent tool integration"
+      ],
+      "priority": "official"
+    },
+    {
+      "id": "browser-use",
+      "name": "Browser Use",
+      "url": "https://github.com/browser-use/browser-use",
+      "owner": "browser-use",
+      "type": "agent-framework",
+      "category": "12-agent-tools",
+      "description": "Framework for AI agents that use a web browser.",
+      "use_for": [
+        "browser automation",
+        "browser agents",
+        "web navigation"
+      ],
+      "priority": "trusted"
+    },
+    {
+      "id": "langgraph",
+      "name": "LangGraph",
+      "url": "https://github.com/langchain-ai/langgraph",
+      "owner": "langchain-ai",
+      "type": "agent-framework",
+      "category": "12-agent-tools",
+      "description": "Framework for building stateful, resilient agents as graphs.",
+      "use_for": [
+        "agent orchestration",
+        "stateful agents",
+        "multi-agent workflow design"
+      ],
+      "priority": "official"
+    },
+    {
+      "id": "google-eng-practices",
+      "name": "Google Engineering Practices",
+      "url": "https://github.com/google/eng-practices",
+      "owner": "google",
+      "type": "reference",
+      "category": "13-code-quality",
+      "description": "Google's engineering practices documentation (code review guides). Repository archived; content still valid.",
+      "use_for": [
+        "code review",
+        "engineering quality",
+        "maintainability",
+        "review practices",
+        "engineering management"
+      ],
+      "priority": "official"
+    },
+    {
+      "id": "wcag",
+      "name": "WCAG",
+      "url": "https://github.com/w3c/wcag",
+      "owner": "w3c",
+      "type": "reference",
+      "category": "14-product-ux",
+      "description": "Source of the W3C Web Content Accessibility Guidelines.",
+      "use_for": [
+        "accessibility",
+        "WCAG",
+        "inclusive UX"
+      ],
+      "priority": "official"
+    },
+    {
+      "id": "github-docs",
+      "name": "GitHub Docs",
+      "url": "https://github.com/github/docs",
+      "owner": "github",
+      "type": "reference",
+      "category": "15-documentation",
+      "description": "Source of docs.github.com.",
+      "use_for": [
+        "GitHub documentation",
+        "git collaboration",
+        "pull requests",
+        "GitHub Actions"
+      ],
+      "priority": "official"
+    },
+    {
+      "id": "write-the-docs",
+      "name": "Write the Docs",
+      "url": "https://github.com/writethedocs/www",
+      "owner": "writethedocs",
+      "type": "reference",
+      "category": "15-documentation",
+      "description": "Source of the Write the Docs website and documentation guide.",
+      "use_for": [
+        "technical writing",
+        "documentation practices"
+      ],
+      "priority": "trusted"
+    },
+    {
+      "id": "openai-evals",
+      "name": "OpenAI Evals",
+      "url": "https://github.com/openai/evals",
+      "owner": "openai",
+      "type": "framework",
+      "category": "16-research-evaluation",
+      "description": "Framework and benchmark registry for evaluating LLMs and LLM systems.",
+      "use_for": [
+        "LLM evaluation",
+        "benchmarks",
+        "eval design"
+      ],
+      "priority": "official"
+    },
+    {
+      "id": "lm-evaluation-harness",
+      "name": "lm-evaluation-harness",
+      "url": "https://github.com/EleutherAI/lm-evaluation-harness",
+      "owner": "EleutherAI",
+      "type": "framework",
+      "category": "16-research-evaluation",
+      "description": "Framework for few-shot evaluation of language models.",
+      "use_for": [
+        "LLM evaluation",
+        "benchmarks",
+        "model comparison"
+      ],
+      "priority": "official"
+    },
+    {
+      "id": "conventional-commits",
+      "name": "Conventional Commits",
+      "url": "https://github.com/conventional-commits/conventionalcommits.org",
+      "owner": "conventional-commits",
+      "type": "reference",
+      "category": "17-git-collaboration",
+      "description": "The Conventional Commits specification.",
+      "use_for": [
+        "commit messages",
+        "git collaboration",
+        "release automation"
+      ],
+      "priority": "official"
+    }
+  ]
+}

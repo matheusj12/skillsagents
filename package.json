@@ -7,9 +7,7 @@
   },
   "files": [
     "instalacao/",
-    "src/",
-    "agents/",
-    "skills/"
+    "maestri-team-setup/"
   ],
   "engines": {
     "node": ">=18"
