@@ -6,7 +6,10 @@
     "skillsagents": "./bin/skillsagents.js"
   },
   "files": [
-    "bin/"
+    "bin/",
+    "src/",
+    "agents/",
+    "skills/"
   ],
   "engines": {
     "node": ">=18"
