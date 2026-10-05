@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "Install AI agents and skills into your project in seconds",
   "bin": {
-    "skillsagents": "./bin/skillsagents.js"
+    "skillsagents": "./instalacao/skillsagents.js"
   },
   "files": [
-    "bin/",
+    "instalacao/",
     "src/",
     "agents/",
     "skills/"
