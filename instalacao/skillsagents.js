@@ -39,7 +39,7 @@ function install() {
 
   const previous = readManifest();
   const next     = {};
-  const count    = { created: 0, updated: 0, unchanged: 0, preserved: [] };
+  const preserved = [];
 
   for (const rel of listFiles(SOURCE)) {
     const src     = path.join(SOURCE, rel);
@@ -49,23 +49,20 @@ function install() {
     if (!fs.existsSync(dest)) {
       copy(src, dest);
       next[rel] = srcHash;
-      count.created++;
       continue;
     }
 
     const destHash = hash(fs.readFileSync(dest));
     if (destHash === srcHash) {
       next[rel] = srcHash;
-      count.unchanged++;
     } else if (destHash === previous[rel]) {
       // Untouched since our last install: safe to update.
       copy(src, dest);
       next[rel] = srcHash;
-      count.updated++;
     } else {
       // Modified by the user (or not created by us): keep it.
       if (previous[rel]) next[rel] = previous[rel];
-      count.preserved.push(rel);
+      preserved.push(rel);
     }
   }
 
@@ -79,14 +76,11 @@ function install() {
 
   fs.writeFileSync(MANIFEST, JSON.stringify({ version: VER, files: next }, null, 2) + '\n');
 
-  console.log(chalk.green('  ✔  ') + `Setup em ${chalk.cyan(path.relative(process.cwd(), TARGET) || '.')}/`);
-  console.log(chalk.gray(`     ${count.created} criados · ${count.updated} atualizados · ${count.unchanged} sem mudança · ${count.preserved.length} preservados`));
-  for (const rel of count.preserved) console.log(chalk.yellow('  ⚠  ') + `mantido (modificado por você): ${rel}`);
+  console.log(chalk.green('  ✔  SkillsAgents instalado em ') + chalk.cyan('.skillsagents/'));
+  for (const rel of preserved) console.log(chalk.yellow('  ⚠  ') + `mantido (modificado por você): ${rel}`);
   console.log();
-  console.log(chalk.green('SkillsAgents instalado.'));
-  console.log();
-  console.log('Abra o projeto no Maestri, inicie o Ranjel e envie:');
-  console.log(chalk.bold('"Leia o `.skillsagents/START.md` e siga as instruções."'));
+  console.log('  No Maestri, envie ao Ranjel:');
+  console.log(chalk.bold('  Leia o .skillsagents/START.md e siga as instruções.'));
   console.log();
 }
 
