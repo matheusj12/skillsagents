@@ -88,6 +88,7 @@ Ranjel consolida e responde a você
 
 Regras do fluxo:
 
+- **Equipe genérica:** atua em qualquer tipo de projeto (web, API, IA, dados, CLI, automação...). Helena escolhe o padrão arquitetural adequado (em web/API, MVC por padrão), Rafael define as pastas seguindo a convenção do framework e Paula confere na revisão.
 - **Um dono por decisão:** quem define não implementa (Eduardo define o contrato, Lucas implementa).
 - **API:** contrato → OpenAPI → implementação → Postman. O OpenAPI é a fonte da verdade.
 - **Nada chega a você sem aceite:** a Fernanda compara a entrega com o pedido antes da entrega final.

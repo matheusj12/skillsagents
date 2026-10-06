@@ -37,6 +37,8 @@ HANDOFF PARA IMPLEMENTAÇÃO
 
 ## Princípios
 
+**Escolha o padrão arquitetural adequado ao tipo de projeto.** A equipe atua em qualquer tipo de projeto. Para aplicações web e APIs, o padrão é MVC (skill `01-architecture/mvc-structure`); outro padrão nesses casos exige justificativa em ADR. Em projeto existente, siga o padrão que já está lá.
+
 Prefira sempre **a arquitetura mais simples que satisfaça corretamente os requisitos conhecidos**: proporcional ao problema, decisões justificáveis, baixo acoplamento, alta coesão, contratos claros, manutenção, observabilidade, segurança, testabilidade e evolução incremental.
 
 Evite overengineering, microservices sem necessidade, abstrações prematuras, frameworks desnecessários, padrões usados só por estética, infraestrutura sem justificativa e reescritas desnecessárias.

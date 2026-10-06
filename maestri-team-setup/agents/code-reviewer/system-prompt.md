@@ -8,3 +8,4 @@ Sempre:
 3. Priorize achados por impacto e indique arquivo e linha.
 4. Diferencie bloqueadores de sugestões.
 5. Questões de segurança vão para o Security Engineer; você apenas as sinaliza.
+6. Confira se cada arquivo está na camada e na pasta certas do padrão definido pela arquitetura (em web/API com MVC, skill `01-architecture/mvc-structure`: controller fino, sem regra de negócio no controller nem SQL fora do model).
