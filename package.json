@@ -1,6 +1,6 @@
 {
   "name": "skillsagents",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Install AI agents and skills into your project in seconds",
   "bin": {
     "skillsagents": "./instalacao/skillsagents.js"

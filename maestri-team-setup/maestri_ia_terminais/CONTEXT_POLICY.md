@@ -36,7 +36,9 @@ completeness or required reasoning (debugging, architecture, evaluation).
   Reasoning roles use `manual`. `ultracave`/`megacave` are not used.
 
 On Claude Code the plugin reads the mode from the `CAVEMAN_DEFAULT_MODE`
-environment variable of the terminal. On Codex the skill has no hook:
+environment variable of the terminal. The global default is `manual`
+(so non-Maestri sessions stay normal); set `CAVEMAN_DEFAULT_MODE` to the
+employee's `context.caveman` in each Maestri terminal. On Codex the skill has no hook:
 activate per session with `/caveman`.
 
 ## Runtime support
@@ -46,7 +48,7 @@ Source: https://github.com/JuliusBrussee/caveman (INSTALL.md, tag v3.1.0).
 | Runtime | Method | Command |
 |---------|--------|---------|
 | Codex | skill (per session `/caveman`) | `npx skills add JuliusBrussee/caveman -a codex -g -s caveman` |
-| Claude Code | plugin + hooks (auto-on) | `claude plugin marketplace add JuliusBrussee/caveman && claude plugin install caveman@caveman` |
+| Claude Code | plugin + hooks | first `~/.config/caveman/config.json` = `{"defaultMode": "manual"}`, then `claude plugin marketplace add JuliusBrussee/caveman && claude plugin install caveman@caveman` |
 | OpenCode | native plugin + AGENTS.md | `npx -y github:JuliusBrussee/caveman -- --only opencode` |
 | Antigravity | skill copy (soft probe) | `npx -y github:JuliusBrussee/caveman -- --only antigravity` (IDE) or `--only antigravity-2` |
 

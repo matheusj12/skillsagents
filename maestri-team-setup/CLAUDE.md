@@ -355,6 +355,16 @@ reference | research | examples
 
 `id` and `url` must be unique in the registry.
 
+Source priority when consulting knowledge:
+
+1. Existing project code and architecture
+2. User requirements
+3. Official documentation
+4. Official vendor repositories
+5. Mature open-source repositories
+6. Research repositories
+7. Experimental repositories
+
 The JSON registry is the discovery layer.
 
 GitHub repositories are the knowledge source.
