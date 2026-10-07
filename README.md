@@ -1,148 +1,116 @@
 # SkillsAgents
 
-Instala no seu projeto a configuração da equipe de agentes de IA do
-Maestri: funcionários, Skills, referências e o roteiro de inicialização
-do Orchestrator (Ranjel).
+Uma equipe de 19 agentes de IA especializados em engenharia de software,
+coordenada por um Orchestrator (Ranjel) no Maestri.
+Para cada tarefa, o Ranjel escolhe o menor time necessário, entrega a cada
+agente só o contexto que ele precisa e aplica revisão proporcional ao risco.
+
+**Smallest team · Shortest valid path · Minimum sufficient context · Proportional review**
+
+Versão atual: **v1.3.0** ([CHANGELOG](CHANGELOG.md))
 
 ## Instalação
 
-Na pasta do projeto:
+Na pasta do projeto (requer Node.js 18+):
 
 ```bash
 npx github:matheusj12/skillsagents
 ```
 
-Requer Node.js 18+. O setup é copiado para `.skillsagents/` no projeto atual.
+O setup é copiado para `.skillsagents/`. Depois, no Maestri, inicie o Ranjel e envie:
 
-## Iniciar a equipe
+> Leia o `.skillsagents/START.md` e siga as instruções.
 
-1. Abra o projeto no Maestri.
-2. Inicie o Ranjel (Orchestrator).
-3. Envie:
+O Ranjel lê só `START.md → BOOTSTRAP.md → team.json` e fica pronto. Instruções
+dos funcionários, Skills e referências só são carregadas quando uma tarefa precisa.
 
-   > Leia o `.skillsagents/START.md` e siga as instruções.
+## Atualização
 
-O Ranjel lê só o necessário para ficar pronto:
-
-```text
-START.md → maestri_ia_terminais/BOOTSTRAP.md → maestri_ia_terminais/team.json → READY
-```
-
-Instruções dos funcionários, Skills e referências externas não são lidas
-na inicialização. Elas são carregadas sob demanda, quando uma tarefa precisa.
-
-## A equipe
-
-19 funcionários. A fonte oficial é `maestri_ia_terminais/team.json`: nome, cargo, terminal, Skills e hierarquia vêm de lá.
-
-| Funcionário | Cargo | O que faz | Terminal |
-|---|---|---|---|
-| **Ranjel** | Orchestrator | Recebe o pedido, decompõe, delega ao menor número de pessoas, coordena e consolida a entrega | claude-code |
-| **Júlia** | Product Engineer | Responde "o que construir e por quê": requisitos, critérios de aceite, UX e protótipos | antigravity |
-| **Marina** | Research Engineer | Pesquisa tecnologias, APIs e bibliotecas, roda PoCs e benchmarks e entrega evidência (não decide) | opencode |
-| **Helena** | Software Architect | Transforma ideias, fluxogramas e diagramas em arquitetura: componentes, fronteiras, integrações, riscos | antigravity |
-| **Eduardo** | Data & API Architect | Modelo de dados (ER, schema, índices, migrations) e contratos de API (OpenAPI) | claude-code |
-| **Rafael** | Tech Lead | Responde "como executar no repositório": direção técnica, padrões e coordenação dos engenheiros | claude-code |
-| **Lucas** | Backend Engineer | Implementa APIs, regras de negócio e migrations a partir do OpenAPI | codex |
-| **Beatriz** | Frontend Engineer | Interfaces e aplicações web, com acessibilidade e performance medidas | antigravity |
-| **Gabriel** | AI Engineer | Sistemas com LLM: agentes, RAG, tool use, structured output, multimodal | codex |
-| **Renata** | Prompt Engineer | Desenha, testa e versiona prompts; cuida da qualidade dos prompts e Skills da equipe | opencode |
-| **Diego** | Platform Engineer | Infraestrutura, Docker, deploy, observabilidade e o que o pipeline de CI executa | opencode |
-| **Camila** | QA / Evaluation Engineer | Testes (unitário, integração, E2E, API), coleção do Postman a partir do OpenAPI e LLM evals | codex |
-| **André** | Security Engineer | Threat modeling, OWASP, autenticação/autorização e segurança de agentes | claude-code |
-| **Paula** | Code Reviewer | Revisão independente: qualidade, simplicidade, legibilidade, overengineering | codex |
-| **Fernanda** | Acceptance Reviewer | Confere se a entrega é realmente o que foi pedido: requisito esquecido, escopo extrapolado | claude-code |
-| **Sofia** | Documentation Engineer | Documentação técnica final: arquitetura, APIs, setup, variáveis, deploy | claude-code |
-| **Thiago** | Release / Delivery Engineer | Responde "isso pode ser entregue?": build, `.env.example`, migrations, Docker, arquivos esquecidos | claude-code |
-| **Daniel** | Engineering Methodology Engineer | Dono do padrão de como o time trabalha: recomenda o processo mínimo para demandas grandes/ambíguas, roda retrospectivas e corta retrabalho e desperdício de tokens. Não está no caminho de toda tarefa | claude-code |
-| **Marcos** | GitHub Engineer | Único que faz push, abre PR e publica release; branches, proteção e GitHub Actions | codex |
-
-## Fluxo de trabalho
-
-O diagrama abaixo é o **teto**, não o caminho padrão. O Ranjel classifica o risco e usa o menor time que entrega corretamente: typo ou CSS → só o dono; endpoint com padrões existentes → dono + revisor; arquitetura, autenticação ou entrega grande → só os especialistas que o risco exige. Regras em `skills/18-engineering-management/orchestration`.
-
-```text
-Você
- ↓
-Ranjel (Orchestrator) ─ classifica e delega
- ↓
-DESCOBRIR      Júlia: o que e por quê, critérios de aceite
-               Marina: pesquisa, se ninguém sabe qual tecnologia usar
- ↓
-ESPECIFICAR    Helena: arquitetura geral
-               Eduardo: modelo de dados + OpenAPI
-               Rafael: plano de execução no repositório
- ↓
-CONSTRUIR      Lucas (backend) · Beatriz (frontend) · Gabriel (IA) + Renata (prompts) · Diego (infra)
- ↓
-REVISAR        Camila: testes + Postman
-               André: segurança
-               Paula: código
-               Fernanda: aceite contra o pedido original
- ↓
-ENTREGAR       Sofia: documentação
-               Thiago: veredito PRONTO ou BLOQUEADO
-               Marcos: push, PR e release
- ↓
-Ranjel consolida e responde a você
-
-Daniel (metodologia) entra só quando necessário:
-  demanda grande, ambígua ou de alto risco → recomenda o processo mínimo ao Ranjel
-  entrega relevante concluída → retrospectiva e melhorias de processo
-```
-
-Regras do fluxo:
-
-- **Equipe genérica:** atua em qualquer tipo de projeto (web, API, IA, dados, CLI, automação...). Helena escolhe o padrão arquitetural adequado (em web/API, MVC por padrão), Rafael define as pastas seguindo a convenção do framework e Paula confere na revisão.
-- **Um dono por decisão:** quem define não implementa (Eduardo define contrato estrutural novo, Lucas implementa; endpoint com padrões existentes é só do Lucas).
-- **API:** contrato → OpenAPI → implementação → Postman. O OpenAPI é a fonte da verdade.
-- **Aceite proporcional:** a Fernanda entra em entregas grandes, com vários requisitos, releases ou risco de desvio de escopo; não em typo, CSS ou bug localizado.
-- **Escalonamento:** especialista que precisa de outro devolve um ESCALATION REQUEST ao Ranjel; só o Ranjel aciona funcionários.
-- **Remoto só pelo Marcos:** os demais fazem commits locais.
-- **Metodologia sem burocracia:** práticas como `grilling`, `to-spec`, `to-tickets`, `tdd` e `diagnosing-bugs` (adaptadas de [mattpocock/skills](https://github.com/mattpocock/skills), MIT) são aplicadas por quem faz o trabalho; o Daniel só mantém o padrão.
-- **Contexto mínimo:** cada funcionário carrega só as próprias instruções e as Skills da tarefa.
-
-## O que é instalado
-
-```text
-.skillsagents/
-├── START.md                  entrada do Ranjel
-├── INDEX.md                  mapa de descoberta
-├── agents/                   como cada funcionário trabalha
-├── skills/                   conhecimento operacional (18 categorias)
-├── references/
-│   └── repositories.json     catálogo de repositórios externos aprovados
-└── maestri_ia_terminais/
-    ├── BOOTSTRAP.md          inicialização do Orchestrator
-    ├── team.json             equipe: cargos, terminais, Skills, hierarquia
-    ├── CONTEXT_POLICY.md     política de contexto e tokens
-    ├── TOOLING.md            ferramentas e governança de instalação
-    └── INSTALL.md            restaurar a equipe numa máquina nova
-```
-
-## Rodar de novo
-
-Rodar o `npx` outra vez atualiza o setup sem duplicar nada:
+Rode o mesmo comando de novo:
 
 - arquivos que você não alterou são atualizados;
 - arquivos que você alterou são mantidos, e o terminal avisa quais;
 - arquivos que você apagou são reinstalados.
 
-O controle fica em `.skillsagents/.install-manifest.json`.
+Se o `npx` mostrar uma versão antiga, limpe o cache: `npx clear-npx-cache`.
 
-## O que o `npx` não faz
+## A equipe
 
-- Não cria os terminais no Maestri: isso é manual.
-- Não instala o Caveman nem outras ferramentas. Comandos oficiais e governança de instalação
-  em `maestri_ia_terminais/TOOLING.md`.
-- Não armazena nem pede credenciais. API keys e logins ficam em cada terminal.
+Fonte oficial: `maestri_ia_terminais/team.json`.
+
+| Funcionário | Cargo | O que faz |
+|---|---|---|
+| **Ranjel** | Orchestrator | Classifica a tarefa, escolhe quem entra, delega e consolida |
+| **Júlia** | Product Engineer | O que construir e por quê: requisitos e critérios de aceite |
+| **Marina** | Research Engineer | Pesquisa tecnologias e traz evidência; não decide |
+| **Helena** | Software Architect | Transforma ideias e diagramas em arquitetura |
+| **Eduardo** | Data & API Architect | Modelo de dados e contratos de API novos ou estruturais |
+| **Rafael** | Tech Lead | Como executar no repositório: padrões, pastas, tickets |
+| **Lucas** | Backend Engineer | APIs, regras de negócio, migrations |
+| **Beatriz** | Frontend Engineer | Interfaces web com acessibilidade e performance |
+| **Gabriel** | AI Engineer | Sistemas com LLM: tool use, RAG, agentes, evals |
+| **Renata** | Prompt Engineer | Prompts e qualidade das Skills da equipe |
+| **Diego** | Platform Engineer | Infra, containers, deploy, observabilidade |
+| **Camila** | QA / Evaluation Engineer | Testes, Postman e avaliação de IA |
+| **André** | Security Engineer | Threat modeling, OWASP, autenticação e autorização |
+| **Paula** | Code Reviewer | Revisão independente pelo diff |
+| **Fernanda** | Acceptance Reviewer | Confere a entrega contra o pedido, em entregas grandes |
+| **Sofia** | Documentation Engineer | Documentação técnica final |
+| **Thiago** | Release Engineer | Diz se a entrega pode ser publicada |
+| **Marcos** | GitHub Engineer | Único que faz push, PR e release |
+| **Daniel** | Methodology Engineer | Melhora o processo do time; entra só quando necessário |
+
+## Como funciona a orquestração
+
+Não existe pipeline fixo. O Ranjel classifica o risco e usa o caminho mais curto que entrega corretamente:
+
+| Risco | Exemplo | Quem participa |
+|---|---|---|
+| LOW | corrigir um typo, ajustar CSS | só o dono |
+| NORMAL | endpoint com padrões existentes, bug localizado | dono + revisor |
+| HIGH | mudar um contrato de API, autorização | especialistas necessários + dono + revisor |
+| CRITICAL | feature grande, autenticação/2FA, release | arquitetura, segurança, QA e aceite só se o risco exigir |
+
+- Cada agente recebe um **Task Context Packet**: objetivo, arquivos, critério de aceite. Nunca a conversa inteira.
+- Especialista que precisa de outro pede ao Ranjel (**escalation**); só o Ranjel aciona funcionários.
+- O Ranjel define o quê e o critério; o especialista decide o como.
+
+Regras completas: `skills/18-engineering-management/orchestration`.
+
+## Como economizamos tokens
+
+- **Startup mínimo:** três arquivos pequenos; nada de Skills ou prompts na largada.
+- **Skills sob demanda:** cada funcionário tem no máximo 2 Skills CORE; o resto só se a tarefa pedir.
+- **Menos agentes por tarefa:** 1 a 2 na maioria dos casos.
+- **Leitura direcionada:** busca e trechos, nunca o repositório inteiro; saída de terminal filtrada.
+- **Revisão pelo diff,** e re-revisão só do diff da correção.
+- **Handoff curto** e memória em arquivos do projeto, não em conversas longas.
+
+Política completa: `maestri_ia_terminais/CONTEXT_POLICY.md`. Ferramentas e regra de instalação: `maestri_ia_terminais/TOOLING.md`.
+
+## Dicas de uso
+
+- Peça a tarefa direto ao Ranjel; não chame especialistas você mesmo.
+- Descreva o resultado esperado e o critério de pronto, e o Ranjel monta o time.
+- Para algo grande ou ambíguo, diga isso: o Ranjel inclui requisitos e aceite.
+- Personalize prompts e Skills em `.skillsagents/`; reinstalar não sobrescreve o que você editou.
+- O `npx` não cria terminais no Maestri, não instala ferramentas e não pede credenciais.
+
+## Novidades da v1.3.0
+
+- Roteamento por risco (LOW / NORMAL / HIGH / CRITICAL) no lugar de pipeline fixo.
+- Task Context Packet e escalation centralizado no Ranjel.
+- Revisão pelo diff e aceite só onde agrega.
+- `CONTEXT_POLICY.md` e `TOOLING.md` como fontes únicas de contexto e ferramentas.
+
+Detalhes no [CHANGELOG](CHANGELOG.md).
 
 ## Estrutura deste repositório
 
 ```text
 instalacao/          CLI do npx: copia o setup para .skillsagents/
 maestri-team-setup/  o setup da equipe (fonte do que é instalado)
+CHANGELOG.md         histórico de versões
 ```
 
-Para adicionar Skills, referências ou funcionários, edite
-`maestri-team-setup/`, seguindo as regras de `maestri-team-setup/CLAUDE.md`.
+Para contribuir com Skills, referências ou funcionários, siga `maestri-team-setup/CLAUDE.md`.
