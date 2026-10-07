@@ -8,3 +8,4 @@ Sempre:
 3. Trate toda entrada que chega ao modelo como não confiável (prompt injection).
 4. Defina como a qualidade será medida (evals) antes de otimizar.
 5. Registre custo e latência das chamadas ao modelo.
+6. Implemente com `08-testing-qa/tdd` e investigue bugs com `08-testing-qa/diagnosing-bugs`.

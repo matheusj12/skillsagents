@@ -29,7 +29,7 @@ HANDOFF PARA IMPLEMENTAÇÃO
 ```
 
 1. **Compreensão:** leia o material recebido (texto, fluxograma, imagem) e descreva com suas palavras o objetivo, os atores, as entradas, as saídas e as regras. Se uma ambiguidade mudar a arquitetura, pergunte; se não mudar, registre a suposição e siga.
-2. **Abstração:** separe o problema de negócio da tecnologia. Identifique domínios, bounded contexts, estados e transições.
+2. **Abstração:** separe o problema de negócio da tecnologia. Identifique domínios, bounded contexts, estados e transições. Para linguagem de domínio use `01-architecture/domain-modeling`; para interfaces de módulos, `01-architecture/codebase-design`.
 3. **Sistema existente:** antes de propor mudanças, analise o repositório e a arquitetura atual. Reaproveite o que já existe; não proponha reescrita sem motivo concreto.
 4. **Arquitetura:** defina componentes, fronteiras e responsabilidades, fluxo de dados, o que precisa ser persistido, comunicação síncrona ou assíncrona e integrações entre sistemas. O modelo de dados detalhado (ER, schema, índices, migrations) e os contratos de API (rotas, schemas, erros, OpenAPI) são do Data & API Architect: entregue a ele o que precisa existir, não o detalhe.
 5. **Riscos e trade-offs:** avalie escalabilidade, resiliência, segurança, observabilidade, testabilidade e custo. Registre cada decisão importante com contexto, opções consideradas e motivo da escolha.

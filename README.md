@@ -33,7 +33,7 @@ na inicialização. Elas são carregadas sob demanda, quando uma tarefa precisa.
 
 ## A equipe
 
-18 funcionários. A fonte oficial é `maestri_ia_terminais/team.json`: nome, cargo, terminal, Skills e hierarquia vêm de lá.
+19 funcionários. A fonte oficial é `maestri_ia_terminais/team.json`: nome, cargo, terminal, Skills e hierarquia vêm de lá.
 
 | Funcionário | Cargo | O que faz | Terminal |
 |---|---|---|---|
@@ -54,6 +54,7 @@ na inicialização. Elas são carregadas sob demanda, quando uma tarefa precisa.
 | **Fernanda** | Acceptance Reviewer | Confere se a entrega é realmente o que foi pedido: requisito esquecido, escopo extrapolado | claude-code |
 | **Sofia** | Documentation Engineer | Documentação técnica final: arquitetura, APIs, setup, variáveis, deploy | claude-code |
 | **Thiago** | Release / Delivery Engineer | Responde "isso pode ser entregue?": build, `.env.example`, migrations, Docker, arquivos esquecidos | claude-code |
+| **Daniel** | Engineering Methodology Engineer | Dono do padrão de como o time trabalha: recomenda o processo mínimo para demandas grandes/ambíguas, roda retrospectivas e corta retrabalho e desperdício de tokens. Não está no caminho de toda tarefa | claude-code |
 | **Marcos** | GitHub Engineer | Único que faz push, abre PR e publica release; branches, proteção e GitHub Actions | codex |
 
 ## Fluxo de trabalho
@@ -84,6 +85,10 @@ ENTREGAR       Sofia: documentação
                Marcos: push, PR e release
  ↓
 Ranjel consolida e responde a você
+
+Daniel (metodologia) entra só quando necessário:
+  demanda grande, ambígua ou de alto risco → recomenda o processo mínimo ao Ranjel
+  entrega relevante concluída → retrospectiva e melhorias de processo
 ```
 
 Regras do fluxo:
@@ -93,6 +98,7 @@ Regras do fluxo:
 - **API:** contrato → OpenAPI → implementação → Postman. O OpenAPI é a fonte da verdade.
 - **Nada chega a você sem aceite:** a Fernanda compara a entrega com o pedido antes da entrega final.
 - **Remoto só pelo Marcos:** os demais fazem commits locais.
+- **Metodologia sem burocracia:** práticas como `grilling`, `to-spec`, `to-tickets`, `tdd` e `diagnosing-bugs` (adaptadas de [mattpocock/skills](https://github.com/mattpocock/skills), MIT) são aplicadas por quem faz o trabalho; o Daniel só mantém o padrão.
 - **Contexto mínimo:** cada funcionário carrega só as próprias instruções e as Skills da tarefa.
 
 ## O que é instalado

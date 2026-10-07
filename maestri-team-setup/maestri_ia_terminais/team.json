@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.1",
+  "schema_version": "1.2",
 
   "team": {
     "id": "maestri-engineering-team",
@@ -27,9 +27,13 @@
       "runtime": { "terminal": "claude-code", "model": null },
       "instructions": "../agents/orchestrator/system-prompt.md",
       "responsibilities": ["receber objetivos", "decompor trabalho", "delegar", "coordenar dependências", "consolidar entregas", "evitar trabalho duplicado"],
-      "skills": ["18-engineering-management"],
+      "skills": {
+        "core": ["18-engineering-management/orchestration", "18-engineering-management/handoff"],
+        "on_demand": ["18-engineering-management/decision-making"]
+      },
+      "owns": ["18-engineering-management/orchestration"],
       "reports_to": null,
-      "coordinates": ["tech-lead", "software-architect", "data-api-architect", "backend-engineer", "frontend-engineer", "ai-engineer", "prompt-engineer", "research-engineer", "platform-engineer", "qa-engineer", "security-engineer", "code-reviewer", "product-engineer", "documentation-engineer", "release-engineer", "github-engineer", "acceptance-reviewer"],
+      "coordinates": ["tech-lead", "software-architect", "data-api-architect", "backend-engineer", "frontend-engineer", "ai-engineer", "prompt-engineer", "research-engineer", "platform-engineer", "qa-engineer", "security-engineer", "code-reviewer", "product-engineer", "documentation-engineer", "release-engineer", "github-engineer", "acceptance-reviewer", "methodology-engineer"],
       "context": { "caveman": "manual" },
       "enabled": true
     },
@@ -42,7 +46,11 @@
       "runtime": { "terminal": "claude-code", "model": null },
       "instructions": "../agents/tech-lead/system-prompt.md",
       "responsibilities": ["direção técnica", "padrões de engenharia", "estrutura de pastas e convenções", "decisões técnicas", "qualidade", "coordenação técnica"],
-      "skills": ["01-architecture", "08-testing-qa", "13-code-quality", "15-documentation", "17-git-collaboration", "18-engineering-management"],
+      "skills": {
+        "core": ["17-git-collaboration/small-changes-and-commits", "08-testing-qa/testing-strategy"],
+        "on_demand": ["18-engineering-management/to-tickets", "01-architecture/mvc-structure", "15-documentation/architecture-decision-records", "18-engineering-management/decision-making", "13-code-quality/simplicity-first"]
+      },
+      "owns": [],
       "reports_to": "orchestrator",
       "coordinates": [],
       "context": { "caveman": "manual" },
@@ -57,7 +65,11 @@
       "runtime": { "terminal": "antigravity", "model": null },
       "instructions": "../agents/software-architect/system-prompt.md",
       "responsibilities": ["interpretar ideias, requisitos e diagramas", "analisar sistema existente", "arquitetura e system design", "padrão arquitetural por tipo de projeto (MVC em web/API)", "componentes e fronteiras", "integrações entre sistemas", "estados, fluxos e o que precisa ser persistido", "escalabilidade e resiliência", "riscos e decisões arquiteturais", "handoff para implementação"],
-      "skills": ["01-architecture", "02-ai-engineering", "09-security", "11-cloud", "15-documentation", "18-engineering-management"],
+      "skills": {
+        "core": ["01-architecture/design-docs", "13-code-quality/simplicity-first"],
+        "on_demand": ["01-architecture/codebase-design", "01-architecture/domain-modeling", "01-architecture/mvc-structure", "15-documentation/architecture-decision-records", "11-cloud/well-architected", "09-security/threat-modeling", "18-engineering-management/decision-making"]
+      },
+      "owns": ["01-architecture/design-docs", "01-architecture/codebase-design", "01-architecture/domain-modeling", "01-architecture/mvc-structure", "11-cloud/well-architected"],
       "reports_to": "orchestrator",
       "coordinates": [],
       "context": { "caveman": "manual" },
@@ -72,7 +84,11 @@
       "runtime": { "terminal": "claude-code", "model": null },
       "instructions": "../agents/data-api-architect/system-prompt.md",
       "responsibilities": ["arquitetura de dados", "modelagem ER", "escolha do banco por projeto", "schema lógico", "constraints e índices", "estratégia de migrations", "contratos REST", "request/response e erros", "versionamento", "OpenAPI"],
-      "skills": ["01-architecture", "05-backend", "07-database-data", "15-documentation", "18-engineering-management"],
+      "skills": {
+        "core": ["05-backend/api-design", "07-database-data/schema-and-migrations"],
+        "on_demand": ["15-documentation/architecture-decision-records", "18-engineering-management/decision-making"]
+      },
+      "owns": ["05-backend/api-design", "07-database-data/schema-and-migrations"],
       "reports_to": "orchestrator",
       "coordinates": [],
       "context": { "caveman": "manual" },
@@ -87,7 +103,11 @@
       "runtime": { "terminal": "codex", "model": null },
       "instructions": "../agents/backend-engineer/system-prompt.md",
       "responsibilities": ["APIs", "serviços", "regras de negócio", "integrações", "implementação de migrations e acesso a dados", "processamento backend"],
-      "skills": ["01-architecture", "05-backend", "07-database-data", "08-testing-qa", "09-security", "13-code-quality", "17-git-collaboration"],
+      "skills": {
+        "core": ["08-testing-qa/tdd", "13-code-quality/simplicity-first"],
+        "on_demand": ["05-backend/api-design", "07-database-data/schema-and-migrations", "08-testing-qa/diagnosing-bugs", "09-security/secure-coding", "01-architecture/mvc-structure", "17-git-collaboration/small-changes-and-commits"]
+      },
+      "owns": [],
       "reports_to": "orchestrator",
       "coordinates": [],
       "enabled": true
@@ -101,7 +121,11 @@
       "runtime": { "terminal": "antigravity", "model": null },
       "instructions": "../agents/frontend-engineer/system-prompt.md",
       "responsibilities": ["interfaces", "aplicações web", "componentes", "experiência do usuário", "acessibilidade"],
-      "skills": ["06-frontend", "08-testing-qa", "13-code-quality", "17-git-collaboration"],
+      "skills": {
+        "core": ["06-frontend/web-quality", "08-testing-qa/tdd"],
+        "on_demand": ["08-testing-qa/diagnosing-bugs", "09-security/secure-coding", "13-code-quality/simplicity-first", "17-git-collaboration/small-changes-and-commits"]
+      },
+      "owns": ["06-frontend/web-quality"],
       "reports_to": "orchestrator",
       "coordinates": [],
       "enabled": true
@@ -115,7 +139,11 @@
       "runtime": { "terminal": "codex", "model": null },
       "instructions": "../agents/ai-engineer/system-prompt.md",
       "responsibilities": ["LLMs", "agentes", "RAG", "tool use", "structured output", "automações com IA", "sistemas multimodais"],
-      "skills": ["02-ai-engineering", "03-rag-knowledge", "04-vision-document-ai", "09-security", "12-agent-tools", "16-research-evaluation", "17-git-collaboration"],
+      "skills": {
+        "core": ["02-ai-engineering/tool-calling-and-structured-outputs", "16-research-evaluation/evals-and-llm-as-judge"],
+        "on_demand": ["03-rag-knowledge/rag-and-vector-search", "02-ai-engineering/prompt-engineering", "12-agent-tools/mcp-protocol", "09-security/guardrails-and-prompt-injection", "18-engineering-management/orchestration", "08-testing-qa/tdd", "08-testing-qa/diagnosing-bugs", "17-git-collaboration/small-changes-and-commits"]
+      },
+      "owns": ["02-ai-engineering/tool-calling-and-structured-outputs", "03-rag-knowledge/rag-and-vector-search", "12-agent-tools/mcp-protocol"],
       "reports_to": "orchestrator",
       "coordinates": [],
       "enabled": true
@@ -129,7 +157,11 @@
       "runtime": { "terminal": "opencode", "model": null },
       "instructions": "../agents/prompt-engineer/system-prompt.md",
       "responsibilities": ["design de prompts", "system prompts", "few-shot e formato de saída", "testes e evals de prompts", "resistência a prompt injection", "versionamento de prompts", "qualidade dos prompts e Skills da equipe"],
-      "skills": ["02-ai-engineering", "09-security", "16-research-evaluation", "17-git-collaboration"],
+      "skills": {
+        "core": ["02-ai-engineering/prompt-engineering", "02-ai-engineering/skill-authoring"],
+        "on_demand": ["16-research-evaluation/evals-and-llm-as-judge", "09-security/guardrails-and-prompt-injection", "17-git-collaboration/small-changes-and-commits"]
+      },
+      "owns": ["02-ai-engineering/prompt-engineering", "02-ai-engineering/skill-authoring"],
       "reports_to": "orchestrator",
       "coordinates": [],
       "context": { "caveman": "manual" },
@@ -144,7 +176,11 @@
       "runtime": { "terminal": "opencode", "model": null },
       "instructions": "../agents/research-engineer/system-prompt.md",
       "responsibilities": ["pesquisa técnica", "experimentação", "benchmarking", "avaliação de tecnologias", "protótipos", "comparação de abordagens"],
-      "skills": ["02-ai-engineering", "16-research-evaluation"],
+      "skills": {
+        "core": ["16-research-evaluation/technical-research"],
+        "on_demand": ["16-research-evaluation/evals-and-llm-as-judge", "18-engineering-management/decision-making"]
+      },
+      "owns": ["16-research-evaluation/technical-research"],
       "reports_to": "orchestrator",
       "coordinates": [],
       "context": { "caveman": "manual" },
@@ -159,7 +195,11 @@
       "runtime": { "terminal": "opencode", "model": null },
       "instructions": "../agents/platform-engineer/system-prompt.md",
       "responsibilities": ["infraestrutura", "Docker", "deployment", "CI/CD (o que o pipeline executa)", "ambientes", "observabilidade", "operação"],
-      "skills": ["09-security", "10-devops", "11-cloud", "17-git-collaboration"],
+      "skills": {
+        "core": ["10-devops/containers", "10-devops/sre-reliability"],
+        "on_demand": ["11-cloud/well-architected", "09-security/secure-coding", "17-git-collaboration/small-changes-and-commits"]
+      },
+      "owns": ["10-devops/containers", "10-devops/sre-reliability"],
       "reports_to": "orchestrator",
       "coordinates": [],
       "enabled": true
@@ -173,7 +213,11 @@
       "runtime": { "terminal": "codex", "model": null },
       "instructions": "../agents/qa-engineer/system-prompt.md",
       "responsibilities": ["testes unitários", "integração", "E2E", "regressão", "API testing", "collection Postman", "LLM evals", "validação"],
-      "skills": ["05-backend", "08-testing-qa", "16-research-evaluation", "17-git-collaboration"],
+      "skills": {
+        "core": ["08-testing-qa/testing-strategy"],
+        "on_demand": ["08-testing-qa/tdd", "08-testing-qa/diagnosing-bugs", "05-backend/api-design", "16-research-evaluation/evals-and-llm-as-judge", "17-git-collaboration/small-changes-and-commits"]
+      },
+      "owns": ["08-testing-qa/testing-strategy", "16-research-evaluation/evals-and-llm-as-judge"],
       "reports_to": "orchestrator",
       "coordinates": [],
       "enabled": true
@@ -187,7 +231,11 @@
       "runtime": { "terminal": "claude-code", "model": null },
       "instructions": "../agents/security-engineer/system-prompt.md",
       "responsibilities": ["application security", "API security", "OWASP", "autenticação", "autorização", "threat modeling", "segurança de agentes"],
-      "skills": ["05-backend", "09-security", "12-agent-tools"],
+      "skills": {
+        "core": ["09-security/threat-modeling", "09-security/secure-coding"],
+        "on_demand": ["09-security/guardrails-and-prompt-injection", "05-backend/api-design", "12-agent-tools/mcp-protocol"]
+      },
+      "owns": ["09-security/threat-modeling", "09-security/secure-coding", "09-security/guardrails-and-prompt-injection"],
       "reports_to": "orchestrator",
       "coordinates": [],
       "context": { "caveman": "manual" },
@@ -202,7 +250,11 @@
       "runtime": { "terminal": "codex", "model": null },
       "instructions": "../agents/code-reviewer/system-prompt.md",
       "responsibilities": ["revisão independente", "qualidade", "simplicidade", "legibilidade", "manutenção", "performance", "detecção de overengineering", "conformidade com as camadas"],
-      "skills": ["01-architecture", "08-testing-qa", "13-code-quality", "17-git-collaboration"],
+      "skills": {
+        "core": ["13-code-quality/code-review", "13-code-quality/simplicity-first"],
+        "on_demand": ["01-architecture/codebase-design", "01-architecture/mvc-structure", "08-testing-qa/testing-strategy"]
+      },
+      "owns": ["13-code-quality/code-review", "13-code-quality/simplicity-first"],
       "reports_to": "orchestrator",
       "coordinates": [],
       "enabled": true
@@ -216,7 +268,11 @@
       "runtime": { "terminal": "antigravity", "model": null },
       "instructions": "../agents/product-engineer/system-prompt.md",
       "responsibilities": ["requisitos", "produto", "UX", "prototipação", "necessidades em funcionalidades", "experiência final"],
-      "skills": ["14-product-ux", "18-engineering-management"],
+      "skills": {
+        "core": ["14-product-ux/working-backwards"],
+        "on_demand": ["14-product-ux/grilling", "14-product-ux/to-spec"]
+      },
+      "owns": ["14-product-ux/working-backwards"],
       "reports_to": "orchestrator",
       "coordinates": [],
       "enabled": true
@@ -230,7 +286,11 @@
       "runtime": { "terminal": "claude-code", "model": null },
       "instructions": "../agents/documentation-engineer/system-prompt.md",
       "responsibilities": ["documentação técnica final", "arquitetura", "APIs", "setup", "variáveis de ambiente", "execução e deploy", "decisões técnicas"],
-      "skills": ["01-architecture", "05-backend", "10-devops", "15-documentation"],
+      "skills": {
+        "core": ["15-documentation/project-docs"],
+        "on_demand": ["15-documentation/architecture-decision-records", "05-backend/api-design", "01-architecture/design-docs"]
+      },
+      "owns": ["15-documentation/project-docs", "15-documentation/architecture-decision-records"],
       "reports_to": "orchestrator",
       "coordinates": [],
       "context": { "caveman": "manual" },
@@ -245,7 +305,11 @@
       "runtime": { "terminal": "claude-code", "model": null },
       "instructions": "../agents/release-engineer/system-prompt.md",
       "responsibilities": ["verificar se é entregável", "build e dependências", ".env.example", "migrations", "Docker", "testes", "arquivos esquecidos", "preparação do release"],
-      "skills": ["08-testing-qa", "10-devops", "15-documentation", "17-git-collaboration"],
+      "skills": {
+        "core": ["10-devops/release-readiness"],
+        "on_demand": ["15-documentation/project-docs", "08-testing-qa/testing-strategy", "10-devops/containers"]
+      },
+      "owns": ["10-devops/release-readiness"],
       "reports_to": "orchestrator",
       "coordinates": [],
       "enabled": true
@@ -259,7 +323,11 @@
       "runtime": { "terminal": "codex", "model": null },
       "instructions": "../agents/github-engineer/system-prompt.md",
       "responsibilities": ["push, PRs e releases (exclusivo)", "branches e merge", "proteção de branch", "GitHub Actions workflows", "tags semver", "issues", "GitHub Secrets"],
-      "skills": ["09-security", "10-devops", "17-git-collaboration"],
+      "skills": {
+        "core": ["17-git-collaboration/github-workflow", "17-git-collaboration/small-changes-and-commits"],
+        "on_demand": []
+      },
+      "owns": ["17-git-collaboration/github-workflow"],
       "reports_to": "orchestrator",
       "coordinates": [],
       "enabled": true
@@ -273,7 +341,30 @@
       "runtime": { "terminal": "claude-code", "model": null },
       "instructions": "../agents/acceptance-reviewer/system-prompt.md",
       "responsibilities": ["comparar entrega com o pedido original", "requisitos esquecidos ou parciais", "divergência do fluxograma", "escopo extrapolado", "arquitetura não seguida"],
-      "skills": ["08-testing-qa", "14-product-ux"],
+      "skills": {
+        "core": [],
+        "on_demand": ["14-product-ux/to-spec", "14-product-ux/working-backwards"]
+      },
+      "owns": [],
+      "reports_to": "orchestrator",
+      "coordinates": [],
+      "context": { "caveman": "manual" },
+      "enabled": true
+    },
+    {
+      "id": "methodology-engineer",
+      "name": "Daniel",
+      "title": "Engineering Methodology Engineer",
+      "department": "methodology",
+      "seniority": "senior",
+      "runtime": { "terminal": "claude-code", "model": "claude-opus-5" },
+      "instructions": "../agents/methodology-engineer/system-prompt.md",
+      "responsibilities": ["metodologia de engenharia (dono do padrão)", "recomendar o processo mínimo para demandas grandes, ambíguas ou de risco", "retrospectivas", "retrabalho e desperdício de tokens", "avaliar e melhorar skills de metodologia", "simplificar o processo"],
+      "skills": {
+        "core": ["18-engineering-management/decision-making"],
+        "on_demand": ["18-engineering-management/retro", "18-engineering-management/handoff"]
+      },
+      "owns": ["14-product-ux/grilling", "14-product-ux/to-spec", "18-engineering-management/to-tickets", "08-testing-qa/tdd", "08-testing-qa/diagnosing-bugs", "18-engineering-management/handoff", "18-engineering-management/retro", "18-engineering-management/decision-making", "17-git-collaboration/small-changes-and-commits"],
       "reports_to": "orchestrator",
       "coordinates": [],
       "context": { "caveman": "manual" },

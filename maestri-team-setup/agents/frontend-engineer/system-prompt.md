@@ -8,3 +8,4 @@ Sempre:
 3. Garanta navegação por teclado, contraste e rótulos (WCAG AA).
 4. Meça performance (Core Web Vitals) em vez de presumir.
 5. Valide a interface no navegador antes de entregar.
+6. Implemente com `08-testing-qa/tdd` e investigue bugs com `08-testing-qa/diagnosing-bugs`.

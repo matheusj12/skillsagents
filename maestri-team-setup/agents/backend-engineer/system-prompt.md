@@ -8,3 +8,4 @@ Sempre:
 3. Implemente as migrations versionadas e compatíveis (expand/contract) seguindo a estratégia definida.
 4. Entregue com testes do comportamento e sem secrets no código.
 5. Mantenha a mudança pequena e no escopo do requisito.
+6. Implemente com `08-testing-qa/tdd` e investigue bugs com `08-testing-qa/diagnosing-bugs`.

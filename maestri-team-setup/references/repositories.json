@@ -701,6 +701,102 @@
         "release automation"
       ],
       "priority": "official"
+    },
+    {
+      "id": "mattpocock-skills",
+      "name": "Matt Pocock Skills",
+      "url": "https://github.com/mattpocock/skills",
+      "owner": "mattpocock",
+      "type": "skills",
+      "category": "18-engineering-management",
+      "description": "Small, composable engineering-methodology skills for coding agents (MIT). Nine adapted, plus parts of research in technical-research; implement and implement-spec rejected (second orchestration layer).",
+      "use_for": [
+        "engineering methodology",
+        "requirements interview",
+        "spec writing",
+        "ticket breakdown",
+        "tdd",
+        "bug diagnosis",
+        "module design",
+        "agent handoff",
+        "retrospectives"
+      ],
+      "priority": "trusted"
+    },
+    {
+      "id": "anthropics-skills",
+      "name": "Anthropic Skills",
+      "url": "https://github.com/anthropics/skills",
+      "owner": "anthropics",
+      "type": "skills",
+      "category": "02-ai-engineering",
+      "description": "Official Anthropic agent skills; per-skill licenses. Reference for skill-creator (skill authoring) and mcp-builder; not installed.",
+      "use_for": [
+        "skill authoring",
+        "skill evaluation",
+        "MCP server building"
+      ],
+      "priority": "official"
+    },
+    {
+      "id": "vercel-agent-skills",
+      "name": "Vercel Agent Skills",
+      "url": "https://github.com/vercel-labs/agent-skills",
+      "owner": "vercel-labs",
+      "type": "skills",
+      "category": "06-frontend",
+      "description": "Vercel agent skills; react-best-practices (MIT per skill) has 70 React/Next.js performance rules. Reference only, for React projects.",
+      "use_for": [
+        "React performance",
+        "Next.js",
+        "frontend code review"
+      ],
+      "priority": "official"
+    },
+    {
+      "id": "mcp-specification",
+      "name": "Model Context Protocol Specification",
+      "url": "https://github.com/modelcontextprotocol/modelcontextprotocol",
+      "owner": "modelcontextprotocol",
+      "type": "reference",
+      "category": "12-agent-tools",
+      "description": "Source of the official MCP specification and schema.",
+      "use_for": [
+        "MCP protocol details",
+        "MCP transports",
+        "MCP security"
+      ],
+      "priority": "official"
+    },
+    {
+      "id": "owasp-llm-top-10",
+      "name": "OWASP Top 10 for LLM Applications",
+      "url": "https://github.com/OWASP/www-project-top-10-for-large-language-model-applications",
+      "owner": "OWASP",
+      "type": "reference",
+      "category": "09-security",
+      "description": "OWASP project for LLM application risks and mitigations.",
+      "use_for": [
+        "prompt injection",
+        "LLM security review",
+        "agent security"
+      ],
+      "priority": "official"
+    },
+    {
+      "id": "owasp-asvs",
+      "name": "OWASP ASVS",
+      "url": "https://github.com/OWASP/ASVS",
+      "owner": "OWASP",
+      "type": "reference",
+      "category": "09-security",
+      "description": "Application Security Verification Standard: testable security requirements.",
+      "use_for": [
+        "security requirements",
+        "security verification",
+        "secure coding review"
+      ],
+      "priority": "official"
     }
   ]
 }

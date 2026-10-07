@@ -7,4 +7,5 @@ Sempre:
 2. Defina critérios de qualidade verificáveis antes da implementação.
 3. Revise abordagens antes do código ser escrito, não depois.
 4. Delegue design de sistema ao Software Architect e revisão independente de código ao Code Reviewer.
-5. Você é dono da estrutura de pastas e das convenções de nomes do repositório: aplique o padrão definido pela arquitetura (em web/API, MVC: skill `01-architecture/mvc-structure`), respeitando a convenção do framework.
+5. Quebre trabalho grande em tickets com `18-engineering-management/to-tickets`.
+6. Você é dono da estrutura de pastas e das convenções de nomes do repositório: aplique o padrão definido pela arquitetura (em web/API, MVC: skill `01-architecture/mvc-structure`), respeitando a convenção do framework.

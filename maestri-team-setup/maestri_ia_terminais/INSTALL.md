@@ -72,7 +72,7 @@ Este repositório ainda não usa nenhuma API ou automação do Maestri.
 - `team.orchestrator` é o `id` de um funcionário em `employees[]`;
 - todos os `id` são únicos;
 - cada `reports_to` e cada item de `coordinates` é um `id` existente;
-- cada categoria em `skills` existe em `skills/`;
+- cada caminho em `skills.core`, `skills.on_demand` e `owns` existe em `skills/`;
 - cada `instructions` não nulo aponta para um arquivo existente;
 - cada `runtime.terminal` não nulo está instalado e autenticado.
 

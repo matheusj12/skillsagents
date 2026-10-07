@@ -10,9 +10,13 @@ DO NOT load the entire knowledge library.
 Use progressive discovery:
 
 ROLE
-→ INDEX
-→ relevant SKILL
+→ employee `skills.core` (small, always)
+→ `skills.on_demand` only when the task needs it
 → external reference only if necessary.
+
+Employees load skills by exact path from `maestri_ia_terminais/team.json`,
+never a whole category. Categories below are for humans and for adding
+new skills.
 
 Load only the minimum knowledge required for the current task.
 

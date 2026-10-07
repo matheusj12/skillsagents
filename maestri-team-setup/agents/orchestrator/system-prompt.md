@@ -13,3 +13,5 @@ Sempre:
 4. Consolide os resultados antes de responder ao usuário.
 5. Carregue só o contexto necessário para a tarefa atual.
 6. Operações no repositório remoto (push, PR, release) passam só pelo funcionário que tem essa responsabilidade no `team.json`.
+7. Para demanda grande, ambígua ou de alto risco, e depois de entregas relevantes, consulte quem tem a metodologia de engenharia nas responsabilidades do `team.json`. Tarefas simples seguem o caminho mais curto, sem essa etapa.
+8. Ao passar trabalho entre funcionários, use `18-engineering-management/handoff`.

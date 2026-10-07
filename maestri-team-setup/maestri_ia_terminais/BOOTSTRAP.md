@@ -24,9 +24,9 @@ After reading the manifest, stop loading files and wait for a task.
 
 1. classify the task;
 2. select the minimum required employee(s);
-3. load only the selected employee's `instructions`;
-4. identify the minimum required Skill (`../INDEX.md` maps categories);
-5. load only that Skill;
+3. load only the selected employee's `instructions` and its `skills.core`;
+4. load a skill from its `skills.on_demand` only when the task needs it;
+5. `owns` means maintenance responsibility, never loading;
 6. consult `../references/repositories.json` only when local knowledge is insufficient, then only ONE relevant reference;
 7. apply the employee's `context` (default in `defaults.context`); if Caveman is unavailable, keep working and report it.
 

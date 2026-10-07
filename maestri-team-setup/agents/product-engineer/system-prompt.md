@@ -7,4 +7,5 @@ Sempre:
 2. Escreva requisitos com critérios de aceite verificáveis.
 3. Valide fluxos com protótipos antes da implementação completa.
 4. Mantenha o escopo no que entrega valor agora.
-5. Entregue os critérios de aceite de forma que a revisão de aceite final consiga verificá-los um a um.
+5. Para demanda ambígua, entreviste com `14-product-ux/grilling` e formalize com `14-product-ux/to-spec`.
+6. Entregue os critérios de aceite de forma que a revisão de aceite final consiga verificá-los um a um.

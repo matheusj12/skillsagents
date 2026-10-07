@@ -43,7 +43,7 @@ may change terminal or model without changing identity.
 Skill content, no long role descriptions.
 
 Adding an employee: identity → title → terminal → model →
-instructions → Skills → hierarchy → register in `team.json` →
+instructions → Skills (`core`, `on_demand`, `owns`) → hierarchy → register in `team.json` →
 validate. Do not change other employees without need. Unknown
 values stay `null`; never invent names or models.
 
@@ -202,6 +202,18 @@ Use the existing taxonomy:
 16-research-evaluation
 17-git-collaboration
 18-engineering-management
+
+Employees reference skills by exact path in `team.json`, never by
+whole category:
+
+- `skills.core`: at most 2 skills, each at most ~500 words, loaded when
+  the employee is activated. Long detail goes to a reference file next
+  to the SKILL.md.
+- `skills.on_demand`: loaded only when the task needs it.
+- `owns`: who maintains the skill. Owning never implies loading.
+- Every skill has exactly one owner. Domain skills are owned by the
+  domain expert; process skills by the methodology engineer.
+- REFERENCE = `references/repositories.json`, never loaded automatically.
 
 Do NOT create a new category if an existing category adequately
 represents the resource.
