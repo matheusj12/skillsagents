@@ -59,7 +59,7 @@ na inicialização. Elas são carregadas sob demanda, quando uma tarefa precisa.
 
 ## Fluxo de trabalho
 
-Ciclo: **descobrir → especificar → construir → revisar → entregar**. O Ranjel aciona só quem a tarefa precisa: uma correção pequena não passa por todos.
+O diagrama abaixo é o **teto**, não o caminho padrão. O Ranjel classifica o risco e usa o menor time que entrega corretamente: typo ou CSS → só o dono; endpoint com padrões existentes → dono + revisor; arquitetura, autenticação ou entrega grande → só os especialistas que o risco exige. Regras em `skills/18-engineering-management/orchestration`.
 
 ```text
 Você
@@ -94,9 +94,10 @@ Daniel (metodologia) entra só quando necessário:
 Regras do fluxo:
 
 - **Equipe genérica:** atua em qualquer tipo de projeto (web, API, IA, dados, CLI, automação...). Helena escolhe o padrão arquitetural adequado (em web/API, MVC por padrão), Rafael define as pastas seguindo a convenção do framework e Paula confere na revisão.
-- **Um dono por decisão:** quem define não implementa (Eduardo define o contrato, Lucas implementa).
+- **Um dono por decisão:** quem define não implementa (Eduardo define contrato estrutural novo, Lucas implementa; endpoint com padrões existentes é só do Lucas).
 - **API:** contrato → OpenAPI → implementação → Postman. O OpenAPI é a fonte da verdade.
-- **Nada chega a você sem aceite:** a Fernanda compara a entrega com o pedido antes da entrega final.
+- **Aceite proporcional:** a Fernanda entra em entregas grandes, com vários requisitos, releases ou risco de desvio de escopo; não em typo, CSS ou bug localizado.
+- **Escalonamento:** especialista que precisa de outro devolve um ESCALATION REQUEST ao Ranjel; só o Ranjel aciona funcionários.
 - **Remoto só pelo Marcos:** os demais fazem commits locais.
 - **Metodologia sem burocracia:** práticas como `grilling`, `to-spec`, `to-tickets`, `tdd` e `diagnosing-bugs` (adaptadas de [mattpocock/skills](https://github.com/mattpocock/skills), MIT) são aplicadas por quem faz o trabalho; o Daniel só mantém o padrão.
 - **Contexto mínimo:** cada funcionário carrega só as próprias instruções e as Skills da tarefa.
@@ -114,7 +115,8 @@ Regras do fluxo:
 └── maestri_ia_terminais/
     ├── BOOTSTRAP.md          inicialização do Orchestrator
     ├── team.json             equipe: cargos, terminais, Skills, hierarquia
-    ├── CONTEXT_POLICY.md     política de contexto e tokens (Caveman)
+    ├── CONTEXT_POLICY.md     política de contexto e tokens
+    ├── TOOLING.md            ferramentas e governança de instalação
     └── INSTALL.md            restaurar a equipe numa máquina nova
 ```
 
@@ -131,8 +133,8 @@ O controle fica em `.skillsagents/.install-manifest.json`.
 ## O que o `npx` não faz
 
 - Não cria os terminais no Maestri: isso é manual.
-- Não instala o Caveman. Os comandos oficiais de cada runtime estão em
-  `maestri_ia_terminais/CONTEXT_POLICY.md`.
+- Não instala o Caveman nem outras ferramentas. Comandos oficiais e governança de instalação
+  em `maestri_ia_terminais/TOOLING.md`.
 - Não armazena nem pede credenciais. API keys e logins ficam em cada terminal.
 
 ## Estrutura deste repositório

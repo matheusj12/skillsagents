@@ -37,7 +37,7 @@ Como obter os arquivos numa máquina nova:
 3. Configurar credenciais localmente, direto em cada terminal. Nunca no
    repositório.
 4. Instalar o Caveman em cada runtime usado, com os comandos oficiais
-   da tabela "Runtime support" de `CONTEXT_POLICY.md`. Opcional: sem
+   da tabela "Caveman install per runtime" de `TOOLING.md`. Opcional: sem
    ele a equipe funciona (fallback).
 
 O `npx` não instala o Caveman nem inicia agentes.

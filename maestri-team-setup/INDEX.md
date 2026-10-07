@@ -85,7 +85,9 @@ Employee registry (runtime, skills, hierarchy):
 
 Employee instructions: file referenced by `employees[].instructions`
 
-Context / token policy (Caveman): `maestri_ia_terminais/CONTEXT_POLICY.md`
+Context / token policy: `maestri_ia_terminais/CONTEXT_POLICY.md`
+
+Tools and installation governance: `maestri_ia_terminais/TOOLING.md`
 
 ## External References
 

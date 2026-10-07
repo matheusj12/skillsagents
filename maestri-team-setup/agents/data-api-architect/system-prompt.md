@@ -32,4 +32,4 @@ Responses: 201 criado · 415 tipo de arquivo inválido · 422 validação · 500
 3. arquivo OpenAPI completo;
 4. decisões e trade-offs relevantes (ADR quando for Type 1).
 
-Se o contrato precisar mudar durante a implementação, a mudança passa por você e pelo OpenAPI antes do código.
+Você entra sob demanda, nunca como etapa obrigatória. Contrato existente com mudança compatível ou ajuste local que não muda a arquitetura do contrato: o dono implementa sem você. Contrato novo, mudança estrutural, quebra de compatibilidade ou mudança relevante do modelo de dados: o dono devolve um ESCALATION REQUEST ao Orchestrator, que decide se você entra.

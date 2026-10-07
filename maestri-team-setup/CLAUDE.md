@@ -51,36 +51,14 @@ values stay `null`; never invent names or models.
 
 ## TOKEN / CONTEXT ECONOMY
 
-Startup must be cheap. Knowledge must be loaded on demand.
+Startup must be cheap; knowledge is loaded on demand. Token economy never
+overrides correctness, security, completeness or required reasoning.
 
-Startup context: `BOOTSTRAP.md` + `team.json`. Then stop and wait.
+- Context and token rules (single source): `maestri_ia_terminais/CONTEXT_POLICY.md`
+- Tools, installation governance and optimization tools (single source):
+  `maestri_ia_terminais/TOOLING.md`
 
-Task context: selected employee instructions + minimum required
-Skills + project files required for the task.
-
-External context: only when required, one relevant reference.
-
-Never: startup → all agents → all skills → all references.
-
-Never load knowledge "in case it is needed later".
-
-### TOKEN EFFICIENCY POLICY
-
-1. Progressive loading first.
-2. Caveman is the default optimization tool where supported.
-3. Do not preload Skills.
-4. Do not preload agent prompts.
-5. Do not preload references.
-6. Compress tool output when safe.
-7. Preserve correctness and reasoning quality.
-8. Caveman failure must not stop an agent.
-
-Token optimization must never override correctness, security,
-completeness or required reasoning.
-
-Details (layers, runtime commands, modes, fallback):
-`maestri_ia_terminais/CONTEXT_POLICY.md`. Caveman lives once per
-runtime install, never copied into `agents/` or `skills/`.
+Reference them; never copy their rules into agents or skills.
 
 ---
 
@@ -280,34 +258,13 @@ Never delete or replace an existing resource silently.
 
 ## CONTEXT EFFICIENCY
 
-This repository MUST use progressive disclosure.
+This repository MUST use progressive disclosure:
 
-Default flow:
+Agent → `instructions` + `skills.core` → `skills.on_demand` only when the
+task needs it → one reference only when necessary.
 
-Agent
-→ INDEX
-→ relevant category
-→ relevant Skill
-→ Reference only when necessary
-
-Never:
-
-Agent
-→ all Skills
-
-Never:
-
-Agent
-→ all References
-
-Never:
-
-Agent
-→ read entire repository
-
-`INDEX.md` must remain a lightweight discovery map.
-
-Do not turn it into a knowledge dump.
+Never: an agent loading all Skills, all references or the whole
+repository. `INDEX.md` must remain a lightweight discovery map.
 
 ---
 

@@ -3,7 +3,7 @@ name: handoff
 description: Compact the current work into a handoff document so another employee can continue with minimal context. Use when passing work between employees or sessions.
 ---
 
-> **Adaptação Maestri:** em "suggested skills", cite skills deste repositório no formato `<categoria>/<skill>`. O destino do handoff é decidido pelo Orchestrator.
+> **Adaptação Maestri:** em "suggested skills", cite skills deste repositório no formato `<categoria>/<skill>`. O destino do handoff é decidido pelo Orchestrator. Entre funcionários, prefira o formato curto: Task · Result (DONE/BLOCKED/FAILED/ESCALATION) · Changed (arquivos/símbolos) · Tests · Decisions novas · Blockers · Notes for next role. Em ESCALATION, inclua motivo e papel sugerido. O documento longo abaixo só para retomar trabalho grande em outra sessão.
 
 Write a handoff document summarising the current conversation so a fresh agent can continue the work. Save to the temporary directory of the user's OS (`$TMPDIR`, else `/tmp`; `%TEMP%` on Windows) - not the current workspace.
 

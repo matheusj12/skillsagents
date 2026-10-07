@@ -1,30 +1,86 @@
 # CONTEXT POLICY
 
-Read only when `team.json` `context` values are unclear. Not part of startup.
+Single source of the team's context and token rules. Not part of startup:
+the Orchestrator applies it; specialists get the rules they need inside the
+Task Context Packet (`18-engineering-management/orchestration`). Tools are
+in `TOOLING.md`.
 
-## Rules
+## Principle
 
-1. Load minimum context.
-2. Load employee instructions only when the employee is activated.
-3. Load Skills on demand.
-4. Load external references only when required.
-5. Prefer concise tool output.
-6. Use Caveman where supported.
-7. Never sacrifice correctness merely to save tokens.
+**Minimum sufficient context**: exactly what the task needs to be done
+correctly. Not the maximum available, not the minimum possible.
+Token economy never overrides correctness, security, completeness or
+required reasoning. When in doubt, load the required context.
 
-Priority: progressive loading > context compression > output compression.
-Not loading 10,000 tokens beats loading and compressing them.
+Priority: not loading > compressing context > compressing output.
 
-Token optimization must never override correctness, security,
-completeness or required reasoning (debugging, architecture, evaluation).
+## Context budget
 
-## Layers
+| Class | Rule |
+|---|---|
+| REQUIRED | goes in the Task Context Packet |
+| USEFUL | loaded on demand (`skills.on_demand`, file sections, docs) |
+| IRRELEVANT | never loaded |
 
-| Layer | What | Status |
-|-------|------|--------|
-| 1 | `BOOTSTRAP.md` + progressive loading | active |
-| 2 | Caveman skill: shorter agent output | see runtime table |
-| 3 | Caveman proxy: compresses logs, diffs, JSON, tool output | not configured |
+Startup is only `START.md` → `BOOTSTRAP.md` → `team.json`.
+
+## Reading code and docs
+
+search → locate → inspect → read the relevant section → act.
+Prefer symbol lookup > targeted search (`rg`) > file section > full file >
+repository scan (last resort). Never dump the repository, every Markdown
+or a whole doc "just in case".
+
+## Terminal output
+
+Filter and limit before running: `rg`, `head`, `tail`, `git diff --stat`,
+`git diff <file>`, a single test file. No massive `cat`, full logs, huge
+`git log` or the full suite when one test answers the question.
+
+## Agent routing and review
+
+Smallest team, shortest valid path. Risk-based routing (TRIVIAL → owner
+only; NORMAL → owner + reviewer; HIGH/CRITICAL → specialists, QA,
+acceptance as needed), specialist entry criteria and escalation live in
+`18-engineering-management/orchestration` (single source).
+
+## Model routing
+
+| Task | Reasoning |
+|---|---|
+| docs, small edits, simple tests, CRUD, mechanical work | low / medium |
+| architecture, hard debugging, security-critical, complex planning | high |
+| high was not enough and risk justifies it | xhigh (exception) |
+
+## Review
+
+Diff-first review and diff-only re-review: `13-code-quality/code-review`.
+
+## Handoff and output
+
+Never pass a whole conversation; use the short format in
+`18-engineering-management/handoff`. Reference files and symbols instead of
+pasting code.
+
+## Durable memory
+
+Conversations are not memory. Read once → summarize → store in the project
+(ADR, spec, research note, handoff) → reference. Before researching, check
+for a valid existing note; redo only if the information changed, the
+source is stale or the evidence is insufficient. When a session grows large
+and its state is persisted, compact or restart it.
+
+## Polling
+
+No frequent polling of agents or terminals. Wait for completion, an event
+or a blocker; never relay identical output twice.
+
+## Waste signals
+
+Same file or research read repeatedly, repository scans, giant outputs or
+plans, extra reviewers, xhigh on simple tasks, irrelevant skills or MCP
+tools, whole history passed on, frequent polling, duplicated
+investigation. When seen: stop → reduce → summarize → reference → continue.
 
 ## `context` in team.json
 
@@ -41,20 +97,6 @@ environment variable of the terminal. The global default is `manual`
 employee's `context.caveman` in each Maestri terminal. On Codex the skill has no hook:
 activate per session with `/caveman`.
 
-## Runtime support
-
-Source: https://github.com/JuliusBrussee/caveman (INSTALL.md, tag v3.1.0).
-
-| Runtime | Method | Command |
-|---------|--------|---------|
-| Codex | skill (per session `/caveman`) | `npx skills add JuliusBrussee/caveman -a codex -g -s caveman` |
-| Claude Code | plugin + hooks | first `~/.config/caveman/config.json` = `{"defaultMode": "manual"}`, then `claude plugin marketplace add JuliusBrussee/caveman && claude plugin install caveman@caveman` |
-| OpenCode | native plugin + AGENTS.md | `npx -y github:JuliusBrussee/caveman -- --only opencode` |
-| Antigravity | skill copy (soft probe) | `npx -y github:JuliusBrussee/caveman -- --only antigravity` (IDE) or `--only antigravity-2` |
-
-Uninstall: `npx -y github:JuliusBrussee/caveman -- --uninstall`; skills
-added with `npx skills add` are removed with `npx skills remove caveman`.
-
 ## Fallback
 
 Caveman is never a single point of failure. If it is unavailable,
@@ -63,7 +105,6 @@ working, report the unavailability once.
 
 ## Measurement
 
-No savings figure is claimed until measured here. The official A/B
-tool is `caveman trial -- <agent>` (needs the Caveman CLI, not installed).
-Compare baseline vs Caveman on: context usage, tool output, task
-correctness, response quality, execution stability.
+No savings figure is claimed until measured here. Measure per task,
+employee, model and tool when the runtime exposes usage; decide on
+metrics, not impressions. Tools for this are tracked in `TOOLING.md`.

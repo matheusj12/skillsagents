@@ -9,6 +9,10 @@ description: Code review standard from Google Engineering Practices - what to lo
 
 Aprove quando a mudança **melhora a saúde geral do código**, mesmo que não esteja perfeita. Não existe código perfeito, só código melhor. Bloqueie apenas o que piora o sistema.
 
+## Comece pelo diff
+
+`git status`, `git diff --stat`, `git diff`; depois a spec; abra outros arquivos só quando o diff exigir. Uma revisão por entrega; na re-revisão, confira só o diff da correção.
+
 ## O que olhar, em ordem
 
 1. **Design:** a mudança faz sentido aqui? Integra bem com o resto?
